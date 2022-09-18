@@ -11,7 +11,7 @@ class HitokotoGenerator {
   static List<Hitokoto> hitokotoList = [];
 
   /// 获取随机一言
-  static Future<Hitokoto> getHotokoto(BuildContext context) async {
+  static Future<Hitokoto> getHitokoto(BuildContext context) async {
     if (hitokotoList.length == 0) {
       var rawJson = await DefaultAssetBundle.of(context).loadString("assets/json/hitokoto.json");
       List data = jsonDecode(rawJson);
