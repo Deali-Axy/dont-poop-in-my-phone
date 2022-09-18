@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '别在我的手机里拉屎！',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(brightness: Brightness.light, primarySwatch: Colors.blue),
+      darkTheme: ThemeData(brightness: Brightness.dark),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
       home: SplashPage(),

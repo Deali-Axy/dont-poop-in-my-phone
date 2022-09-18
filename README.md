@@ -21,6 +21,9 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 ## 版本
 
+### 1.2.3
+- 适配系统深色模式
+
 ### 1.2.2
 - 优化侧边栏显示
 - 新增历史记录功能（为自定义规则做准备）
