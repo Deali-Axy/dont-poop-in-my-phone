@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/services/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
@@ -37,20 +38,30 @@ class _HomePageState extends State<HomePage> {
 
   /// 请求权限
   requestPermission() async {
-    var status = await Permission.manageExternalStorage.request();
-    while (!status.isGranted) {
-      BotToast.showNotification(title: (func) => Text('需要存储权限才能扫描流氓App在手机里拉的屎~'));
-      if (status.isPermanentlyDenied) {
-        BotToast.showText(text: '永久拒绝权限需要到设置中手动开启！');
-        openAppSettings();
-        return;
+    if (Platform.isAndroid) {
+      var permissions = <Permission>[];
+      var deviceInfo = DeviceInfoPlugin();
+      var androidInfo = await deviceInfo.androidInfo;
+      if (androidInfo.version.sdkInt > 29) {
+        permissions.add(Permission.manageExternalStorage);
+      } else {
+        permissions.add(Permission.storage);
       }
-      status = await Permission.manageExternalStorage.request();
-    }
 
-    setState(() {
-      _future = StarFileSystem.listSdCard();
-    });
+      BotToast.showText(text: '需要存储权限才能扫描流氓App在手机里拉的屎~');
+      var statuses = await permissions.request();
+      for (var item in statuses.entries) {
+        if (item.value.isPermanentlyDenied) {
+          BotToast.showText(text: '永久拒绝权限需要到设置中手动开启！');
+          openAppSettings();
+          return;
+        }
+      }
+
+      setState(() {
+        _future = StarFileSystem.listSdCard();
+      });
+    }
   }
 
   @override
@@ -61,11 +72,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {
-                _future = StarFileSystem.listSdCard();
-              });
-            },
+            onPressed: () => _turnToPath(_currentPath),
           )
         ],
       ),
@@ -75,6 +82,7 @@ class _HomePageState extends State<HomePage> {
         builder: (ctx, AsyncSnapshot<dynamic> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
+              return _buildNoPermissionBody();
             case ConnectionState.waiting:
             case ConnectionState.active:
               return Center(child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()));
@@ -83,6 +91,21 @@ class _HomePageState extends State<HomePage> {
           }
           return null;
         },
+      ),
+    );
+  }
+
+  Widget _buildNoPermissionBody() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline_outlined, size: 120),
+          SizedBox(height: 15),
+          Text('无法访问手机存储，请先授权', style: TextStyle(fontSize: 20)),
+          SizedBox(height: 15),
+          OutlinedButton(child: Text('打开设置'), onPressed: () => openAppSettings()),
+        ],
       ),
     );
   }
@@ -139,13 +162,6 @@ class _HomePageState extends State<HomePage> {
     return ListView(children: listviewChildren);
   }
 
-  Widget _buildCard(FileSystemEntity entity) {
-    if (FileSystemEntity.isFileSync(entity.path))
-      return _buildFile(entity);
-    else
-      return _buildDirectory(entity);
-  }
-
   Widget _buildFile(FileSystemEntity entity) {
     return Card(
       child: ListTile(
@@ -192,8 +208,8 @@ class _HomePageState extends State<HomePage> {
       child: ListTile(
         leading: Icon(Icons.folder, size: 40),
         title: Text(dirName),
-        subtitle: StarFileSystem.isInWhiteList(entity.path) ? Text('重要文件，不支持清理') : Text(entity.path),
-        trailing: StarFileSystem.isInWhiteList(entity.path) ? null : menuButton,
+        subtitle: StarFileSystem.isInWhiteList(entity.path) && _isRootPath ? Text('重要文件，不支持清理') : Text(entity.path),
+        trailing: StarFileSystem.isInWhiteList(entity.path) && _isRootPath ? null : menuButton,
       ),
     );
 
