@@ -56,11 +56,11 @@ abstract class AppUpdate {
               // SimpleDialogOption(child: Text('简介：${appInfo.description}')),
               SimpleDialogOption(child: Text('更新说明：${appInfo.update_description}')),
               SimpleDialogOption(
-                child: TextButton(
+                child: OutlinedButton(
                   child: Text('点击下载'),
                   onPressed: () async {
-                    if (await canLaunch(appInfo.download_link)) {
-                      await launch(appInfo.download_link);
+                    if (await canLaunchUrl(Uri.parse(appInfo.download_link))) {
+                      await launchUrl(Uri.parse(appInfo.download_link));
                     } else {
                       throw 'Could not launch ${appInfo.download_link}';
                     }
