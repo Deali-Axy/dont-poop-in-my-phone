@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
 
    <application
-        android:label="别在我手机里拉屎"
+        android:label="别在我手机里拉屎：垃圾清理与文件夹替换"
         android:icon="@mipmap/launcher_icon"
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true">
