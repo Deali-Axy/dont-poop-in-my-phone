@@ -76,8 +76,8 @@ class _AboutPageState extends State<AboutPage> {
                   onPressed: () async {
                     // 调用系统邮件客户端来反馈
                     const url = 'mailto:feedback@deali.cn?subject=极简诗词App反馈&body=反馈内容：';
-                    if (await canLaunch(url)) {
-                      await launch(url);
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(Uri.parse(url));
                     } else {
                       BotToast.showText(text: '无法启动邮件客户端');
                     }
@@ -93,10 +93,10 @@ class _AboutPageState extends State<AboutPage> {
                       showLoading(context, text: '检查更新');
                       var hasUpdate = await AppUpdate.checkUpdate(context);
                       Navigator.of(context).pop();
-                      if (!hasUpdate) BotToast.showText(text: '已经是最新版本');
-                      setState(() {
-                        isUpToDate = true;
-                      });
+                      // if (!hasUpdate) BotToast.showText(text: '已经是最新版本');
+                      // setState(() {
+                      //   isUpToDate = true;
+                      // });
                     },
                   ),
                 Expanded(child: Text('')),
