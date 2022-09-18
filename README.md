@@ -21,6 +21,9 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 ## 版本
 
+### 1.2.1
+- 适配旧版Android
+
 ### 1.2.0
 - 适配 Android13
 - 新增文件浏览功能
