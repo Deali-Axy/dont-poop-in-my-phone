@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
+import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/services/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
@@ -47,9 +49,12 @@ class _HomePageState extends State<HomePage> {
         permissions.add(Permission.storage);
       }
 
-      BotToast.showText(text: '需要存储权限才能扫描流氓App在手机里拉的屎~');
       var statuses = await permissions.request();
       for (var item in statuses.entries) {
+        if (item.value.isDenied) {
+          BotToast.showText(text: '需要存储权限才能扫描流氓App在手机里拉的屎~');
+        }
+
         if (item.value.isPermanentlyDenied) {
           BotToast.showText(text: '永久拒绝权限需要到设置中手动开启！');
           openAppSettings();
@@ -176,6 +181,7 @@ class _HomePageState extends State<HomePage> {
 
     var menuButton = PopupMenuButton(
       onSelected: (value) async {
+        History history;
         switch (value) {
           case 1:
             var result = await showDeleteDirDialog(context, title: '删除并替换目录');
@@ -183,8 +189,14 @@ class _HomePageState extends State<HomePage> {
               showLoading(context);
               await StarFileSystem.deleteDirectory(entity.path);
               StarFileSystem.createFile(dirName);
+              history = new History(
+                name: dirName,
+                path: entity.path,
+                time: DateTime.now(),
+                actionType: ActionType.deleteAndReplace,
+              );
               Navigator.of(context).pop();
-              BotToast.showText(text: '替换文件夹 $dirName 完成！手动刷新查看效果');
+              BotToast.showText(text: '替换文件夹 $dirName 完成！');
             }
             break;
           case 2:
@@ -192,9 +204,24 @@ class _HomePageState extends State<HomePage> {
             if (result) {
               showLoading(context);
               await StarFileSystem.deleteDirectory(entity.path);
+              history = new History(
+                name: dirName,
+                path: entity.path,
+                time: DateTime.now(),
+                actionType: ActionType.delete,
+              );
               Navigator.of(context).pop();
+              BotToast.showText(text: '删除文件夹 $dirName 完成！');
               break;
             }
+        }
+
+        // 刷新列表
+        _turnToPath(_currentPath);
+
+        if (history != null) {
+          Global.appConfig.history.add(history);
+          Global.saveAppConfig();
         }
       },
       itemBuilder: (context) => <PopupMenuItem<int>>[
