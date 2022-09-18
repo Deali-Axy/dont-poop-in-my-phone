@@ -21,6 +21,16 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 ## 版本
 
+### 1.2.2
+- 优化侧边栏显示
+- 新增历史记录功能（为自定义规则做准备）
+- 优化一言功能
+- 优化检查更新功能
+- 优化介绍页面
+- 优化权限请求逻辑
+- 时间显示优化
+- 修复一些bug
+
 ### 1.2.1
 - 适配旧版Android
 
