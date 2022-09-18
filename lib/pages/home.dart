@@ -27,8 +27,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     // 显示状态栏
-    // todo setEnabledSystemUIOverlays 已经弃用，研究一下 setEnabledSystemUIMode 方法如何使用
-    // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     var systemUiOverlayStyle = const SystemUiOverlayStyle(statusBarColor: Colors.transparent);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
