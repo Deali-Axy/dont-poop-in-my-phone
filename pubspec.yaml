@@ -24,6 +24,7 @@ dependencies:
   url_launcher: ^6.1.5
   intro_views_flutter: ^3.2.0
   shared_preferences: ^2.0.15
+  device_info_plus: ^4.1.2
 
 
 dev_dependencies:
