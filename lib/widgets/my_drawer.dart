@@ -15,7 +15,6 @@ class MyDrawer extends StatefulWidget {
 class _MyDrawerState extends State<MyDrawer> {
   static const _backgroundImageUrl = 'http://www.sblt.deali.cn:15002/Api/PicLib/Random/600/450';
   var _currentHitokoto = Hitokoto(hitokoto: '（正在加载一言）', creator: '别在我的手机里拉屎！');
-  var _random = Random();
 
   @override
   void initState() {
@@ -24,7 +23,8 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   void _loadHitokoto() async {
-    _currentHitokoto = await HitokotoGenerator.getHotokoto(context);
+    _currentHitokoto = await HitokotoGenerator.getHitokoto(context);
+    setState(() {});
   }
 
   @override
