@@ -46,6 +46,11 @@ class _MyDrawerState extends State<MyDrawer> {
               BotToast.showText(text: '功能暂未上线，目前仅支持内置规则~');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.history, size: 35),
+            title: Text('历史记录'),
+            onTap: () => Navigator.of(context).pushNamed('history'),
+          ),
           Divider(height: 1, thickness: 1),
           ListTile(
             leading: const Icon(Icons.help_outline, size: 35),

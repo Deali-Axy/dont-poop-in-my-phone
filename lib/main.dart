@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
       home: SplashPage(),
       routes: {
         'about': (ctx) => AboutPage(),
+        'history': (ctx) => HistoryPage(),
         'home': (ctx) => HomePage(),
         'introview': (ctx) => IntroViewPage(),
         'splash': (ctx) => SplashPage(),

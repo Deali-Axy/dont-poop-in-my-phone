@@ -1,13 +1,32 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dont_poop_in_my_phone/models/index.dart';
 
 abstract class Global {
   static SharedPreferences _prefs;
+  static AppConfig _appConfig;
 
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();
     _prefs = await SharedPreferences.getInstance();
+
+    // 读取App配置
+    var configJson = _prefs.getString('config');
+    if (configJson != null) {
+      _appConfig = AppConfig.fromJson(jsonDecode(configJson));
+    } else {
+      _appConfig = AppConfig.fromDefault();
+    }
   }
+
+  static AppConfig get appConfig {
+    return _appConfig;
+  }
+
+  static void saveAppConfig() => _prefs.setString('config', jsonEncode(appConfig.toJson()));
+
 
   static bool get firstRun {
     if (_prefs.containsKey('firstRun'))
