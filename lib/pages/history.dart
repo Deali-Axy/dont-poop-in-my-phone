@@ -1,4 +1,6 @@
 import 'package:dont_poop_in_my_phone/common/global.dart';
+import 'package:dont_poop_in_my_phone/common/time.dart';
+import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
 
@@ -44,11 +46,28 @@ class _HistoryPageState extends State<HistoryPage> with SingleTickerProviderStat
 
     return ListView(
       children: Global.appConfig.history.map((item) {
+        var time = DateTimeBeautifier(item.time);
+
+        const double iconSize = 40;
+        Widget icon;
+        switch (item.actionType) {
+          case ActionType.delete:
+            icon = Icon(Icons.delete_outline, size: iconSize);
+            break;
+          case ActionType.deleteAndReplace:
+            icon = Icon(Icons.do_not_disturb, size: iconSize);
+            break;
+          default:
+            icon = Icon(Icons.question_mark, size: iconSize);
+            break;
+        }
+
         return Card(
           child: ListTile(
+            leading: icon,
             title: Text(item.name),
             subtitle: Text(item.path),
-            trailing: Text(item.time.toString()),
+            trailing: Text(time.shortDateTime),
           ),
         );
       }).toList(),
