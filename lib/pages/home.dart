@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   Future _future;
   var _currentPath = StarFileSystem.SDCARD_ROOT;
   bool _isRootPath = true;
+  DateTime _lastWillPopAt; //上次返回退出动作时间
 
   @override
   void initState() {
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    var scaffold = Scaffold(
       appBar: AppBar(
         title: Text('别在我的手机里拉屎！'),
         actions: [
@@ -96,6 +97,19 @@ class _HomePageState extends State<HomePage> {
           return null;
         },
       ),
+    );
+
+    return WillPopScope(
+      child: scaffold,
+      onWillPop: () async {
+        if (_lastWillPopAt == null || DateTime.now().difference(_lastWillPopAt) > Duration(seconds: 1)) {
+          BotToast.showText(text: '再按一次返回键退出应用~');
+          //两次点击间隔超过1秒则重新计时
+          _lastWillPopAt = DateTime.now();
+          return false;
+        }
+        return true;
+      },
     );
   }
 
