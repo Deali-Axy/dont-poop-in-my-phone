@@ -24,6 +24,8 @@ class _HomePageState extends State<HomePage> {
   var _currentPath = StarFileSystem.SDCARD_ROOT;
   bool _isRootPath = true;
   DateTime _lastWillPopAt; //上次返回退出动作时间
+  final _currentDirs = <String>[];
+  final _currentFiles = <String>[];
 
   @override
   void initState() {
@@ -82,9 +84,9 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: MyDrawer(),
-      body: FutureBuilder(
+      body: FutureBuilder<List<FileSystemEntity>>(
         future: _future,
-        builder: (ctx, AsyncSnapshot<dynamic> snapshot) {
+        builder: (ctx, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               return _buildNoPermissionBody();
@@ -92,7 +94,23 @@ class _HomePageState extends State<HomePage> {
             case ConnectionState.active:
               return Center(child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()));
             case ConnectionState.done:
-              return snapshot.hasError ? _buildErrorBody(snapshot.error) : _buildBody(snapshot.data);
+              if (snapshot.hasError) {
+                return _buildErrorBody(snapshot.error);
+              } else {
+                _currentFiles.clear();
+                _currentDirs.clear();
+                for (var entity in snapshot.data) {
+                  if (FileSystemEntity.isFileSync(entity.path)) {
+                    _currentFiles.add(entity.path);
+                  } else {
+                    _currentDirs.add(entity.path);
+                  }
+                  // 根据名称排序
+                  _currentDirs.sort((a, b) => path.basename(a).compareTo(path.basename(b)));
+                  _currentFiles.sort((a, b) => path.basename(a).compareTo(path.basename(b)));
+                }
+              }
+              return snapshot.hasError ? _buildErrorBody(snapshot.error) : _buildBody();
           }
           return null;
         },
@@ -149,9 +167,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBody(List<FileSystemEntity> entities) {
+  Widget _buildBody() {
     var listviewChildren = <Widget>[];
-    var fileList = <FileSystemEntity>[];
 
     if (!_isRootPath) {
       listviewChildren.add(GestureDetector(
@@ -165,78 +182,43 @@ class _HomePageState extends State<HomePage> {
       ));
     }
 
-    for (var entity in entities) {
-      if (FileSystemEntity.isFileSync(entity.path)) {
-        fileList.add(entity);
-        continue;
-      }
-      listviewChildren.add(_buildDirectory(entity));
+    for (var item in _currentDirs) {
+      listviewChildren.add(_buildDirectory(item));
     }
-
-    for (var entity in fileList) {
-      listviewChildren.add(_buildFile(entity));
+    for (var item in _currentFiles) {
+      listviewChildren.add(_buildFile(item));
     }
 
     return ListView(children: listviewChildren);
   }
 
-  Widget _buildFile(FileSystemEntity entity) {
+  Widget _buildFile(String entityPath) {
     return Card(
       child: ListTile(
         leading: Icon(Icons.description_outlined, size: 40),
-        title: Text(path.basename(entity.path)),
-        subtitle: Text(StarFileSystem.getFileSize(entity.path)),
+        title: Text(path.basename(entityPath)),
+        subtitle: Text(StarFileSystem.getFileSize(entityPath)),
       ),
     );
   }
 
-  Widget _buildDirectory(FileSystemEntity entity) {
-    var dirName = path.basename(entity.path);
+  Widget _buildDirectory(String entityPath) {
+    var dirName = path.basename(entityPath);
 
     var menuButton = PopupMenuButton(
       onSelected: (value) async {
-        History history;
         switch (value) {
           case 1:
-            var result = await showDeleteDirDialog(context, title: '删除并替换目录');
-            if (result) {
-              showLoading(context);
-              await StarFileSystem.deleteDirectory(entity.path);
-              StarFileSystem.createFile(dirName);
-              history = new History(
-                name: dirName,
-                path: entity.path,
-                time: DateTime.now(),
-                actionType: ActionType.deleteAndReplace,
-              );
-              Navigator.of(context).pop();
-              BotToast.showText(text: '替换文件夹 $dirName 完成！');
-            }
+            await _procDirAction(entityPath, ActionType.deleteAndReplace);
             break;
           case 2:
-            var result = await showDeleteDirDialog(context);
-            if (result) {
-              showLoading(context);
-              await StarFileSystem.deleteDirectory(entity.path);
-              history = new History(
-                name: dirName,
-                path: entity.path,
-                time: DateTime.now(),
-                actionType: ActionType.delete,
-              );
-              Navigator.of(context).pop();
-              BotToast.showText(text: '删除文件夹 $dirName 完成！');
-              break;
-            }
+            await _procDirAction(entityPath, ActionType.delete);
+            break;
         }
 
+        // 删除后不需要刷新，这样页面不会闪烁
         // 刷新列表
-        _turnToPath(_currentPath);
-
-        if (history != null) {
-          Global.appConfig.history.add(history);
-          Global.saveAppConfig();
-        }
+        // _turnToPath(_currentPath);
       },
       itemBuilder: (context) => <PopupMenuItem<int>>[
         PopupMenuItem(value: 1, child: StarTextButton(icon: const Icon(Icons.do_not_disturb), text: '删除并替换')),
@@ -248,12 +230,62 @@ class _HomePageState extends State<HomePage> {
       child: ListTile(
         leading: Icon(Icons.folder, size: 40),
         title: Text(dirName),
-        subtitle: StarFileSystem.isInWhiteList(entity.path) && _isRootPath ? Text('重要文件，不支持清理') : Text(entity.path),
-        trailing: StarFileSystem.isInWhiteList(entity.path) && _isRootPath ? null : menuButton,
+        subtitle: StarFileSystem.isInWhiteList(entityPath) && _isRootPath ? Text('重要文件，不支持清理') : Text(entityPath),
+        trailing: StarFileSystem.isInWhiteList(entityPath) && _isRootPath ? null : menuButton,
       ),
     );
 
-    return GestureDetector(child: card, onTap: () => _turnToPath(entity.path));
+    return GestureDetector(child: card, onTap: () => _turnToPath(entityPath));
+  }
+
+  /// 处理文件夹操作
+  Future _procDirAction(String entityPath, ActionType actionType) async {
+    var dirName = path.basename(entityPath);
+
+    String title = '';
+    switch (actionType) {
+      case ActionType.delete:
+        title = '删除目录';
+        break;
+      case ActionType.deleteAndReplace:
+        title = '删除并替换目录';
+        break;
+      default:
+        return;
+    }
+    var result = await showDeleteDirDialog(context, title: title);
+    if (!result) return;
+
+    showLoading(context);
+    try {
+      await StarFileSystem.deleteDirectory(entityPath);
+      if (actionType == ActionType.deleteAndReplace) {
+        StarFileSystem.createFile(dirName);
+      }
+      var history = new History(
+        name: dirName,
+        path: entityPath,
+        time: DateTime.now(),
+        actionType: actionType,
+      );
+
+      BotToast.showText(text: '处理文件夹 $dirName 完成！');
+
+      setState(() {
+        _currentDirs.remove(entityPath);
+        // 替换的话，把目录加到文件那里去
+        if (actionType == ActionType.deleteAndReplace) {
+          _currentFiles.add(entityPath);
+        }
+      });
+
+      Global.appConfig.history.add(history);
+      Global.saveAppConfig();
+    } catch (ex) {
+      BotToast.showText(text: '处理文件夹失败！$ex');
+    } finally {
+      Navigator.of(context).pop();
+    }
   }
 
   void _backToParentPath() {

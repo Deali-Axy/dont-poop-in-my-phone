@@ -21,11 +21,11 @@ abstract class StarFileSystem {
     'books',
   ];
 
-  static Future listSdCard() async {
+  static Future<List<FileSystemEntity>> listSdCard() async {
     return Directory(SDCARD_ROOT).listSync();
   }
 
-  static Future listDir(String path) async {
+  static Future<List<FileSystemEntity>> listDir(String path) async {
     return Directory(path).listSync();
   }
 
