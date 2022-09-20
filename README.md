@@ -20,6 +20,9 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 
 ## 版本
+### 1.2.5
+- 优化操作逻辑，提高性能
+
 ### 1.2.4
 - 新增退出App确认
 
