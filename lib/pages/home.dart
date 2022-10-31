@@ -260,7 +260,7 @@ class _HomePageState extends State<HomePage> {
     try {
       await StarFileSystem.deleteDirectory(entityPath);
       if (actionType == ActionType.deleteAndReplace) {
-        StarFileSystem.createFile(dirName);
+        StarFileSystem.createFile(entityPath);
       }
       var history = new History(
         name: dirName,
