@@ -106,18 +106,18 @@ class _AboutPageState extends State<AboutPage> {
                     TextButton(
                         child: Text('软件许可'),
                         onPressed: () async {
-                          const url = 'http://www.sblt.deali.cn:9000/APP许可协议.html';
-                          if (await canLaunch(url))
-                            await launch(url);
+                          var uri = Uri.parse('http://www.sblt.deali.cn:9000/APP许可协议.html');
+                          if (await canLaunchUrl(uri))
+                            await launchUrl(uri);
                           else
                             BotToast.showText(text: '无法启动浏览器');
                         }),
                     TextButton(
                         child: Text('用户隐私协议'),
                         onPressed: () async {
-                          const url = 'http://www.sblt.deali.cn:9000/APP隐私政策.html';
-                          if (await canLaunch(url))
-                            await launch(url);
+                          var uri = Uri.parse('http://www.sblt.deali.cn:9000/APP隐私政策.html');
+                          if (await canLaunchUrl(uri))
+                            await launchUrl(uri);
                           else
                             BotToast.showText(text: '无法启动浏览器');
                         }),
