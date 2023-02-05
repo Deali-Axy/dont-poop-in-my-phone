@@ -21,11 +21,11 @@ abstract class StarFileSystem {
     'books',
   ];
 
-  static Future<List<FileSystemEntity>> listSdCard() async {
+  static List<FileSystemEntity> listSdCard() {
     return Directory(SDCARD_ROOT).listSync();
   }
 
-  static Future<List<FileSystemEntity>> listDir(String path) async {
+  static List<FileSystemEntity> listDir(String path) {
     return Directory(path).listSync();
   }
 
@@ -34,7 +34,7 @@ abstract class StarFileSystem {
   }
 
   static String formatFileSize(int fileSize) {
-    String str = '';
+    var str = '';
 
     if (fileSize < 1024) {
       str = '${fileSize.toStringAsFixed(2)}B';
@@ -49,10 +49,7 @@ abstract class StarFileSystem {
 
   static bool isInWhiteList(String dirpath) {
     var dirName = path.basename(dirpath).toLowerCase();
-    if (DIR_NAME_WHITE_LIST.contains(dirName))
-      return true;
-    else
-      return false;
+    return DIR_NAME_WHITE_LIST.contains(dirName);
   }
 
   static Future<FileSystemEntity> deleteDirectory(String path) {

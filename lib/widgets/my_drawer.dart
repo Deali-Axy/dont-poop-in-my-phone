@@ -13,7 +13,7 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  static const _backgroundImageUrl = 'http://www.sblt.deali.cn:15002/Api/PicLib/Random/600/450';
+  static const _backgroundImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/600/450';
   var _currentHitokoto = Hitokoto(hitokoto: '（正在加载一言）', creator: '别在我的手机里拉屎！');
 
   @override

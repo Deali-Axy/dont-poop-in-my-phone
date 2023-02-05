@@ -19,6 +19,7 @@ class AppConfig {
   }
 
   List<History> history;
+  List<String> whiteList;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

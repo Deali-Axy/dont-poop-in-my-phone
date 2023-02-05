@@ -9,7 +9,8 @@ import 'package:dont_poop_in_my_phone/services/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path/path.dart' as path;
+import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
+import 'package:path/path.dart' as osPath;
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,9 +21,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static const String AppTitle = '别在我的手机里拉屎！';
   Future _future;
+  var _subtitle = '';
   var _currentPath = StarFileSystem.SDCARD_ROOT;
-  bool _isRootPath = true;
+  var _hasPermission = false;
+  var _isRootPath = true;
   DateTime _lastWillPopAt; //上次返回退出动作时间
   final _currentDirs = <String>[];
   final _currentFiles = <String>[];
@@ -36,37 +40,17 @@ class _HomePageState extends State<HomePage> {
     var systemUiOverlayStyle = const SystemUiOverlayStyle(statusBarColor: Colors.transparent);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
-    requestPermission();
+    // requestPermission();
+    _turnToPath(StarFileSystem.SDCARD_ROOT);
     AppUpdate.checkUpdate(context);
   }
 
   /// 请求权限
   requestPermission() async {
-    if (Platform.isAndroid) {
-      var permissions = <Permission>[];
-      var deviceInfo = DeviceInfoPlugin();
-      var androidInfo = await deviceInfo.androidInfo;
-      if (androidInfo.version.sdkInt > 29) {
-        permissions.add(Permission.manageExternalStorage);
-      } else {
-        permissions.add(Permission.storage);
-      }
-
-      var statuses = await permissions.request();
-      for (var item in statuses.entries) {
-        if (item.value.isDenied) {
-          BotToast.showText(text: '需要存储权限才能扫描流氓App在手机里拉的屎~');
-        }
-
-        if (item.value.isPermanentlyDenied) {
-          BotToast.showText(text: '永久拒绝权限需要到设置中手动开启！');
-          openAppSettings();
-          return;
-        }
-      }
-
+    _hasPermission = await PermissionService.request();
+    if (_hasPermission) {
       setState(() {
-        _future = StarFileSystem.listSdCard();
+        _turnToPath(StarFileSystem.SDCARD_ROOT);
       });
     }
   }
@@ -75,7 +59,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var scaffold = Scaffold(
       appBar: AppBar(
-        title: Text('别在我的手机里拉屎！'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppTitle),
+            if (_subtitle.length > 0) Text(_subtitle, style: TextStyle(fontSize: 12)),
+          ],
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -84,45 +74,19 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: MyDrawer(),
-      body: FutureBuilder<List<FileSystemEntity>>(
-        future: _future,
-        builder: (ctx, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return _buildNoPermissionBody();
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              return Center(child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()));
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                return _buildErrorBody(snapshot.error);
-              } else {
-                _currentFiles.clear();
-                _currentDirs.clear();
-                for (var entity in snapshot.data) {
-                  if (FileSystemEntity.isFileSync(entity.path)) {
-                    _currentFiles.add(entity.path);
-                  } else {
-                    _currentDirs.add(entity.path);
-                  }
-                  // 根据名称排序
-                  _currentDirs.sort((a, b) => path.basename(a).compareTo(path.basename(b)));
-                  _currentFiles.sort((a, b) => path.basename(a).compareTo(path.basename(b)));
-                }
-              }
-              return snapshot.hasError ? _buildErrorBody(snapshot.error) : _buildBody();
-          }
-          return null;
-        },
-      ),
+      body: _hasPermission ? _buildBody() : _buildNoPermissionBody(),
     );
 
     return WillPopScope(
       child: scaffold,
       onWillPop: () async {
+        if (!_isRootPath) {
+          _backToParentPath();
+          return false;
+        }
         if (_lastWillPopAt == null || DateTime.now().difference(_lastWillPopAt) > Duration(seconds: 1)) {
           BotToast.showText(text: '再按一次返回键退出应用~');
-          //两次点击间隔超过1秒则重新计时
+          // 两次点击间隔超过1秒则重新计时
           _lastWillPopAt = DateTime.now();
           return false;
         }
@@ -140,7 +104,14 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 15),
           Text('无法访问手机存储，请先授权', style: TextStyle(fontSize: 20)),
           SizedBox(height: 15),
-          OutlinedButton(child: Text('打开设置'), onPressed: () => openAppSettings()),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OutlinedButton(child: Text('重新获取'), onPressed: () => _turnToPath(StarFileSystem.SDCARD_ROOT)),
+              SizedBox(width: 10),
+              OutlinedButton(child: Text('打开设置'), onPressed: () => openAppSettings()),
+            ],
+          ),
         ],
       ),
     );
@@ -189,21 +160,44 @@ class _HomePageState extends State<HomePage> {
       listviewChildren.add(_buildFile(item));
     }
 
-    return ListView(children: listviewChildren);
+    return Column(
+      children: [
+        BreadCrumb(
+          items: <BreadCrumbItem>[
+            BreadCrumbItem(content: Text('Item1')),
+            BreadCrumbItem(content: Text('Item2')),
+            BreadCrumbItem(content: Text('Item3')),
+            BreadCrumbItem(content: Text('Item4')),
+            BreadCrumbItem(content: Text('Item5')),
+            BreadCrumbItem(content: Text('Item6')),
+            BreadCrumbItem(content: Text('Item7')),
+            BreadCrumbItem(content: Text('Item8')),
+            BreadCrumbItem(content: Text('Item9')),
+          ],
+          divider: Icon(Icons.chevron_right),
+          overflow: ScrollableOverflow(
+            keepLastDivider: true,
+            reverse: false,
+            direction: Axis.horizontal,
+          ),
+        ),
+        Expanded(child: ListView(children: listviewChildren))
+      ],
+    );
   }
 
   Widget _buildFile(String entityPath) {
     return Card(
       child: ListTile(
         leading: Icon(Icons.description_outlined, size: 40),
-        title: Text(path.basename(entityPath)),
+        title: Text(osPath.basename(entityPath)),
         subtitle: Text(StarFileSystem.getFileSize(entityPath)),
       ),
     );
   }
 
   Widget _buildDirectory(String entityPath) {
-    var dirName = path.basename(entityPath);
+    var dirName = osPath.basename(entityPath);
 
     var menuButton = PopupMenuButton(
       onSelected: (value) async {
@@ -240,7 +234,7 @@ class _HomePageState extends State<HomePage> {
 
   /// 处理文件夹操作
   Future _procDirAction(String entityPath, ActionType actionType) async {
-    var dirName = path.basename(entityPath);
+    var dirName = osPath.basename(entityPath);
 
     String title = '';
     switch (actionType) {
@@ -288,31 +282,44 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _backToParentPath() {
+  void updateSubtitle() {
     setState(() {
-      var parentPath = path.dirname(_currentPath);
-      _future = StarFileSystem.listDir(parentPath);
-      _currentPath = parentPath;
-      if (parentPath == StarFileSystem.SDCARD_ROOT) {
-        _isRootPath = true;
-      }
+      _subtitle = '${_currentDirs.length}个目录，${_currentFiles.length}个文件';
     });
   }
 
-  void _turnToPath(String path) {
+  void _backToParentPath() {
     setState(() {
-      _currentPath = path;
-      _isRootPath = path == StarFileSystem.SDCARD_ROOT;
-      try {
-        _future = StarFileSystem.listDir(path);
-      } catch (ex) {
-        if (ex is FileSystemException) {
-          BotToast.showText(text: '无权访问该目录！');
-        } else {
-          BotToast.showText(text: '未知错误～');
-        }
-        _backToParentPath();
-      }
+      var parentPath = osPath.dirname(_currentPath);
+      _turnToPath(parentPath);
     });
+  }
+
+  Future _turnToPath(String path) async {
+    _hasPermission = await PermissionService.request();
+    _currentPath = path;
+    _isRootPath = path == StarFileSystem.SDCARD_ROOT;
+    try {
+      var entities = StarFileSystem.listDir(path);
+      _currentFiles.clear();
+      _currentDirs.clear();
+      for (var entity in entities) {
+        if (FileSystemEntity.isFileSync(entity.path)) {
+          _currentFiles.add(entity.path);
+        } else {
+          _currentDirs.add(entity.path);
+        }
+        // 根据名称排序
+        _currentDirs.sort((a, b) => osPath.basename(a).compareTo(osPath.basename(b)));
+        _currentFiles.sort((a, b) => osPath.basename(a).compareTo(osPath.basename(b)));
+      }
+    } on FileSystemException catch (ex) {
+      BotToast.showText(text: '无权访问该目录！');
+      _backToParentPath();
+    } on Exception catch (ex) {
+      BotToast.showText(text: '未知错误～');
+    }
+
+    updateSubtitle();
   }
 }

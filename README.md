@@ -20,6 +20,9 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 
 ## 版本
+### 1.2.7
+- 次级目录使用返回手势可以回到上一级目录
+
 ### 1.2.6
 - 修复非根目录下替换错误的bug
 
