@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
-import 'package:dont_poop_in_my_phone/services/index.dart';
+import 'package:dont_poop_in_my_phone/utils/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
+import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
@@ -22,14 +22,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static const String AppTitle = '别在我的手机里拉屎！';
-  Future _future;
   var _subtitle = '';
-  var _currentPath = StarFileSystem.SDCARD_ROOT;
   var _hasPermission = false;
-  var _isRootPath = true;
   DateTime _lastWillPopAt; //上次返回退出动作时间
-  final _currentDirs = <String>[];
-  final _currentFiles = <String>[];
+  var _folders = <FolderItem>[];
+  var _files = <FileItem>[];
+  var _folderStack = <FolderItem>[];
+  Exception _exception;
+
+  final _scrollController = ScrollController();
+
+  FolderItem get currentFolder => _folderStack.last;
 
   @override
   void initState() {
@@ -41,7 +44,7 @@ class _HomePageState extends State<HomePage> {
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
     // requestPermission();
-    _turnToPath(StarFileSystem.SDCARD_ROOT);
+    _turnToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
     AppUpdate.checkUpdate(context);
   }
 
@@ -50,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     _hasPermission = await PermissionService.request();
     if (_hasPermission) {
       setState(() {
-        _turnToPath(StarFileSystem.SDCARD_ROOT);
+        _turnToPath(currentFolder);
       });
     }
   }
@@ -69,18 +72,18 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: () => _turnToPath(_currentPath),
-          )
+            onPressed: () => _turnToPath(currentFolder),
+          ),
         ],
       ),
       drawer: MyDrawer(),
-      body: _hasPermission ? _buildBody() : _buildNoPermissionBody(),
+      body: _buildBody(),
     );
 
     return WillPopScope(
       child: scaffold,
       onWillPop: () async {
-        if (!_isRootPath) {
+        if (!currentFolder.isRootPath) {
           _backToParentPath();
           return false;
         }
@@ -107,7 +110,7 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              OutlinedButton(child: Text('重新获取'), onPressed: () => _turnToPath(StarFileSystem.SDCARD_ROOT)),
+              OutlinedButton(child: Text('重新获取'), onPressed: () => _turnToPath(currentFolder)),
               SizedBox(width: 10),
               OutlinedButton(child: Text('打开设置'), onPressed: () => openAppSettings()),
             ],
@@ -117,13 +120,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildErrorBody(Object error) {
+  Widget _buildErrorBody(Exception error) {
     String friendlyText;
     if (error is FileSystemException) {
-      friendlyText = '无权访问该目录';
+      friendlyText = '无权访问该目录: ${error.message}';
     } else {
-      friendlyText = '未知错误';
+      friendlyText = error.toString();
     }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -138,104 +142,90 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildNormalBody() {
     var listviewChildren = <Widget>[];
 
-    if (!_isRootPath) {
-      listviewChildren.add(GestureDetector(
-        child: Card(
-          child: ListTile(
-            leading: Icon(Icons.keyboard_return),
-            title: Text('返回上级目录'),
-          ),
-        ),
-        onTap: _backToParentPath,
-      ));
-    }
+    // 返回上一级的按钮卡片好丑，不显示了
+    // if (!currentFolder.isRootPath) {
+    //   listviewChildren.add(_buildBackToParentPathCard());
+    // }
 
-    for (var item in _currentDirs) {
-      listviewChildren.add(_buildDirectory(item));
-    }
-    for (var item in _currentFiles) {
-      listviewChildren.add(_buildFile(item));
-    }
+    listviewChildren.addAll(_folders.map((e) => FolderCard(
+          e,
+          (folderItem) => _turnToPath(folderItem),
+          (folderItem) => _procDirAction(folderItem, ActionType.delete),
+          (folderItem) => _procDirAction(folderItem, ActionType.deleteAndReplace),
+        )));
+    listviewChildren.addAll(_files.map((e) => FileCard(e)));
 
     return Column(
       children: [
-        BreadCrumb(
-          items: <BreadCrumbItem>[
-            BreadCrumbItem(content: Text('Item1')),
-            BreadCrumbItem(content: Text('Item2')),
-            BreadCrumbItem(content: Text('Item3')),
-            BreadCrumbItem(content: Text('Item4')),
-            BreadCrumbItem(content: Text('Item5')),
-            BreadCrumbItem(content: Text('Item6')),
-            BreadCrumbItem(content: Text('Item7')),
-            BreadCrumbItem(content: Text('Item8')),
-            BreadCrumbItem(content: Text('Item9')),
-          ],
-          divider: Icon(Icons.chevron_right),
-          overflow: ScrollableOverflow(
-            keepLastDivider: true,
-            reverse: false,
-            direction: Axis.horizontal,
-          ),
+        if (_folderStack.length > 1) _buildBreadCrumb(),
+        Expanded(child: ListView(children: listviewChildren)),
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    if (!_hasPermission) {
+      return _buildNoPermissionBody();
+    }
+
+    if (_exception != null) {
+      return _buildErrorBody(_exception);
+    }
+
+    return _buildNormalBody();
+  }
+
+  Widget _buildBreadCrumb() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      width: double.infinity,
+      padding: EdgeInsets.all(8),
+      child: BreadCrumb.builder(
+        itemCount: _folderStack.length,
+        builder: (index) {
+          var dirName = _folderStack[index].dirName;
+          if (dirName == '0') dirName = '根目录';
+
+          return BreadCrumbItem(
+            content: Text(dirName),
+            onTap: () {
+              var item = _folderStack[index];
+              _folderStack.removeRange(index, _folderStack.length);
+              _turnToPath(item);
+            },
+          );
+        },
+        divider: Icon(
+          Icons.chevron_right,
+          color: Colors.red,
         ),
-        Expanded(child: ListView(children: listviewChildren))
-      ],
-    );
-  }
-
-  Widget _buildFile(String entityPath) {
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.description_outlined, size: 40),
-        title: Text(osPath.basename(entityPath)),
-        subtitle: Text(StarFileSystem.getFileSize(entityPath)),
+        overflow: ScrollableOverflow(
+          keepLastDivider: false,
+          reverse: false,
+          direction: Axis.horizontal,
+          controller: _scrollController,
+        ),
       ),
     );
   }
 
-  Widget _buildDirectory(String entityPath) {
-    var dirName = osPath.basename(entityPath);
-
-    var menuButton = PopupMenuButton(
-      onSelected: (value) async {
-        switch (value) {
-          case 1:
-            await _procDirAction(entityPath, ActionType.deleteAndReplace);
-            break;
-          case 2:
-            await _procDirAction(entityPath, ActionType.delete);
-            break;
-        }
-
-        // 删除后不需要刷新，这样页面不会闪烁
-        // 刷新列表
-        // _turnToPath(_currentPath);
-      },
-      itemBuilder: (context) => <PopupMenuItem<int>>[
-        PopupMenuItem(value: 1, child: StarTextButton(icon: const Icon(Icons.do_not_disturb), text: '删除并替换')),
-        PopupMenuItem(value: 2, child: StarTextButton(icon: const Icon(Icons.delete_outline), text: '仅删除')),
-      ],
-    );
-
-    var card = Card(
-      child: ListTile(
-        leading: Icon(Icons.folder, size: 40),
-        title: Text(dirName),
-        subtitle: StarFileSystem.isInWhiteList(entityPath) && _isRootPath ? Text('重要文件，不支持清理') : Text(entityPath),
-        trailing: StarFileSystem.isInWhiteList(entityPath) && _isRootPath ? null : menuButton,
+  Widget _buildBackToParentPathCard() {
+    return GestureDetector(
+      child: Card(
+        child: ListTile(
+          leading: Icon(Icons.keyboard_return),
+          title: Text('返回上级目录'),
+        ),
       ),
+      onTap: _backToParentPath,
     );
-
-    return GestureDetector(child: card, onTap: () => _turnToPath(entityPath));
   }
 
   /// 处理文件夹操作
-  Future _procDirAction(String entityPath, ActionType actionType) async {
-    var dirName = osPath.basename(entityPath);
-
+  Future _procDirAction(FolderItem folderItem, ActionType actionType) async {
     String title = '';
     switch (actionType) {
       case ActionType.delete:
@@ -252,26 +242,24 @@ class _HomePageState extends State<HomePage> {
 
     showLoading(context);
     try {
-      await StarFileSystem.deleteDirectory(entityPath);
+      await StarFileSystem.deleteDirectory(folderItem.folderPath);
       if (actionType == ActionType.deleteAndReplace) {
-        StarFileSystem.createFile(entityPath);
+        StarFileSystem.createFile(folderItem.folderPath);
       }
       var history = new History(
-        name: dirName,
-        path: entityPath,
+        name: folderItem.dirName,
+        path: folderItem.folderPath,
         time: DateTime.now(),
         actionType: actionType,
       );
 
-      BotToast.showText(text: '处理文件夹 $dirName 完成！');
+      BotToast.showText(text: '处理文件夹 ${folderItem.dirName} 完成！');
 
-      setState(() {
-        _currentDirs.remove(entityPath);
-        // 替换的话，把目录加到文件那里去
-        if (actionType == ActionType.deleteAndReplace) {
-          _currentFiles.add(entityPath);
-        }
-      });
+      _folders.remove(folderItem);
+      // 替换的话，把目录加到文件那里去
+      if (actionType == ActionType.deleteAndReplace) {
+        _files.add(FileItem(folderItem.folderPath));
+      }
 
       Global.appConfig.history.add(history);
       Global.saveAppConfig();
@@ -279,47 +267,56 @@ class _HomePageState extends State<HomePage> {
       BotToast.showText(text: '处理文件夹失败！$ex');
     } finally {
       Navigator.of(context).pop();
+      setState(() {});
     }
   }
 
-  void updateSubtitle() {
-    setState(() {
-      _subtitle = '${_currentDirs.length}个目录，${_currentFiles.length}个文件';
-    });
-  }
-
+  /// 返回上一级目录
   void _backToParentPath() {
-    setState(() {
-      var parentPath = osPath.dirname(_currentPath);
-      _turnToPath(parentPath);
-    });
+    if (currentFolder.isRootPath) return;
+    if (_folderStack.length <= 1) return;
+
+    // 有错误的话得先清除，不然返回后还是显示错误界面
+    _exception = null;
+
+    var parentFolder = _folderStack[_folderStack.length - 2];
+    print('parentFolder: ${parentFolder.dirName}');
+    _folderStack.removeRange(_folderStack.length - 2, _folderStack.length);
+    _turnToPath(parentFolder);
   }
 
-  Future _turnToPath(String path) async {
+  /// 跳转到指定目录
+  Future _turnToPath(FolderItem folderItem) async {
     _hasPermission = await PermissionService.request();
-    _currentPath = path;
-    _isRootPath = path == StarFileSystem.SDCARD_ROOT;
+
     try {
-      var entities = StarFileSystem.listDir(path);
-      _currentFiles.clear();
-      _currentDirs.clear();
-      for (var entity in entities) {
-        if (FileSystemEntity.isFileSync(entity.path)) {
-          _currentFiles.add(entity.path);
-        } else {
-          _currentDirs.add(entity.path);
-        }
-        // 根据名称排序
-        _currentDirs.sort((a, b) => osPath.basename(a).compareTo(osPath.basename(b)));
-        _currentFiles.sort((a, b) => osPath.basename(a).compareTo(osPath.basename(b)));
-      }
+      _folders = FolderItem.getFolderItems(folderItem.folderPath);
+      _files = FileItem.getFileItems(folderItem.folderPath);
     } on FileSystemException catch (ex) {
       BotToast.showText(text: '无权访问该目录！');
-      _backToParentPath();
+      _exception = ex;
     } on Exception catch (ex) {
       BotToast.showText(text: '未知错误～');
+      _exception = ex;
     }
 
-    updateSubtitle();
+    setState(() {
+      _folderStack.add(folderItem);
+      _subtitle = '${_folders.length}个目录，${_files.length}个文件';
+    });
+
+    print('目录栈_folderStack: ' + _folderStack.map((e) => e.dirName).join(','));
+
+    if (_folderStack.length > 2) {
+      _animateToLast();
+    }
+  }
+
+  void _animateToLast() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 }
