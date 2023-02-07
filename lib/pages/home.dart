@@ -251,8 +251,16 @@ class _HomePageState extends State<HomePage> {
       BotToast.showText(text: '处理文件夹失败！$ex');
     } finally {
       Navigator.of(context).pop();
-      setState(() {});
+      // setState(() {});
+      _updateTitleBar();
     }
+  }
+
+  // 更新标题栏
+  void _updateTitleBar(){
+    setState(() {
+      _subtitle = '${_folders.length}个目录，${_files.length}个文件';
+    });
   }
 
   /// 返回上一级目录
@@ -288,8 +296,9 @@ class _HomePageState extends State<HomePage> {
       if (_folderStack.isEmpty || (_folderStack.isNotEmpty && folderItem != currentFolder)) {
         _folderStack.add(folderItem);
       }
-      _subtitle = '${_folders.length}个目录，${_files.length}个文件';
     });
+
+    _updateTitleBar();
 
     print('目录栈_folderStack: ' + _folderStack.map((e) => e.dirName).join(','));
 
