@@ -43,8 +43,8 @@ class _HomePageState extends State<HomePage> {
     var systemUiOverlayStyle = const SystemUiOverlayStyle(statusBarColor: Colors.transparent);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
-    // requestPermission();
-    _turnToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
+    // 启动就打开根目录
+    _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
     AppUpdate.checkUpdate(context);
   }
 
@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     _hasPermission = await PermissionService.request();
     if (_hasPermission) {
       setState(() {
-        _turnToPath(currentFolder);
+        _goToPath(currentFolder);
       });
     }
   }
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: () => _turnToPath(currentFolder),
+            onPressed: () => _goToPath(currentFolder),
           ),
         ],
       ),
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              OutlinedButton(child: Text('重新获取'), onPressed: () => _turnToPath(currentFolder)),
+              OutlinedButton(child: Text('重新获取'), onPressed: () => _goToPath(currentFolder)),
               SizedBox(width: 10),
               OutlinedButton(child: Text('打开设置'), onPressed: () => openAppSettings()),
             ],
@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
 
     listviewChildren.addAll(_folders.map((e) => FolderCard(
           e,
-          (folderItem) => _turnToPath(folderItem),
+          (folderItem) => _goToPath(folderItem),
           (folderItem) => _procDirAction(folderItem, ActionType.delete),
           (folderItem) => _procDirAction(folderItem, ActionType.deleteAndReplace),
         )));
@@ -191,11 +191,7 @@ class _HomePageState extends State<HomePage> {
 
           return BreadCrumbItem(
             content: Text(dirName),
-            onTap: () {
-              var item = _folderStack[index];
-              _folderStack.removeRange(index, _folderStack.length);
-              _turnToPath(item);
-            },
+            onTap: () => _goToStackIndex(index),
           );
         },
         divider: Icon(
@@ -209,18 +205,6 @@ class _HomePageState extends State<HomePage> {
           controller: _scrollController,
         ),
       ),
-    );
-  }
-
-  Widget _buildBackToParentPathCard() {
-    return GestureDetector(
-      child: Card(
-        child: ListTile(
-          leading: Icon(Icons.keyboard_return),
-          title: Text('返回上级目录'),
-        ),
-      ),
-      onTap: _backToParentPath,
     );
   }
 
@@ -244,7 +228,7 @@ class _HomePageState extends State<HomePage> {
     try {
       await StarFileSystem.deleteDirectory(folderItem.folderPath);
       if (actionType == ActionType.deleteAndReplace) {
-        StarFileSystem.createFile(folderItem.folderPath);
+        await StarFileSystem.createFile(folderItem.folderPath);
       }
       var history = new History(
         name: folderItem.dirName,
@@ -277,16 +261,16 @@ class _HomePageState extends State<HomePage> {
     if (_folderStack.length <= 1) return;
 
     // 有错误的话得先清除，不然返回后还是显示错误界面
-    _exception = null;
+    setState(() {
+      _exception = null;
+    });
 
-    var parentFolder = _folderStack[_folderStack.length - 2];
-    print('parentFolder: ${parentFolder.dirName}');
-    _folderStack.removeRange(_folderStack.length - 2, _folderStack.length);
-    _turnToPath(parentFolder);
+    _goToStackIndex(_folderStack.length - 2);
+    return;
   }
 
   /// 跳转到指定目录
-  Future _turnToPath(FolderItem folderItem) async {
+  Future _goToPath(FolderItem folderItem) async {
     _hasPermission = await PermissionService.request();
 
     try {
@@ -301,7 +285,9 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
-      _folderStack.add(folderItem);
+      if (_folderStack.isEmpty || (_folderStack.isNotEmpty && folderItem != currentFolder)) {
+        _folderStack.add(folderItem);
+      }
       _subtitle = '${_folders.length}个目录，${_files.length}个文件';
     });
 
@@ -310,6 +296,19 @@ class _HomePageState extends State<HomePage> {
     if (_folderStack.length > 2) {
       _animateToLast();
     }
+  }
+
+  /// 跳转到目录栈的指定层级
+  Future _goToStackIndex(int index) async {
+    if (index < 0 || index >= _folderStack.length) return;
+
+    var item = _folderStack[index];
+    // 目录栈里面有多个的情况下才删掉前面的，只有一个的话没必要删
+    if (_folderStack.length > 1) {
+      _folderStack.removeRange(index, _folderStack.length);
+    }
+
+    _goToPath(item);
   }
 
   void _animateToLast() {
