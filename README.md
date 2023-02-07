@@ -20,6 +20,10 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 
 ## 版本
+### 1.2.8
+- 修复了代码重构之后引入的几个bug
+- 支持多种文件图标显示
+
 ### 1.2.7
 - 次级目录使用返回手势可以回到上一级目录
 - 支持使用外部App打开文件
