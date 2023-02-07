@@ -21,6 +21,9 @@ class FileCard extends StatelessWidget {
     );
   }
 
+  /// 根据文件的 MIME-Type 来生成对应的图标
+  /// MIME-Type 参考 https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+  /// 但手机上的文件与HTTP的不完全一致，比如 chemical 就是在HTTP文档中没有的
   Widget _buildFileIcon() {
     final fullMime = lookupMimeType(fileItem.filepath) ?? 'unknown';
     final tempArray = fullMime.split('/');
