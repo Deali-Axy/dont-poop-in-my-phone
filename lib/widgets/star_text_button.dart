@@ -4,7 +4,7 @@ class StarTextButton extends StatelessWidget {
   final Icon icon;
   final String text;
 
-  StarTextButton({@required this.icon, @required this.text});
+  StarTextButton({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {

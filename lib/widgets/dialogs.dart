@@ -17,6 +17,11 @@ Widget buildDeleteDirDialog(BuildContext context, {String title = '删除目录'
   );
 }
 
-Future<bool> showDeleteDirDialog(BuildContext context, {String title = '删除目录', String content = '删除后不能恢复'}) {
-  return showDialog<bool>(context: context, builder: (context) => buildDeleteDirDialog(context, title: title, content: content));
+Future<bool> showDeleteDirDialog(BuildContext context, {String title = '删除目录', String content = '删除后不能恢复'}) async {
+  var result = await showDialog<bool>(
+    context: context,
+    builder: (context) => buildDeleteDirDialog(context, title: title, content: content),
+  );
+
+  return result ?? false;
 }

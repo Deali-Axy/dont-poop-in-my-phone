@@ -2,10 +2,10 @@ enum ActionType { delete, deleteAndReplace }
 
 class History {
   History({
-    this.name,
-    this.path,
-    this.time,
-    this.actionType,
+    required this.name,
+    required this.path,
+    required this.time,
+    required this.actionType,
   });
 
   History.fromJson(dynamic json) {
@@ -17,10 +17,10 @@ class History {
     actionType = ActionType.values[json['actionType']];
   }
 
-  String name;
-  String path;
-  DateTime time;
-  ActionType actionType;
+  late String name;
+  late String path;
+  late DateTime time;
+  late ActionType actionType;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

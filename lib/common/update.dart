@@ -15,7 +15,16 @@ class AppInfo {
   String download_link;
   String detail_link;
 
-  AppInfo({this.id, this.name, this.description, this.version, this.version_str, this.update_description, this.download_link, this.detail_link});
+  AppInfo({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.version,
+    required this.version_str,
+    required this.update_description,
+    required this.download_link,
+    required this.detail_link,
+  });
 }
 
 abstract class AppUpdate {

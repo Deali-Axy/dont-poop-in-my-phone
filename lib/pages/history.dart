@@ -5,14 +5,14 @@ import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({Key key}) : super(key: key);
+  const HistoryPage({Key? key}) : super(key: key);
 
   @override
   _HistoryPageState createState() => _HistoryPageState();
 }
 
 class _HistoryPageState extends State<HistoryPage> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  late AnimationController _controller;
 
   @override
   void initState() {
@@ -38,7 +38,6 @@ class _HistoryPageState extends State<HistoryPage> with SingleTickerProviderStat
     if (Global.appConfig.history.length == 0) {
       return Empty(
         content: '没有历史记录',
-        isShowButton: true,
         buttonText: '返回',
         onButtonPressed: () => Navigator.of(context).pop(),
       );

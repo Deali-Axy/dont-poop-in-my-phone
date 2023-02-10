@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 
 abstract class Global {
-  static SharedPreferences _prefs;
-  static AppConfig _appConfig;
+  static late SharedPreferences _prefs;
+  static late AppConfig _appConfig;
 
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intro_views_flutter/intro_views_flutter.dart';
 
 class IntroViewPage extends StatelessWidget {
-  IntroViewPage({Key key}) : super(key: key);
+  IntroViewPage({Key? key}) : super(key: key);
 
   final mainImage = Image.asset(
     'assets/icon/icon.png',

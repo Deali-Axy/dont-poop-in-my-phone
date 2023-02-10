@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 
 class Empty extends StatelessWidget {
   final String content;
-  final bool isShowButton;
-  final String buttonText;
-  final Function onButtonPressed;
+  final String? buttonText;
+  final Function? onButtonPressed;
 
   const Empty({
-    @required this.content,
-    @required this.isShowButton,
+    required this.content,
     this.buttonText,
     this.onButtonPressed,
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -24,7 +22,7 @@ class Empty extends StatelessWidget {
           SizedBox(height: 15),
           Text(content, style: TextStyle(fontSize: 20)),
           SizedBox(height: 15),
-          if (isShowButton) OutlinedButton(child: Text(buttonText), onPressed: onButtonPressed),
+          if (buttonText != null) OutlinedButton(child: Text(buttonText!), onPressed: () => onButtonPressed?.call()),
         ],
       ),
     );

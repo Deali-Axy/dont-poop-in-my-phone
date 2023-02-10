@@ -4,11 +4,11 @@ import 'package:dont_poop_in_my_phone/utils/index.dart';
 
 class FolderItem {
   final String folderPath;
-  Directory _dir;
+  late Directory _dir;
   String _dirName = '';
   String _label = '';
-  bool _isDirNameInWhiteList;
-  bool _isRootPath;
+  late bool _isDirNameInWhiteList;
+  late bool _isRootPath;
 
   Directory get directory => _dir;
 

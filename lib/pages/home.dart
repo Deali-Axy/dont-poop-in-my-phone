@@ -14,7 +14,7 @@ import 'package:path/path.dart' as osPath;
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -24,11 +24,11 @@ class _HomePageState extends State<HomePage> {
   static const String AppTitle = '别在我的手机里拉屎！';
   var _subtitle = '';
   var _hasPermission = false;
-  DateTime _lastWillPopAt; //上次返回退出动作时间
+  DateTime? _lastWillPopAt; //上次返回退出动作时间
   var _folders = <FolderItem>[];
   var _files = <FileItem>[];
   var _folderStack = <FolderItem>[];
-  Exception _exception;
+  Exception? _exception;
 
   final _scrollController = ScrollController();
 
@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
           _backToParentPath();
           return false;
         }
-        if (_lastWillPopAt == null || DateTime.now().difference(_lastWillPopAt) > Duration(seconds: 1)) {
+        if (_lastWillPopAt == null || DateTime.now().difference(_lastWillPopAt!) > Duration(seconds: 1)) {
           BotToast.showText(text: '再按一次返回键退出应用~');
           // 两次点击间隔超过1秒则重新计时
           _lastWillPopAt = DateTime.now();
@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildErrorBody(Exception error) {
+  Widget _buildErrorBody(Exception? error) {
     String friendlyText;
     if (error is FileSystemException) {
       friendlyText = '无权访问该目录: ${error.message}';
@@ -257,7 +257,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // 更新标题栏
-  void _updateTitleBar(){
+  void _updateTitleBar() {
     setState(() {
       _subtitle = '${_folders.length}个目录，${_files.length}个文件';
     });

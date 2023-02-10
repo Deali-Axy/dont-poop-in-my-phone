@@ -5,7 +5,7 @@ import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
 class FileCard extends StatelessWidget {
   final FileItem fileItem;
 
-  const FileCard(this.fileItem, {Key key}) : super(key: key);
+  const FileCard(this.fileItem, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

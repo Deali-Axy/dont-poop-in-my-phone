@@ -6,9 +6,9 @@ import 'package:path/path.dart' as path;
 
 class FileItem {
   final String filepath;
-  File _file;
-  String _fileSize;
-  String _fileName;
+  late File _file;
+  late String _fileSize;
+  late String _fileName;
 
   File get file => _file;
 

@@ -6,7 +6,7 @@ import 'package:dont_poop_in_my_phone/contrib/hitokoto/models/hitokoto.dart';
 import 'package:flutter/material.dart';
 
 class MyDrawer extends StatefulWidget {
-  MyDrawer({Key key}) : super(key: key);
+  MyDrawer({Key? key}) : super(key: key);
 
   @override
   _MyDrawerState createState() => _MyDrawerState();
@@ -14,7 +14,10 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   static const _backgroundImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/600/450';
-  var _currentHitokoto = Hitokoto(hitokoto: '（正在加载一言）', creator: '别在我的手机里拉屎！');
+  var _currentHitokoto = Hitokoto(
+    hitokoto: '（正在加载一言）',
+    creator: '别在我的手机里拉屎！',
+  );
 
   @override
   void initState() {

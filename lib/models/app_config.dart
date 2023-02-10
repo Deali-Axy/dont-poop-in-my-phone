@@ -2,7 +2,7 @@ import 'history.dart';
 
 class AppConfig {
   AppConfig({
-    this.history,
+    required this.history,
   });
 
   AppConfig.fromJson(dynamic json) {
@@ -18,14 +18,14 @@ class AppConfig {
     history = [];
   }
 
-  List<History> history;
-  List<String> whiteList;
+  late List<History> history;
+  late List<String> whiteList;
 
   Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    if (history != null) {
-      map['history'] = history.map((v) => v.toJson()).toList();
-    }
+    final map = <String, dynamic>{
+      'history': history.map((v) => v.toJson()).toList(),
+    };
+
     return map;
   }
 }
