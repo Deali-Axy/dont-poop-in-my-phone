@@ -4,6 +4,8 @@ import 'package:path/path.dart' as path;
 
 abstract class StarFileSystem {
   static const SDCARD_ROOT = '/storage/emulated/0';
+  // todo 白名单要改成完整路径
+  // todo 而且白名单里面的文件都不能操作！
   static const DIR_NAME_WHITE_LIST = [
     'android',
     'music',

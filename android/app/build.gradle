@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // TO DO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "cn.deali.dont_poop_in_my_phone"
         minSdkVersion 16
         targetSdkVersion 33
