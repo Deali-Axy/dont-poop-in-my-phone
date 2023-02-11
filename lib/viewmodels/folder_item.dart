@@ -9,6 +9,7 @@ class FolderItem {
   String _label = '';
   late bool _isDirNameInWhiteList;
   late bool _isRootPath;
+  late bool _isInWhiteList;
 
   Directory get directory => _dir;
 
@@ -16,11 +17,7 @@ class FolderItem {
 
   String get label => _label;
 
-  bool get isInWhiteList {
-    var parentPath = path.dirname(folderPath);
-    var isParentRoot = parentPath == StarFileSystem.SDCARD_ROOT;
-    return isParentRoot && _isDirNameInWhiteList;
-  }
+  bool get isInWhiteList => _isInWhiteList;
 
   bool get isRootPath => _isRootPath;
 
@@ -29,6 +26,7 @@ class FolderItem {
     _dirName = path.basename(folderPath);
     _isDirNameInWhiteList = StarFileSystem.isInWhiteList(folderPath);
     _isRootPath = folderPath == StarFileSystem.SDCARD_ROOT;
+    _isInWhiteList = StarFileSystem.isInWhiteList(folderPath);
     if (isInWhiteList) {
       _label = '重要文件，不支持清理';
     }

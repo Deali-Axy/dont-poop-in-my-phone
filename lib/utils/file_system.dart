@@ -4,23 +4,25 @@ import 'package:path/path.dart' as path;
 
 abstract class StarFileSystem {
   static const SDCARD_ROOT = '/storage/emulated/0';
-  // todo 白名单要改成完整路径
-  // todo 而且白名单里面的文件都不能操作！
-  static const DIR_NAME_WHITE_LIST = [
-    'android',
-    'music',
-    'download',
-    'tencent',
-    'pictures',
-    'ankidroid',
-    'dcim',
-    'huawei',
-    '.photoshare',
-    'movies',
-    'sounds',
-    'documents',
-    'data',
-    'books',
+
+  static const PATH_WHITE_LIST = [
+    SDCARD_ROOT + '/android',
+    SDCARD_ROOT + '/android/data',
+    SDCARD_ROOT + '/android/media',
+    SDCARD_ROOT + '/android/obb',
+    SDCARD_ROOT + '/music',
+    SDCARD_ROOT + '/download',
+    SDCARD_ROOT + '/tencent',
+    SDCARD_ROOT + '/pictures',
+    SDCARD_ROOT + '/ankidroid',
+    SDCARD_ROOT + '/dcim',
+    SDCARD_ROOT + '/huawei',
+    SDCARD_ROOT + '/.photoshare',
+    SDCARD_ROOT + '/movies',
+    SDCARD_ROOT + '/sounds',
+    SDCARD_ROOT + '/documents',
+    SDCARD_ROOT + '/data',
+    SDCARD_ROOT + '/books',
   ];
 
   static List<FileSystemEntity> listSdCard() {
@@ -50,8 +52,7 @@ abstract class StarFileSystem {
   }
 
   static bool isInWhiteList(String dirpath) {
-    var dirName = path.basename(dirpath).toLowerCase();
-    return DIR_NAME_WHITE_LIST.contains(dirName);
+    return PATH_WHITE_LIST.contains(dirpath.toLowerCase());
   }
 
   static Future<FileSystemEntity> deleteDirectory(String path) {
