@@ -28,7 +28,7 @@ class FileCard extends StatelessWidget {
     final fullMime = lookupMimeType(fileItem.filepath) ?? 'unknown';
     final tempArray = fullMime.split('/');
     final majorMime = tempArray.isEmpty ? fullMime : tempArray[0];
-    var icon = Icons.description_outlined;
+    var icon = Icons.insert_drive_file_outlined;
     switch (majorMime) {
       case 'application':
         icon = Icons.settings_applications_outlined;

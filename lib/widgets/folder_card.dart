@@ -22,7 +22,7 @@ class _FolderCardState extends State<FolderCard> {
   Widget build(BuildContext context) {
     var card = Card(
       child: ListTile(
-        leading: Icon(Icons.folder, size: 40),
+        leading: _buildIcon(),
         title: Text(widget.folderItem.dirName),
         subtitle: _buildSubtitle(),
         trailing: _buildPopupMenu(),
@@ -32,12 +32,22 @@ class _FolderCardState extends State<FolderCard> {
     return GestureDetector(child: card, onTap: () => widget.onCardTap(widget.folderItem));
   }
 
+  Widget _buildIcon() {
+    var icon = Icons.folder_outlined;
+    if (widget.folderItem.isInWhiteList) {
+      icon = Icons.folder_special_outlined;
+    }
+
+    return Icon(icon, size: 40);
+  }
+
   Widget? _buildSubtitle() {
     Widget? subtitle;
     if (widget.folderItem.label.length > 0) {
-      var style = TextStyle(color: Colors.grey);
+      final double fontSize = 12;
+      var style = TextStyle(color: Colors.grey, fontSize: fontSize);
       if (widget.folderItem.isInWhiteList) {
-        style = TextStyle(fontWeight: FontWeight.w100);
+        style = TextStyle(fontWeight: FontWeight.w100, fontSize: fontSize);
       }
       subtitle = Text(widget.folderItem.label, style: style);
     }
