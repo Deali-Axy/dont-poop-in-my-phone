@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dont_poop_in_my_phone/common/global.dart';
+import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart' as path;
@@ -23,11 +25,29 @@ class FileItem {
   }
 
   launch() async {
-    try{
+    try {
       OpenFilex.open(filepath);
-    } on Exception catch(ex){
+    } on Exception catch (ex) {
       BotToast.showText(text: '无法打开文件~ $ex');
     }
+  }
+
+  Future<FileSystemEntity> delete({bool replace = false}) async {
+    var entity = await file.delete(recursive: true);
+    if (replace) {
+      await StarFileSystem.createFile(filepath);
+    }
+
+    var history = new History(
+      name: '${replace ? '替换' : '删除'}文件: $fileName',
+      path: filepath,
+      time: DateTime.now(),
+      actionType: replace ? ActionType.deleteAndReplace : ActionType.delete,
+    );
+    Global.appConfig.history.add(history);
+    Global.saveAppConfig();
+
+    return entity;
   }
 
   static List<FileItem> getFileItems(String parentPath) {

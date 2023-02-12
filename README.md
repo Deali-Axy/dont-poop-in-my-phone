@@ -20,6 +20,11 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 
 ## 版本
+### 1.2.10
+- 目录白名单规则优化
+- 主界面UI优化调整
+- 支持删除和替换文件
+
 ### 1.2.9
 - 修复删除和替换文件夹后标题栏不刷新的bug
 - 修复次级目录白名单识别问题

@@ -51,12 +51,8 @@ abstract class StarFileSystem {
     return str;
   }
 
-  static bool isInWhiteList(String dirpath) {
-    return PATH_WHITE_LIST.contains(dirpath.toLowerCase());
-  }
-
-  static Future<FileSystemEntity> deleteDirectory(String path) {
-    return Directory(path).delete(recursive: true);
+  static bool isInWhiteList(String dirPath) {
+    return PATH_WHITE_LIST.contains(dirPath.toLowerCase());
   }
 
   static Future<FileSystemEntity> createFile(String filename) {

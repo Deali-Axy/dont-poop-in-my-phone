@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget buildDeleteDirDialog(BuildContext context, {String title = '删除目录', String content = '删除后不能恢复'}) {
+Widget buildDeleteDialog(BuildContext context, {String title = '删除目录', String content = '删除后不能恢复'}) {
   return AlertDialog(
     title: Text(title),
     content: Text(content),
@@ -17,10 +17,10 @@ Widget buildDeleteDirDialog(BuildContext context, {String title = '删除目录'
   );
 }
 
-Future<bool> showDeleteDirDialog(BuildContext context, {String title = '删除目录', String content = '删除后不能恢复'}) async {
+Future<bool> showDeleteDialog(BuildContext context, {String title = '删除目录', String content = '删除后不能恢复'}) async {
   var result = await showDialog<bool>(
     context: context,
-    builder: (context) => buildDeleteDirDialog(context, title: title, content: content),
+    builder: (context) => buildDeleteDialog(context, title: title, content: content),
   );
 
   return result ?? false;

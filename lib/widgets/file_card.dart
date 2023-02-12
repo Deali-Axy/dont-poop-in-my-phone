@@ -1,11 +1,17 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
+import 'package:dont_poop_in_my_phone/widgets/index.dart';
+
+typedef void FileActionEvent(FileItem fileItem);
 
 class FileCard extends StatelessWidget {
   final FileItem fileItem;
+  final FileActionEvent onDeleteAndReplace;
+  final FileActionEvent onDelete;
 
-  const FileCard(this.fileItem, {Key? key}) : super(key: key);
+  const FileCard(this.fileItem, this.onDeleteAndReplace, this.onDelete, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +20,8 @@ class FileCard extends StatelessWidget {
         child: ListTile(
           leading: _buildFileIcon(),
           title: Text(fileItem.fileName),
-          subtitle: Text(fileItem.fileSize),
+          subtitle: _buildSubtitle(),
+          trailing: _buildPopupMenu(),
         ),
       ),
       onTap: fileItem.launch,
@@ -60,5 +67,31 @@ class FileCard extends StatelessWidget {
     }
 
     return Icon(icon, size: 40);
+  }
+
+  Widget _buildSubtitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [Text(DateFormat('yyyy-MM-dd H:mm').format(fileItem.file.lastModifiedSync())), Text(fileItem.fileSize)],
+    );
+  }
+
+  Widget? _buildPopupMenu() {
+    return PopupMenuButton(
+      onSelected: (value) async {
+        switch (value) {
+          case 1:
+            onDeleteAndReplace(fileItem);
+            break;
+          case 2:
+            onDelete(fileItem);
+            break;
+        }
+      },
+      itemBuilder: (context) => <PopupMenuItem<int>>[
+        PopupMenuItem(value: 1, child: StarTextButton(icon: const Icon(Icons.do_not_disturb), text: '删除并替换')),
+        PopupMenuItem(value: 2, child: StarTextButton(icon: const Icon(Icons.delete_outline), text: '仅删除')),
+      ],
+    );
   }
 }

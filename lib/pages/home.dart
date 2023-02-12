@@ -145,18 +145,17 @@ class _HomePageState extends State<HomePage> {
   Widget _buildNormalBody() {
     var listviewChildren = <Widget>[];
 
-    // 返回上一级的按钮卡片好丑，不显示了
-    // if (!currentFolder.isRootPath) {
-    //   listviewChildren.add(_buildBackToParentPathCard());
-    // }
-
     listviewChildren.addAll(_folders.map((e) => FolderCard(
           e,
           (folderItem) => _goToPath(folderItem),
-          (folderItem) => _procDirAction(folderItem, ActionType.delete),
-          (folderItem) => _procDirAction(folderItem, ActionType.deleteAndReplace),
+          (folderItem) => _doDirAction(folderItem, ActionType.delete),
+          (folderItem) => _doDirAction(folderItem, ActionType.deleteAndReplace),
         )));
-    listviewChildren.addAll(_files.map((e) => FileCard(e)));
+    listviewChildren.addAll(_files.map((e) => FileCard(
+          e,
+          (fileItem) => _doFileAction(fileItem, ActionType.deleteAndReplace),
+          (fileItem) => _doFileAction(fileItem, ActionType.delete),
+        )));
 
     return Column(
       children: [
@@ -209,49 +208,49 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// 处理文件夹操作
-  Future _procDirAction(FolderItem folderItem, ActionType actionType) async {
-    String title = '';
-    switch (actionType) {
-      case ActionType.delete:
-        title = '删除目录';
-        break;
-      case ActionType.deleteAndReplace:
-        title = '删除并替换目录';
-        break;
-      default:
-        return;
-    }
-    var result = await showDeleteDirDialog(context, title: title);
+  Future _doDirAction(FolderItem folderItem, ActionType actionType) async {
+    var title = actionType == ActionType.deleteAndReplace ? '删除并替换目录' : '删除目录';
+    var result = await showDeleteDialog(context, title: title);
     if (!result) return;
 
     showLoading(context);
     try {
-      await StarFileSystem.deleteDirectory(folderItem.folderPath);
-      if (actionType == ActionType.deleteAndReplace) {
-        await StarFileSystem.createFile(folderItem.folderPath);
-      }
-      var history = new History(
-        name: folderItem.dirName,
-        path: folderItem.folderPath,
-        time: DateTime.now(),
-        actionType: actionType,
-      );
-
-      BotToast.showText(text: '处理文件夹 ${folderItem.dirName} 完成！');
+      await folderItem.delete(replace: actionType == ActionType.deleteAndReplace);
 
       _folders.remove(folderItem);
       // 替换的话，把目录加到文件那里去
       if (actionType == ActionType.deleteAndReplace) {
         _files.add(FileItem(folderItem.folderPath));
       }
-
-      Global.appConfig.history.add(history);
-      Global.saveAppConfig();
+      BotToast.showText(text: '处理文件夹 ${folderItem.dirName} 完成！');
     } catch (ex) {
       BotToast.showText(text: '处理文件夹失败！$ex');
     } finally {
       Navigator.of(context).pop();
-      // setState(() {});
+      _updateTitleBar();
+    }
+  }
+
+  /// 处理文件操作
+  Future _doFileAction(FileItem fileItem, ActionType actionType) async {
+    var title = actionType == ActionType.deleteAndReplace ? '删除并替换文件' : '删除文件';
+    var result = await showDeleteDialog(context, title: title);
+    if (!result) return;
+
+    showLoading(context);
+    try {
+      await fileItem.delete(replace: actionType == ActionType.deleteAndReplace);
+
+      _files.remove(fileItem);
+      // 替换的话，加到文件那里去
+      if (actionType == ActionType.deleteAndReplace) {
+        _files.add(FileItem(fileItem.filepath));
+      }
+      BotToast.showText(text: '处理文件 ${fileItem.fileName} 完成！');
+    } catch (ex) {
+      BotToast.showText(text: '处理文件失败！$ex');
+    } finally {
+      Navigator.of(context).pop();
       _updateTitleBar();
     }
   }
