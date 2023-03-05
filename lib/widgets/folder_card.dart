@@ -66,11 +66,15 @@ class _FolderCardState extends State<FolderCard> {
                 case 2:
                   widget.onDelete(widget.folderItem);
                   break;
+                case 3:
+
+                  break;
               }
             },
             itemBuilder: (context) => <PopupMenuItem<int>>[
               PopupMenuItem(value: 1, child: StarTextButton(icon: const Icon(Icons.do_not_disturb), text: '删除并替换')),
               PopupMenuItem(value: 2, child: StarTextButton(icon: const Icon(Icons.delete_outline), text: '仅删除')),
+              PopupMenuItem(value: 3, child: StarTextButton(icon: const Icon(Icons.addchart), text: '添加规则')),
             ],
           );
   }

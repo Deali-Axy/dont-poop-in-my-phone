@@ -12,6 +12,7 @@ class AppConfig {
         history.add(History.fromJson(v));
       });
     }
+    whiteList = json['whiteList'];
   }
 
   AppConfig.fromDefault() {
@@ -24,6 +25,7 @@ class AppConfig {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
       'history': history.map((v) => v.toJson()).toList(),
+      'whiteList': whiteList,
     };
 
     return map;

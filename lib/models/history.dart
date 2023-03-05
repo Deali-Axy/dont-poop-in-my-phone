@@ -1,4 +1,4 @@
-enum ActionType { delete, deleteAndReplace }
+import 'action_type.dart';
 
 class History {
   History({
