@@ -1,3 +1,4 @@
+import 'package:dont_poop_in_my_phone/pages/index.dart';
 import 'package:flutter/material.dart';
 import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
@@ -67,7 +68,7 @@ class _FolderCardState extends State<FolderCard> {
                   widget.onDelete(widget.folderItem);
                   break;
                 case 3:
-
+                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => AddRulePage()));
                   break;
               }
             },
