@@ -68,7 +68,9 @@ class _FolderCardState extends State<FolderCard> {
                   widget.onDelete(widget.folderItem);
                   break;
                 case 3:
-                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => AddRulePage()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => AddRulePage(path: widget.folderItem.folderPath),
+                  ));
                   break;
               }
             },
