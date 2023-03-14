@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:dont_poop_in_my_phone/pages/index.dart';
 import 'package:flutter/material.dart';
 import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
@@ -68,9 +69,14 @@ class _FolderCardState extends State<FolderCard> {
                   widget.onDelete(widget.folderItem);
                   break;
                 case 3:
-                  Navigator.of(context).push(MaterialPageRoute(
+                  String result = await Navigator.of(context).push(MaterialPageRoute(
                     builder: (ctx) => AddRulePage(path: widget.folderItem.folderPath),
                   ));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(result),
+                    action: SnackBarAction(label: '知道啦', onPressed: () {}),
+                  ));
+                  // BotToast.showText(text: result);
                   break;
               }
             },

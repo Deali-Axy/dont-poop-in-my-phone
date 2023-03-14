@@ -35,7 +35,9 @@ class MyApp extends StatelessWidget {
         'history': (ctx) => HistoryPage(),
         'home': (ctx) => HomePage(),
         'introview': (ctx) => IntroViewPage(),
+        'rule': (ctx) => RulePage(),
         'splash': (ctx) => SplashPage(),
+        'white_list': (ctx) => WhiteListPage(),
       },
     );
   }

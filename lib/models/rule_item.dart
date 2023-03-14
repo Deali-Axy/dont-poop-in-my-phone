@@ -17,7 +17,7 @@ class RuleItem {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['path'] = path;
-    map['action'] = actionType.index;
+    map['actionType'] = actionType.index;
     return map;
   }
 }

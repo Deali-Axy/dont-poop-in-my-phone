@@ -76,6 +76,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        label: const Text('自动清理'),
+        icon: const Icon(Icons.cleaning_services_rounded),
+      ),
       drawer: MyDrawer(),
       body: _buildBody(),
     );

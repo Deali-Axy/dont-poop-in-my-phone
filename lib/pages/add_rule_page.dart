@@ -39,13 +39,34 @@ class _AddRulePageState extends State<AddRulePage> {
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
-              for (var item in Global.appConfig.ruleList) {
-                if (item.name == 'default') {}
-              }
+              var rule = _getDefaultRule();
 
               if (_ruleType == null) {
-                BotToast.showText(text: '请选择规则类型！');
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text('请选择规则类型！'),
+                  action: SnackBarAction(label: '知道啦', onPressed: () {}),
+                ));
                 return;
+              }
+
+              switch (_ruleType) {
+                case RuleType.whileList:
+                  Global.appConfig.whiteList.add(widget.path);
+                  Global.saveAppConfig();
+                  Navigator.of(context).pop('已经把 ${widget.path} 添加到白名单~');
+                  break;
+                case RuleType.delete:
+                  rule.rules.add(RuleItem(path: widget.path, actionType: ActionType.delete));
+                  Global.saveAppConfig();
+                  Navigator.of(context).pop('已经为 ${widget.path} 添加自动删除规则~');
+                  break;
+                case RuleType.deleteAndReplace:
+                  rule.rules.add(RuleItem(path: widget.path, actionType: ActionType.deleteAndReplace));
+                  Global.saveAppConfig();
+                  Navigator.of(context).pop('已经为 ${widget.path} 添加自动删除且替换规则~');
+                  break;
+                default:
+                  break;
               }
             },
           ),
@@ -53,6 +74,18 @@ class _AddRulePageState extends State<AddRulePage> {
       ),
       body: _buildBody(),
     );
+  }
+
+  Rule _getDefaultRule() {
+    var rule = Rule(name: Rule.defaultRuleName, rules: []);
+    for (var item in Global.appConfig.ruleList) {
+      if (item.name == Rule.defaultRuleName) {
+        rule = item;
+        return rule;
+      }
+    }
+    Global.appConfig.ruleList.add(rule);
+    return rule;
   }
 
   Widget _buildBody() {

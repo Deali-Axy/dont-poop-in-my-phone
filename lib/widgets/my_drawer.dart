@@ -42,12 +42,14 @@ class _MyDrawerState extends State<MyDrawer> {
             onTap: () => {},
           ),
           ListTile(
+            leading: const Icon(Icons.list_alt, size: 35),
+            title: Text('白名单'),
+            onTap: () => Navigator.of(context).pushNamed('white_list'),
+          ),
+          ListTile(
             leading: const Icon(Icons.rule, size: 35),
             title: Text('清理规则'),
-            onTap: () {
-              Navigator.of(context).pop();
-              BotToast.showText(text: '功能暂未上线，目前仅支持内置规则~');
-            },
+            onTap: () => Navigator.of(context).pushNamed('rule'),
           ),
           ListTile(
             leading: const Icon(Icons.history, size: 35),

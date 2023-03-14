@@ -1,6 +1,8 @@
 import 'rule_item.dart';
 
 class Rule {
+  static const String defaultRuleName = 'default';
+
   Rule({
     required this.name,
     required this.rules,
