@@ -26,7 +26,7 @@ abstract class WhitelistDao {
   }
 
   static Whitelist addPath(String path) {
-    var item = Whitelist(path: path);
+    var item = Whitelist(path: path.toLowerCase());
     return add(item);
   }
 }
