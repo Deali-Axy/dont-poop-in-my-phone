@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dont_poop_in_my_phone/common/global.dart';
+import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:path/path.dart' as path;
 import 'package:dont_poop_in_my_phone/utils/index.dart';
@@ -26,11 +27,7 @@ class FolderItem {
     _dir = Directory(folderPath);
     _dirName = path.basename(folderPath);
     _isRootPath = folderPath == StarFileSystem.SDCARD_ROOT;
-    for (var item in Global.appConfig.whiteList) {
-      if (item.path == folderPath) {
-        _isInWhiteList = true;
-      }
-    }
+    _isInWhiteList = WhitelistDao.contains(folderPath);
     if (isInWhiteList) {
       _label = '重要文件，不支持清理';
     }

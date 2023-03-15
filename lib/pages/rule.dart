@@ -1,10 +1,17 @@
 import 'package:dont_poop_in_my_phone/common/global.dart';
+import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
+import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
 
-class RulePage extends StatelessWidget {
+class RulePage extends StatefulWidget {
   const RulePage({Key? key}) : super(key: key);
 
+  @override
+  State<RulePage> createState() => _RulePageState();
+}
+
+class _RulePageState extends State<RulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,11 +26,14 @@ class RulePage extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    var rule = Rule(name: Rule.defaultRuleName, rules: []);
-    for (var item in Global.appConfig.ruleList) {
-      if (item.name == Rule.defaultRuleName) {
-        rule = item;
-      }
+    var rule = RuleDao.getDefault();
+
+    if (rule.rules.isEmpty) {
+      return Empty(
+        content: '没有清理规则',
+        buttonText: '返回',
+        onButtonPressed: () => Navigator.of(context).pop(),
+      );
     }
 
     return ListView(

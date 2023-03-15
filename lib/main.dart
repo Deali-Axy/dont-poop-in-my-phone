@@ -25,8 +25,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '别在我的手机里拉屎！',
-      theme: ThemeData(brightness: Brightness.light, primarySwatch: Colors.blue),
-      darkTheme: ThemeData(brightness: Brightness.dark),
+      theme: _getTheme(Brightness.light),
+      darkTheme: _getTheme(Brightness.dark),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
       home: SplashPage(),
@@ -37,8 +37,16 @@ class MyApp extends StatelessWidget {
         'introview': (ctx) => IntroViewPage(),
         'rule': (ctx) => RulePage(),
         'splash': (ctx) => SplashPage(),
-        'white_list': (ctx) => WhiteListPage(),
+        'white_list': (ctx) => WhitelistPage(),
       },
+    );
+  }
+
+  ThemeData _getTheme(Brightness brightness){
+    return ThemeData(
+      brightness: brightness,
+      colorSchemeSeed: const Color(0xff0763f5),
+      useMaterial3: false,
     );
   }
 }

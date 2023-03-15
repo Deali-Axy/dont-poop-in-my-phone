@@ -37,8 +37,8 @@ class _MyDrawerState extends State<MyDrawer> {
         children: [
           _buildHeader2(context),
           ListTile(
-            leading: const Icon(Icons.cleaning_services_outlined, size: 35),
-            title: Text('清理'),
+            leading: const Icon(Icons.rule_folder_outlined, size: 35),
+            title: Text('文件管理'),
             onTap: () => {},
           ),
           ListTile(

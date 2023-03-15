@@ -1,10 +1,10 @@
 /// path : ""
 /// annotation : ""
 
-class WhiteList {
-  WhiteList({required this.path, this.annotation = '', this.readOnly = false});
+class Whitelist {
+  Whitelist({required this.path, this.annotation = '', this.readOnly = false});
 
-  WhiteList.fromJson(dynamic json) {
+  Whitelist.fromJson(dynamic json) {
     path = json['path'];
     annotation = json['annotation'];
   }
