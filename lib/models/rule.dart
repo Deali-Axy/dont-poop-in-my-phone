@@ -1,4 +1,4 @@
-import 'rule_item.dart';
+import 'index.dart';
 
 class Rule {
   static const String defaultRuleName = 'default';

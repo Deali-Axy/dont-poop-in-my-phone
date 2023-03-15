@@ -1,4 +1,4 @@
-import 'action_type.dart';
+import 'index.dart';
 
 class RuleItem {
   RuleItem({

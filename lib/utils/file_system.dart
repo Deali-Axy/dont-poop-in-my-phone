@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart' as path;
 
 abstract class StarFileSystem {

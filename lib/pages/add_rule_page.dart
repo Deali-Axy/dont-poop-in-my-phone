@@ -51,7 +51,7 @@ class _AddRulePageState extends State<AddRulePage> {
 
               switch (_ruleType) {
                 case RuleType.whileList:
-                  Global.appConfig.whiteList.add(widget.path);
+                  Global.appConfig.whiteList.add(WhiteList(path: widget.path));
                   Global.saveAppConfig();
                   Navigator.of(context).pop('已经把 ${widget.path} 添加到白名单~');
                   break;

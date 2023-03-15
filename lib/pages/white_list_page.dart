@@ -21,7 +21,8 @@ class _WhiteListPageState extends State<WhiteListPage> {
     return ListView(
       children: Global.appConfig.whiteList.map((e) {
         return ListTile(
-          title: Text(e),
+          title: Text(e.path),
+          subtitle: Text(e.annotation),
         );
       }).toList(),
     );

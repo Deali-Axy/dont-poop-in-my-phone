@@ -1,6 +1,5 @@
-import 'package:dont_poop_in_my_phone/models/rule.dart';
-
-import 'history.dart';
+import 'index.dart';
+import 'package:dont_poop_in_my_phone/utils/index.dart';
 
 class AppConfig {
   AppConfig({
@@ -8,34 +7,27 @@ class AppConfig {
   });
 
   AppConfig.fromJson(dynamic json) {
-    if (json['history'] != null) {
-      history = [];
-      json['history'].forEach((v) => history.add(History.fromJson(v)));
-    }
-    if (json['whiteList'] != null) {
-      whiteList = [];
-      json['whiteList'].forEach((v) => whiteList.add(v.toString()));
-    }
-    if (json['ruleList'] != null) {
-      ruleList = [];
-      json['ruleList'].forEach((v) => ruleList.add(Rule.fromJson(v)));
-    }
+    ruleList = json['history']?.map((e) => History.fromJson(e))?.toList() ?? [];
+    ruleList = json['whiteList']?.map((e) => WhiteList.fromJson(e))?.toList() ?? [];
+    ruleList = json['ruleList']?.map((e) => Rule.fromJson(e))?.toList() ?? [];
   }
 
   AppConfig.fromDefault() {
     history = [];
-    whiteList = [];
+    whiteList = StarFileSystem.PATH_WHITE_LIST.map((e) {
+      return WhiteList(path: e, annotation: '[内置规则]系统/重要文件目录', readOnly: true);
+    }).toList();
     ruleList = [];
   }
 
   late List<History> history;
-  late List<String> whiteList;
+  late List<WhiteList> whiteList;
   late List<Rule> ruleList;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
-      'history': history.map((v) => v.toJson()).toList(),
-      'whiteList': whiteList,
+      'history': history.map((e) => e.toJson()).toList(),
+      'whiteList': whiteList.map((e) => e.toJson()).toList(),
       'ruleList': ruleList.map((e) => e.toJson()).toList(),
     };
 
