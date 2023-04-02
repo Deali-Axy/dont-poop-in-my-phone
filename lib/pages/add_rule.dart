@@ -25,6 +25,8 @@ class AddRulePage extends StatefulWidget {
 class _AddRulePageState extends State<AddRulePage> {
   late TextEditingController _controller;
   RuleType? _ruleType;
+  String _annotation = '';
+
   final List<bool> _expandedStatusList = [true, true, true];
   final List<RuleTypeItem> _rulelist = [
     RuleTypeItem(RuleType.whileList, '白名单'),
@@ -59,15 +61,27 @@ class _AddRulePageState extends State<AddRulePage> {
 
               switch (_ruleType) {
                 case RuleType.whileList:
-                  WhitelistDao.addPath(widget.path);
+                  WhitelistDao.addPath(widget.path, annotation: _annotation);
                   Navigator.of(context).pop('已经把 ${widget.path} 添加到白名单~');
                   break;
                 case RuleType.delete:
-                  RuleDao.add(Rule.defaultRuleName, RuleItem(path: widget.path, actionType: ActionType.delete));
+                  RuleDao.add(
+                      Rule.defaultRuleName,
+                      RuleItem(
+                        path: widget.path,
+                        actionType: ActionType.delete,
+                        annotation: _annotation,
+                      ));
                   Navigator.of(context).pop('已经为 ${widget.path} 添加自动删除规则~');
                   break;
                 case RuleType.deleteAndReplace:
-                  RuleDao.add(Rule.defaultRuleName, RuleItem(path: widget.path, actionType: ActionType.deleteAndReplace));
+                  RuleDao.add(
+                      Rule.defaultRuleName,
+                      RuleItem(
+                        path: widget.path,
+                        actionType: ActionType.deleteAndReplace,
+                        annotation: _annotation,
+                      ));
                   Navigator.of(context).pop('已经为 ${widget.path} 添加自动删除且替换规则~');
                   break;
                 default:
@@ -149,24 +163,8 @@ class _AddRulePageState extends State<AddRulePage> {
           border: OutlineInputBorder(),
           labelText: '请输入标注',
         ),
-        onSubmitted: (String value) async {
-          await showDialog<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Thanks!'),
-                content: Text('You typed "$value", which has length ${value.characters.length}.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
+        onEditingComplete: () {
+          _annotation = _controller.text;
         },
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
@@ -33,6 +34,16 @@ class _WhitelistPageState extends State<WhitelistPage> {
         return ListTile(
           title: Text(e.path),
           subtitle: Text(e.annotation),
+          trailing: e.readOnly
+              ? null
+              : TextButton(
+                  child: const Text('删除'),
+                  onPressed: () {
+                    WhitelistDao.delete(e.path);
+                    BotToast.showText(text: '已删除');
+                    setState(() {});
+                  },
+                ),
         );
       }).toList(),
     );

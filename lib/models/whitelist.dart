@@ -7,6 +7,7 @@ class Whitelist {
   Whitelist.fromJson(dynamic json) {
     path = json['path'];
     annotation = json['annotation'];
+    readOnly = json['readOnly'];
   }
 
   late final String path;
@@ -17,6 +18,7 @@ class Whitelist {
     final map = <String, dynamic>{};
     map['path'] = path;
     map['annotation'] = annotation;
+    map['readOnly'] = readOnly;
     return map;
   }
 }

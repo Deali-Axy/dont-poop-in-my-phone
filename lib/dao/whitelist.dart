@@ -25,8 +25,13 @@ abstract class WhitelistDao {
     return whitelist;
   }
 
-  static Whitelist addPath(String path) {
-    var item = Whitelist(path: path.toLowerCase());
+  static Whitelist addPath(String path, {String annotation = ''}) {
+    var item = Whitelist(path: path.toLowerCase(), annotation: annotation);
     return add(item);
+  }
+
+  static void delete(String path) {
+    Global.appConfig.whiteList.removeWhere((e) => e.path == path);
+    Global.saveAppConfig();
   }
 }
