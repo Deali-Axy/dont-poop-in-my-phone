@@ -1,15 +1,23 @@
 import 'dart:io';
-
-import 'package:bot_toast/bot_toast.dart';
-import 'package:dont_poop_in_my_phone/pages/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:bot_toast/bot_toast.dart';
+import 'package:provider/provider.dart';
 
+import 'states/index.dart';
+import 'pages/index.dart';
 import 'common/global.dart';
 
 void main() {
   Global.init().then((value) {
-    runApp(MyApp());
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeState()),
+        ],
+        child: MyApp(),
+      ),
+    );
   });
 
   if (Platform.isAndroid) {
@@ -25,13 +33,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '别在我的手机里拉屎！',
-      theme: _getTheme(Brightness.light),
-      darkTheme: _getTheme(Brightness.dark),
+      theme: _getTheme(context.watch<ThemeState>().darkMode ? Brightness.dark : Brightness.light),
+      // 以前自适应系统暗色设置才开启的这个配置，现在改成手动
+      // darkTheme: _getTheme(Brightness.dark),
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
       home: SplashPage(),
       routes: {
         'about': (ctx) => AboutPage(),
+        'clean': (ctx) => CleanPage(),
         'history': (ctx) => HistoryPage(),
         'home': (ctx) => HomePage(),
         'introview': (ctx) => IntroViewPage(),
@@ -42,7 +52,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  ThemeData _getTheme(Brightness brightness){
+  ThemeData _getTheme(Brightness brightness) {
     return ThemeData(
       brightness: brightness,
       colorSchemeSeed: const Color(0xff0763f5),

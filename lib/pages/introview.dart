@@ -33,6 +33,15 @@ class IntroViewPage extends StatelessWidget {
       bodyTextStyle: const TextStyle(fontFamily: 'MyFont', color: Colors.white),
     ),
     PageViewModel(
+      pageColor: const Color(0xFF2B5641),
+      iconImageAssetPath: 'assets/icon/icon.png',
+      body: const Text('创建自定义的清理规则，自动清理'),
+      title: const Text('规则'),
+      mainImage: Icon(Icons.rule, size: 285, color: const Color(0xFFACD8FF)),
+      titleTextStyle: const TextStyle(fontFamily: 'MyFont', color: Colors.white),
+      bodyTextStyle: const TextStyle(fontFamily: 'MyFont', color: Colors.white),
+    ),
+    PageViewModel(
       pageBackground: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -64,6 +73,9 @@ class IntroViewPage extends StatelessWidget {
         showNextButton: true,
         showBackButton: true,
         showSkipButton: false,
+        backText: const Text('返回'),
+        nextText: const Text('继续'),
+        doneText: const Text('我知道了'),
         onTapDoneButton: () {
           Global.firstRun = false;
           // Use Navigator.pushReplacement if you want to dispose the latest route
