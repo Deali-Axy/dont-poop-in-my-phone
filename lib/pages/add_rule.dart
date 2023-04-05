@@ -61,8 +61,11 @@ class _AddRulePageState extends State<AddRulePage> {
 
               switch (_ruleType) {
                 case RuleType.whileList:
-                  WhitelistDao.addPath(widget.path, annotation: _annotation);
-                  Navigator.of(context).pop('已经把 ${widget.path} 添加到白名单~');
+                  if (WhitelistDao.addPath(widget.path, annotation: _annotation) != null) {
+                    Navigator.of(context).pop('已经把 ${widget.path} 添加到白名单~');
+                  } else {
+                    BotToast.showText(text: '白名单已存在！');
+                  }
                   break;
                 case RuleType.delete:
                   RuleDao.add(
