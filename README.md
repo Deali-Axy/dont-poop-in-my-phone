@@ -20,7 +20,7 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 
 ## 版本
-### 1.3.1
+### 1.3.0
 - 修复了关于界面的bug
 - 适配 Android 14
 - 新增了自适应图标

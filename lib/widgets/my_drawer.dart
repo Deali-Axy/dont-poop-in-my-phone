@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:dont_poop_in_my_phone/contrib/hitokoto/hitokoto_generator.dart';
 import 'package:dont_poop_in_my_phone/contrib/hitokoto/models/hitokoto.dart';
+import 'package:dont_poop_in_my_phone/states/index.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyDrawer extends StatefulWidget {
   MyDrawer({Key? key}) : super(key: key);
@@ -57,6 +59,12 @@ class _MyDrawerState extends State<MyDrawer> {
             onTap: () => Navigator.of(context).pushNamed('history'),
           ),
           Divider(height: 1, thickness: 1),
+          SwitchListTile(
+            secondary: const Icon(Icons.dark_mode_outlined, size: 35),
+            title: const Text('暗色模式'),
+            value: context.watch<ThemeState>().darkMode,
+            onChanged: (bool? value) => context.read<ThemeState>().darkMode = value ?? false,
+          ),
           ListTile(
             leading: const Icon(Icons.help_outline, size: 35),
             title: Text('帮助'),

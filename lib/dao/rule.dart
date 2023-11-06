@@ -18,6 +18,10 @@ abstract class RuleDao {
     return getByName(Rule.defaultRuleName);
   }
 
+  static bool hasRule(String path) {
+    return getDefault().rules.where((e) => e.path == path).length > 0;
+  }
+
   static Rule add(String ruleName, RuleItem ruleItem) {
     var rule = getByName(ruleName);
     rule.rules.add(ruleItem);

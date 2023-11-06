@@ -7,9 +7,10 @@ class AppConfig {
   });
 
   AppConfig.fromJson(dynamic json) {
-    ruleList = json['history']?.map((e) => History.fromJson(e))?.toList() ?? [];
-    ruleList = json['whiteList']?.map((e) => Whitelist.fromJson(e))?.toList() ?? [];
-    ruleList = json['ruleList']?.map((e) => Rule.fromJson(e))?.toList() ?? [];
+    history = json['history']?.map<History>((e) => History.fromJson(e))?.toList() ?? <History>[];
+    whiteList = json['whiteList']?.map<Whitelist>((e) => Whitelist.fromJson(e))?.toList() ?? <Whitelist>[];
+    ruleList = json['ruleList']?.map<Rule>((e) => Rule.fromJson(e))?.toList() ?? <Rule>[];
+    darkMode = json['darkMode'] ?? false;
   }
 
   AppConfig.fromDefault() {
@@ -23,12 +24,14 @@ class AppConfig {
   late List<History> history;
   late List<Whitelist> whiteList;
   late List<Rule> ruleList;
+  bool darkMode = false;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
       'history': history.map((e) => e.toJson()).toList(),
       'whiteList': whiteList.map((e) => e.toJson()).toList(),
       'ruleList': ruleList.map((e) => e.toJson()).toList(),
+      'darkMode': darkMode,
     };
 
     return map;

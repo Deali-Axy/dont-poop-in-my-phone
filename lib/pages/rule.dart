@@ -40,7 +40,7 @@ class _RulePageState extends State<RulePage> {
       children: rule.rules.map((e) {
         return ListTile(
           title: Text(e.path),
-          subtitle: Text(e.actionType.toString()),
+          subtitle: Text('${e.actionType}\n${e.annotation}'),
         );
       }).toList(),
     );

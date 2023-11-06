@@ -18,15 +18,23 @@ abstract class WhitelistDao {
     return result;
   }
 
-  static Whitelist add(Whitelist whitelist) {
+  static Whitelist? add(Whitelist whitelist) {
+    if (contains(whitelist.path)) {
+      return null;
+    }
     Global.appConfig.whiteList.add(whitelist);
     Global.saveAppConfig();
 
     return whitelist;
   }
 
-  static Whitelist addPath(String path) {
-    var item = Whitelist(path: path.toLowerCase());
+  static Whitelist? addPath(String path, {String annotation = ''}) {
+    var item = Whitelist(path: path.toLowerCase(), annotation: annotation); 
     return add(item);
+  }
+
+  static void delete(String path) {
+    Global.appConfig.whiteList.removeWhere((e) => e.path == path);
+    Global.saveAppConfig();
   }
 }

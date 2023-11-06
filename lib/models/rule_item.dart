@@ -6,6 +6,7 @@ class RuleItem {
   RuleItem.fromJson(dynamic json) {
     path = json['path'];
     actionType = ActionType.values[json['actionType']];
+    annotation = json['annotation'];
   }
 
   late String path;
@@ -16,6 +17,7 @@ class RuleItem {
     final map = <String, dynamic>{};
     map['path'] = path;
     map['actionType'] = actionType.index;
+    map['annotation'] = annotation;
     return map;
   }
 }
