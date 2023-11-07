@@ -15,19 +15,21 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => ThemeState()),
         ],
-        child: MyApp(),
+        child: const MyApp(),
       ),
     );
   });
 
   if (Platform.isAndroid) {
     // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
-    var systemUiOverlayStyle = SystemUiOverlayStyle(statusBarColor: Colors.transparent);
+    var systemUiOverlayStyle = const SystemUiOverlayStyle(statusBarColor: Colors.transparent);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
   }
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -40,14 +42,14 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [BotToastNavigatorObserver()],
       home: SplashPage(),
       routes: {
-        'about': (ctx) => AboutPage(),
-        'clean': (ctx) => CleanPage(),
-        'history': (ctx) => HistoryPage(),
+        'about': (ctx) => const AboutPage(),
+        'clean': (ctx) => const CleanPage(),
+        'history': (ctx) => const HistoryPage(),
         'home': (ctx) => HomePage(),
         'introview': (ctx) => IntroViewPage(),
-        'rule': (ctx) => RulePage(),
+        'rule': (ctx) => const RulePage(),
         'splash': (ctx) => SplashPage(),
-        'white_list': (ctx) => WhitelistPage(),
+        'white_list': (ctx) => const WhitelistPage(),
       },
     );
   }

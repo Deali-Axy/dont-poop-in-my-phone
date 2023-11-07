@@ -1,7 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,10 +9,10 @@ class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
 
   @override
-  _AboutPageState createState() => _AboutPageState();
+  AboutPageState createState() => AboutPageState();
 }
 
-class _AboutPageState extends State<AboutPage> {
+class AboutPageState extends State<AboutPage> {
   bool isUpToDate = false;
 
   @override
@@ -44,31 +43,31 @@ class _AboutPageState extends State<AboutPage> {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        margin: EdgeInsets.fromLTRB(30, 20, 30, 20),
+        margin: const EdgeInsets.fromLTRB(30, 20, 30, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
+            const Text(
               '别在我手机里拉屎',
               style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text('${packageInfo?.version} Build${packageInfo?.buildNumber} (${DateTime.now().toString()})'),
-            SizedBox(height: 10),
-            Text('清理流氓APP产生的垃圾，并且把坑占了，不让它们再生产垃圾！'),
-            SizedBox(height: 40),
-            Text('Design By: DealiAxy'),
-            SizedBox(height: 10),
-            Text('微信公众号：程序设计实验室'),
-            Divider(height: 40),
+            const SizedBox(height: 10),
+            const Text('清理流氓APP产生的垃圾，并且把坑占了，不让它们再生产垃圾！'),
+            const SizedBox(height: 40),
+            const Text('Design By: DealiAxy'),
+            const SizedBox(height: 10),
+            const Text('微信公众号：程序设计实验室'),
+            const Divider(height: 40),
             TextButton.icon(
-              icon: Icon(Icons.details),
-              label: Text('功能介绍'),
+              icon: const Icon(Icons.details),
+              label: const Text('功能介绍'),
               onPressed: () => Navigator.of(context).pushNamed('introview'),
             ),
             TextButton.icon(
-              icon: Icon(Icons.send),
-              label: Text('反馈'),
+              icon: const Icon(Icons.send),
+              label: const Text('反馈'),
               onPressed: () async {
                 // 调用系统邮件客户端来反馈
                 const url = 'mailto:feedback@deali.cn?subject=别在我手机里拉屎App反馈&body=反馈内容：';
@@ -79,12 +78,12 @@ class _AboutPageState extends State<AboutPage> {
                 }
               },
             ),
-            if (isUpToDate) SizedBox(height: 10),
-            if (isUpToDate) Text('已经是最新版本'),
+            if (isUpToDate) const SizedBox(height: 10),
+            if (isUpToDate) const Text('已经是最新版本'),
             if (!isUpToDate)
               TextButton.icon(
-                icon: Icon(Icons.refresh),
-                label: Text('检查新版本'),
+                icon: const Icon(Icons.refresh),
+                label: const Text('检查新版本'),
                 onPressed: () async {
                   showLoading(context, text: '检查更新');
                   var hasUpdate = await AppUpdate.checkUpdate(context);
@@ -95,27 +94,29 @@ class _AboutPageState extends State<AboutPage> {
                   });
                 },
               ),
-            Expanded(child: Text('')),
+            const Expanded(child: Text('')),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 TextButton(
-                    child: Text('软件许可'),
+                    child: const Text('软件许可'),
                     onPressed: () async {
                       var uri = Uri.parse('http://www.sblt.deali.cn:9000/APP许可协议.html');
-                      if (await canLaunchUrl(uri))
+                      if (await canLaunchUrl(uri)) {
                         await launchUrl(uri);
-                      else
+                      } else {
                         BotToast.showText(text: '无法启动浏览器');
+                      }
                     }),
                 TextButton(
-                    child: Text('用户隐私协议'),
+                    child: const Text('用户隐私协议'),
                     onPressed: () async {
                       var uri = Uri.parse('http://www.sblt.deali.cn:9000/APP隐私政策.html');
-                      if (await canLaunchUrl(uri))
+                      if (await canLaunchUrl(uri)) {
                         await launchUrl(uri);
-                      else
+                      } else {
                         BotToast.showText(text: '无法启动浏览器');
+                      }
                     }),
               ],
             ),
