@@ -19,7 +19,7 @@ abstract class RuleDao {
   }
 
   static bool hasRule(String path) {
-    return getDefault().rules.where((e) => e.path == path).length > 0;
+    return getDefault().rules.where((e) => e.path == path).isNotEmpty;
   }
 
   static Rule add(String ruleName, RuleItem ruleItem) {

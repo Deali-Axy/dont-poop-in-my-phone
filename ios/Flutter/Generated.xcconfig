@@ -1,6 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=C:\Users\Deali\scoop\apps\flutter\current
-FLUTTER_APPLICATION_PATH=D:\Code\0_Flutter\dont-poop-in-my-phone
+FLUTTER_ROOT=C:\Users\deali\scoop\apps\flutter\current
+FLUTTER_APPLICATION_PATH=D:\Code\dont_poop_in_my_phone
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=lib\main.dart
 FLUTTER_BUILD_DIR=build

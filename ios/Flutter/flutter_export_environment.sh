@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\Users\Deali\scoop\apps\flutter\current"
-export "FLUTTER_APPLICATION_PATH=D:\Code\0_Flutter\dont-poop-in-my-phone"
+export "FLUTTER_ROOT=C:\Users\deali\scoop\apps\flutter\current"
+export "FLUTTER_APPLICATION_PATH=D:\Code\dont_poop_in_my_phone"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
