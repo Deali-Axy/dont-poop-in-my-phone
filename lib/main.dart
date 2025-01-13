@@ -35,7 +35,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '别在我的手机里拉屎！',
-      theme: _getTheme(context.watch<ThemeState>().darkMode ? Brightness.dark : Brightness.light),
+      theme: _getTheme(
+        context.watch<ThemeState>().darkMode ? Brightness.dark : Brightness.light,
+        context.watch<ThemeState>().material3,
+      ),
       // 以前自适应系统暗色设置才开启的这个配置，现在改成手动
       // darkTheme: _getTheme(Brightness.dark),
       builder: BotToastInit(),
@@ -54,11 +57,11 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  ThemeData _getTheme(Brightness brightness) {
+  ThemeData _getTheme(Brightness brightness, bool useMaterial3) {
     return ThemeData(
       brightness: brightness,
       colorSchemeSeed: const Color(0xff0763f5),
-      useMaterial3: false,
+      useMaterial3: useMaterial3,
     );
   }
 }

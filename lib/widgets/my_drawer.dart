@@ -65,6 +65,13 @@ class _MyDrawerState extends State<MyDrawer> {
             value: context.watch<ThemeState>().darkMode,
             onChanged: (bool? value) => context.read<ThemeState>().darkMode = value ?? false,
           ),
+          SwitchListTile(
+            secondary: const Icon(Icons.adb, size: 35),
+            title: const Text('MD3主题 (beta)'),
+            value: context.watch<ThemeState>().material3,
+            onChanged: (bool? value) => context.read<ThemeState>().material3 = value ?? false,
+          ),
+          Divider(height: 1, thickness: 1),
           ListTile(
             leading: const Icon(Icons.help_outline, size: 35),
             title: Text('帮助'),
