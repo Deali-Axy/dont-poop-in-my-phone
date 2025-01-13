@@ -2,7 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatefulWidget {
