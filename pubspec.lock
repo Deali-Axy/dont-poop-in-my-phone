@@ -557,14 +557,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.0"
-  storage_space:
-    dependency: "direct main"
-    description:
-      name: storage_space
-      sha256: fb9945e2fc239f54eae1147dfe0793b5198769c0f87d0e78a472b58b4385b932
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   stream_channel:
     dependency: transitive
     description:

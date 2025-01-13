@@ -15,11 +15,19 @@ flutter pub run flutter_launcher_icons:main
 ### 打包apk
 
 ```bash
-flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
+flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi --release
 ```
 
 
 ## 版本
+### 1.3.1
+- 适配 Android 15
+- 增加Material3的主题切换开关（不过还没完全适配MD3）
+- 移除了不兼容的 storage_space 组件
+
+参考资料：
+- Flutter 小技巧之 3.16 升级最坑 M3 默认适配技巧 - https://juejin.cn/post/7304537109850472499
+
 ### 1.3.0
 - 修复了关于界面的bug
 - 适配 Android 14

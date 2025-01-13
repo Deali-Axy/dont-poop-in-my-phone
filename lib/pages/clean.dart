@@ -1,4 +1,3 @@
-import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
 
 class CleanPage extends StatefulWidget {
@@ -22,7 +21,7 @@ class _CleanPageState extends State<CleanPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          StorageMeter()
+          Text('功能开发中', style: TextStyle(fontSize: 30))
         ],
       ),
     );
