@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'states/index.dart';
 import 'pages/index.dart';
 import 'common/global.dart';
+import 'utils/theme.dart';
 
 void main() {
   Global.init().then((value) {
@@ -58,10 +59,17 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _getTheme(Brightness brightness, bool useMaterial3) {
+    const primaryColor = Color(0xff0763f5);
+
+    if (useMaterial3) {
+      const md3Theme = MaterialTheme(TextTheme());
+      return brightness == Brightness.light ? md3Theme.light() : md3Theme.dark();
+    }
+
     return ThemeData(
+      useMaterial3: false,
       brightness: brightness,
-      colorSchemeSeed: const Color(0xff0763f5),
-      useMaterial3: useMaterial3,
+      colorSchemeSeed: primaryColor,
     );
   }
 }
