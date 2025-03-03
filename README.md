@@ -20,6 +20,10 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 
 ## 版本
+### 1.3.2
+- 暂时不显示主页的FAB按钮，免得覆盖下面的菜单
+- 底部导航栏增加沉浸效果
+
 ### 1.3.1
 - 适配 Android 15
 - 增加Material3的主题切换开关（不过还没完全适配MD3）

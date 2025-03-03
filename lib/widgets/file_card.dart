@@ -16,6 +16,7 @@ class FileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: fileItem.launch,
       child: Card(
         child: ListTile(
           leading: _buildFileIcon(),
@@ -24,7 +25,6 @@ class FileCard extends StatelessWidget {
           trailing: _buildPopupMenu(),
         ),
       ),
-      onTap: fileItem.launch,
     );
   }
 

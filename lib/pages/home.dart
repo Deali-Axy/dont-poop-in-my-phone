@@ -76,11 +76,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).pushNamed('clean'),
-        label: const Text('自动清理'),
-        icon: const Icon(Icons.cleaning_services_rounded),
-      ),
+      // 暂时不显示这个按钮，免得覆盖下面的菜单
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => Navigator.of(context).pushNamed('clean'),
+      //   label: const Text('自动清理'),
+      //   icon: const Icon(Icons.cleaning_services_rounded),
+      // ),
       drawer: MyDrawer(),
       body: _buildBody(),
     );
