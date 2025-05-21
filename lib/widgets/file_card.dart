@@ -36,16 +36,16 @@ class _FileCardState extends State<FileCard> {
           borderRadius: BorderRadius.circular(12.0),
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            child: ListTile(
-              leading: _buildFileIcon(),
+        child: ListTile(
+          leading: _buildFileIcon(),
               title: Text(
                 widget.fileItem.fileName,
                 style: const TextStyle(
                   fontSize: 16,
                 ),
               ),
-              subtitle: _buildSubtitle(),
-              trailing: _buildPopupMenu(),
+          subtitle: _buildSubtitle(),
+          trailing: _buildPopupMenu(),
             ),
           ),
         ),

@@ -41,8 +41,8 @@ class _FolderCardState extends State<FolderCard> {
           borderRadius: BorderRadius.circular(12.0),
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            child: ListTile(
-              leading: _buildIcon(),
+      child: ListTile(
+        leading: _buildIcon(),
               title: Text(
                 widget.folderItem.dirName,
                 style: TextStyle(
@@ -50,8 +50,8 @@ class _FolderCardState extends State<FolderCard> {
                   fontSize: 16,
                 ),
               ),
-              subtitle: _buildSubtitle(),
-              trailing: _buildPopupMenu(),
+        subtitle: _buildSubtitle(),
+        trailing: _buildPopupMenu(),
             ),
           ),
         ),

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
-import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
@@ -10,7 +9,6 @@ import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
-import 'package:path/path.dart' as osPath;
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,12 +26,17 @@ class _HomePageState extends State<HomePage> {
   var _folders = <FolderItem>[];
   var _files = <FileItem>[];
   var _folderStack = <FolderItem>[];
-  Exception? _exception;
+  Object? _exception;
   bool _isLoading = false;
 
   final _scrollController = ScrollController();
 
-  FolderItem get currentFolder => _folderStack.last;
+  FolderItem get currentFolder {
+    if (_folderStack.isEmpty) {
+      return FolderItem(StarFileSystem.SDCARD_ROOT);
+    }
+    return _folderStack.last;
+  }
 
   @override
   void initState() {
@@ -49,14 +52,20 @@ class _HomePageState extends State<HomePage> {
     AppUpdate.checkUpdate(context);
   }
 
-  /// 请求权限
-  requestPermission() async {
+  Future<void> requestPermission() async {
+    if (!mounted) return;
     _hasPermission = await PermissionService.request();
-    if (_hasPermission) {
-      setState(() {
-        _goToPath(currentFolder);
-      });
-    }
+    if (!mounted) return;
+
+    setState(() {
+      if (_hasPermission) {
+        if (_folderStack.isNotEmpty) {
+          _goToPath(currentFolder);
+        } else {
+          _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
+        }
+      }
+    });
   }
 
   @override
@@ -86,7 +95,13 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _isLoading ? null : () => _goToPath(currentFolder),
+            onPressed: _isLoading ? null : () {
+               if (_folderStack.isNotEmpty) {
+                _goToPath(currentFolder);
+              } else {
+                _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
+              }
+            },
           ),
           IconButton(
             icon: const Icon(Icons.cleaning_services_rounded),
@@ -102,7 +117,7 @@ class _HomePageState extends State<HomePage> {
         onPopInvoked: (didPop) async {
           if (didPop) return;
 
-          if (!currentFolder.isRootPath) {
+          if (_folderStack.length > 1 && !currentFolder.isRootPath) {
             _backToParentPath();
             return;
           }
@@ -110,11 +125,10 @@ class _HomePageState extends State<HomePage> {
           if (_lastWillPopAt == null || 
               DateTime.now().difference(_lastWillPopAt!) > const Duration(seconds: 1)) {
             BotToast.showText(text: '再按一次返回键退出应用~');
-            // 两次点击间隔超过1秒则重新计时
             _lastWillPopAt = DateTime.now();
             return;
           }
-          Navigator.of(context).pop(true);
+          SystemNavigator.pop();
         },
         child: _buildBody(),
       ),
@@ -155,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
-                  onPressed: () => _goToPath(currentFolder),
+                  onPressed: () => _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT)),
                 ),
                 const SizedBox(width: 16),
                 OutlinedButton.icon(
@@ -174,12 +188,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildErrorBody(Exception? error) {
+  Widget _buildErrorBody(Object? error) {
     String friendlyText;
     if (error is FileSystemException) {
-      friendlyText = '无权访问该目录: ${error.message}';
+      friendlyText = '文件系统错误: ${error.path}\n${error.osError?.message ?? error.message}';
+    } else if (error is Exception) {
+      friendlyText = '发生错误: ${error.toString()}';
+    } else if (error != null) {
+      friendlyText = '发生内部错误，请稍后重试。 (${error.runtimeType})';
     } else {
-      friendlyText = error.toString();
+      friendlyText = '发生未知错误';
     }
 
     return Center(
@@ -206,7 +224,7 @@ class _HomePageState extends State<HomePage> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
-              onPressed: _backToParentPath,
+              onPressed: _folderStack.length > 1 ? _backToParentPath : null,
             ),
           ],
         ),
@@ -229,14 +247,14 @@ class _HomePageState extends State<HomePage> {
             Icon(
               Icons.folder_off_rounded,
               size: 80,
-              color: Colors.grey,
+              color: Colors.grey.withOpacity(0.7),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               '空文件夹',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.grey,
+                color: Colors.grey.withOpacity(0.9),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -255,27 +273,26 @@ class _HomePageState extends State<HomePage> {
           (folderItem) => _doDirAction(folderItem, ActionType.deleteAndReplace),
         )));
     
-    // 如果同时有文件夹和文件，添加分隔部分
     if (_folders.isNotEmpty && _files.isNotEmpty) {
       listviewChildren.add(Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            const Icon(Icons.insert_drive_file_outlined, color: Colors.grey),
+            Icon(Icons.insert_drive_file_outlined, color: Colors.grey.shade600),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               '文件',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey,
+                color: Colors.grey.shade700,
               ),
             ),
-            Expanded(
+            const Expanded(
               child: Divider(
-                indent: 8,
+                indent: 12,
                 endIndent: 8,
-                color: Colors.grey.withOpacity(0.3),
+                thickness: 0.8,
               ),
             ),
           ],
@@ -283,7 +300,6 @@ class _HomePageState extends State<HomePage> {
       ));
     }
     
-    // 添加文件
     listviewChildren.addAll(_files.map((e) => FileCard(
           e,
           (fileItem) => _doFileAction(fileItem, ActionType.deleteAndReplace),
@@ -295,7 +311,7 @@ class _HomePageState extends State<HomePage> {
         if (_folderStack.length > 1) _buildBreadCrumb(),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 72, top: 4),
             itemCount: listviewChildren.length,
             itemBuilder: (context, index) => listviewChildren[index],
           ),
@@ -305,30 +321,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBody() {
-    if (!_hasPermission) {
+    if (!_hasPermission && !_isLoading) {
       return _buildNoPermissionBody();
     }
 
     if (_exception != null) {
       return _buildErrorBody(_exception);
     }
-
     return _buildNormalBody();
   }
 
   Widget _buildBreadCrumb() {
     return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 8),
+      margin: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 4),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 1,
-            offset: const Offset(0, 1),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -340,47 +355,53 @@ class _HomePageState extends State<HomePage> {
           builder: (index) {
             var dirName = _folderStack[index].dirName;
             if (dirName == '0') dirName = '根目录';
+            final bool isLast = index == _folderStack.length - 1;
   
             return BreadCrumbItem(
-              content: Text(
-                dirName,
-                style: TextStyle(
-                  fontWeight: index == _folderStack.length - 1 ? FontWeight.bold : FontWeight.normal,
-                  color: index == _folderStack.length - 1
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).textTheme.bodyMedium?.color,
+              content: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Text(
+                  dirName,
+                  style: TextStyle(
+                    fontWeight: isLast ? FontWeight.bold : FontWeight.normal,
+                    color: isLast
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                    fontSize: 15,
+                  ),
                 ),
               ),
-              onTap: () => _goToStackIndex(index),
-              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+              onTap: isLast ? null : () => _goToStackIndex(index),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
             );
           },
           divider: Icon(
             Icons.chevron_right_rounded,
-            color: Theme.of(context).colorScheme.primary,
-            size: 20,
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+            size: 22,
           ),
         ),
       ),
     );
   }
 
-  /// 处理文件夹操作
   Future _doDirAction(FolderItem folderItem, ActionType actionType) async {
+    if (!mounted) return;
     var title = actionType == ActionType.deleteAndReplace ? '删除并替换目录' : '删除目录';
     var result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(title),
-        content: Text('确定要${actionType == ActionType.deleteAndReplace ? "删除并替换" : "删除"}目录 ${folderItem.dirName} 吗？'),
+        content: Text('确定要${actionType == ActionType.deleteAndReplace ? "删除并替换" : "删除"}目录 "${folderItem.dirName}" 吗？此操作不可恢复。'),
         actions: [
           TextButton(
             child: const Text('取消'),
             onPressed: () => Navigator.of(context).pop(false),
           ),
-          FilledButton(
+          FilledButton.tonal(
             child: const Text('确定'),
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.8)),
             onPressed: () => Navigator.of(context).pop(true),
           ),
         ],
@@ -388,46 +409,51 @@ class _HomePageState extends State<HomePage> {
     );
     
     if (result != true) return;
+    if (!mounted) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
     
     try {
       await folderItem.delete(replace: actionType == ActionType.deleteAndReplace);
+      if (!mounted) return;
 
-      _folders.remove(folderItem);
-      // 替换的话，把目录加到文件那里去
-      if (actionType == ActionType.deleteAndReplace) {
-        _files.add(FileItem(folderItem.folderPath));
-      }
-      BotToast.showText(text: '处理文件夹 ${folderItem.dirName} 完成！');
-    } catch (ex) {
-      ErrorHandler().handleGeneralError(context, ex);
-    } finally {
       setState(() {
-        _isLoading = false;
-        _updateTitleBar();
+        _folders.remove(folderItem);
+        if (actionType == ActionType.deleteAndReplace) {
+          _files.add(FileItem(folderItem.folderPath));
+          _files.sort((a, b) => a.fileName.compareTo(b.fileName));
+        }
       });
+      BotToast.showText(text: '处理文件夹 "${folderItem.dirName}" 完成！');
+    } catch (ex) {
+      if (mounted) ErrorHandler().handleGeneralError(context, ex);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _updateTitleBar();
+        });
+      }
     }
   }
 
-  /// 处理文件操作
   Future _doFileAction(FileItem fileItem, ActionType actionType) async {
+    if (!mounted) return;
     var title = actionType == ActionType.deleteAndReplace ? '删除并替换文件' : '删除文件';
     var result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(title),
-        content: Text('确定要${actionType == ActionType.deleteAndReplace ? "删除并替换" : "删除"}文件 ${fileItem.fileName} 吗？'),
+        content: Text('确定要${actionType == ActionType.deleteAndReplace ? "删除并替换" : "删除"}文件 "${fileItem.fileName}" 吗？此操作不可恢复。'),
         actions: [
           TextButton(
             child: const Text('取消'),
             onPressed: () => Navigator.of(context).pop(false),
           ),
-          FilledButton(
+          FilledButton.tonal(
             child: const Text('确定'),
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.8)),
             onPressed: () => Navigator.of(context).pop(true),
           ),
         ],
@@ -435,100 +461,128 @@ class _HomePageState extends State<HomePage> {
     );
     
     if (result != true) return;
-
-    setState(() {
-      _isLoading = true;
-    });
+    if (!mounted) return;
+    
+    setState(() => _isLoading = true);
     
     try {
       await fileItem.delete(replace: actionType == ActionType.deleteAndReplace);
-      _files.remove(fileItem);
-      BotToast.showText(text: '处理文件 ${fileItem.fileName} 完成！');
+      if (!mounted) return;
+      setState(() => _files.remove(fileItem));
+      BotToast.showText(text: '处理文件 "${fileItem.fileName}" 完成！');
     } catch (ex) {
-      ErrorHandler().handleGeneralError(context, ex);
+      if (mounted) ErrorHandler().handleGeneralError(context, ex);
     } finally {
-      setState(() {
-        _isLoading = false;
-        _updateTitleBar();
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _updateTitleBar();
+        });
+      }
     }
   }
 
-  /// 跳转到指定路径
-  Future _goToPath(FolderItem folderItem) async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _exception = null;
-      });
+  Future<void> _goToPath(FolderItem folderItem) async {
+    if (!mounted) return;
 
+    setState(() {
+      _isLoading = true;
+      _exception = null;
+    });
+
+    try {
       if (!_hasPermission) {
-        await requestPermission();
-        if (!_hasPermission) return;
+        _hasPermission = await PermissionService.request();
+        if (!mounted) return;
+
+        if (!_hasPermission) {
+          setState(() => _isLoading = false);
+          return;
+        }
+        setState(() {}); 
       }
 
-      // 如果是根目录，就清空堆栈，开始入栈
       if (folderItem.isRootPath) {
         _folderStack.clear();
       }
 
-      // 先尝试打开目录，如果目录不存在就返回
       var directory = Directory(folderItem.folderPath);
       if (!directory.existsSync()) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
-          _exception = FileSystemException('目录不存在');
+          _exception = FileSystemException('目录不存在或无法访问', folderItem.folderPath);
         });
         return;
       }
+      
+      var tempFolders = FolderItem.getFolderItems(folderItem.folderPath);
+      var tempFiles = FileItem.getFileItems(folderItem.folderPath);
 
-      // 获取对应目录的文件夹和文件
-      _folders = FolderItem.getFolderItems(folderItem.folderPath);
-      _files = FileItem.getFileItems(folderItem.folderPath);
+      if (!mounted) return;
 
-      // 入栈
-      if (_folderStack.any((element) => element.folderPath == folderItem.folderPath)) {
-        // 如果堆栈中有这一项(意味着点了面包屑)
-        // 就从栈中删除目标元素及之后的所有元素，直到目标元素成为栈顶
-        var index = _folderStack.indexWhere((element) => element.folderPath == folderItem.folderPath);
-        _folderStack.removeRange(index + 1, _folderStack.length);
+      int existingIndex = _folderStack.indexWhere((e) => e.folderPath == folderItem.folderPath);
+      if (existingIndex != -1) {
+        if (existingIndex + 1 < _folderStack.length) {
+          _folderStack.removeRange(existingIndex + 1, _folderStack.length);
+        }
       } else {
         _folderStack.add(folderItem);
       }
-
+      
+      _folders = tempFolders;
+      _files = tempFiles;
+      
       _updateTitleBar();
+      
       setState(() {
         _isLoading = false;
       });
+      
+      if (_folderStack.isNotEmpty && existingIndex == -1 && _scrollController.hasClients) {
+         WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollController.hasClients) {
+                 _scrollController.animateTo(
+                    _scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                );
+            }
+        });
+      }
+
     } catch (e) {
+      if (!mounted) return;
+      ErrorHandler().handleGeneralError(context, e);
       setState(() {
         _isLoading = false;
-        _exception = e as Exception;
+        _exception = e;
       });
     }
   }
 
-  /// 后退栈
   void _goToStackIndex(int index) {
     if (index < 0 || index >= _folderStack.length) return;
-
-    _goToPath(_folderStack[index]);
+    if (index < _folderStack.length -1) {
+       _goToPath(_folderStack[index]);
+    }
   }
 
-  /// 返回上一级目录
   void _backToParentPath() {
-    if (_folderStack.length <= 1) return; // 已经到了根目录，不能继续返回
-
-    _folderStack.removeLast(); // 移除栈顶
-    _goToPath(_folderStack.removeLast()); // 移除当前栈顶并打开，会自动入栈
+    if (_folderStack.length <= 1) return; 
+    
+    FolderItem parentItem = _folderStack[_folderStack.length - 2];
+    _goToPath(parentItem);
   }
 
-  /// 更新标题栏
   void _updateTitleBar() {
-    if (currentFolder.isRootPath) {
+    if (!mounted) return;
+    if (_folderStack.isEmpty) {
       _subtitle = '';
+    } else if (currentFolder.isRootPath) {
+      _subtitle = '存储根目录';
     } else {
-      _subtitle = '当前位置：${currentFolder.folderPath}';
+      _subtitle = currentFolder.dirName;
     }
   }
 }

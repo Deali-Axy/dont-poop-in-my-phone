@@ -74,14 +74,14 @@ class AboutPageState extends State<AboutPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    '别在我手机里拉屎',
+            const Text(
+              '别在我手机里拉屎',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                  ),
+            ),
                   const SizedBox(height: 8),
                   Text(
                     '${packageInfo?.version} (Build ${packageInfo?.buildNumber})',
@@ -126,36 +126,36 @@ class AboutPageState extends State<AboutPage> {
                         icon: Icons.help_outline,
                         text: '功能介绍',
                         onTap: () => Navigator.of(context).pushNamed('introview'),
-                      ),
+            ),
                       _buildActionButton(
                         icon: Icons.send,
                         text: '意见反馈',
                         onTap: () async {
-                          const url = 'mailto:feedback@deali.cn?subject=别在我手机里拉屎App反馈&body=反馈内容：';
-                          if (await canLaunchUrl(Uri.parse(url))) {
-                            await launchUrl(Uri.parse(url));
-                          } else {
-                            BotToast.showText(text: '无法启动邮件客户端');
-                          }
-                        },
-                      ),
+                const url = 'mailto:feedback@deali.cn?subject=别在我手机里拉屎App反馈&body=反馈内容：';
+                if (await canLaunchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url));
+                } else {
+                  BotToast.showText(text: '无法启动邮件客户端');
+                }
+              },
+            ),
                       _buildActionButton(
                         icon: isUpToDate ? Icons.check_circle_outline : Icons.refresh,
                         text: isUpToDate ? '已是最新版本' : '检查更新',
                         onTap: isUpToDate 
                             ? null 
                             : () async {
-                                showLoading(context, text: '检查更新');
-                                var hasUpdate = await AppUpdate.checkUpdate(context);
-                                Navigator.of(context).pop();
+                  showLoading(context, text: '检查更新');
+                  var hasUpdate = await AppUpdate.checkUpdate(context);
+                  Navigator.of(context).pop();
                                 if (!hasUpdate) {
                                   BotToast.showText(text: '已经是最新版本');
-                                  setState(() {
-                                    isUpToDate = true;
-                                  });
+                  setState(() {
+                    isUpToDate = true;
+                  });
                                 }
-                              },
-                      ),
+                },
+              ),
                     ],
                   ),
                 ],
@@ -168,7 +168,7 @@ class AboutPageState extends State<AboutPage> {
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
+              children: <Widget>[
                   TextButton.icon(
                     icon: Icon(Icons.gavel, size: 18, color: Theme.of(context).colorScheme.primary),
                     label: const Text('软件许可'),
@@ -193,8 +193,8 @@ class AboutPageState extends State<AboutPage> {
                       }
                     },
                   ),
-                ],
-              ),
+              ],
+            ),
             ),
             const SizedBox(height: 8),
             Center(
