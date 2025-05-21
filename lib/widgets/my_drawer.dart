@@ -71,6 +71,11 @@ class _MyDrawerState extends State<MyDrawer> {
                   title: '历史记录',
                   onTap: () => Navigator.of(context).pushNamed('history'),
                 ),
+                _buildMenuItem(
+                  icon: Icons.bug_report_outlined,
+                  title: '调试工具',
+                  onTap: () => Navigator.of(context).pushNamed('debug'),
+                ),
                 const Divider(height: 1, thickness: 1),
                 SwitchListTile(
                   secondary: Icon(

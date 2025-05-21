@@ -10,6 +10,7 @@ class AppRoutes {
   static const String rule = 'rule';
   static const String splash = 'splash';
   static const String whitelist = 'white_list';
+  static const String debug = 'debug';
   
   static Map<String, WidgetBuilder> routes = {
     home: (ctx) => HomePage(),
@@ -20,6 +21,7 @@ class AppRoutes {
     rule: (ctx) => const RulePage(),
     splash: (ctx) => SplashPage(),
     whitelist: (ctx) => const WhitelistPage(),
+    debug: (ctx) => const DebugPage(),
   };
   
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
