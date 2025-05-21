@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MyDrawer extends StatefulWidget {
-  MyDrawer({Key? key}) : super(key: key);
+  const MyDrawer({Key? key}) : super(key: key);
 
   @override
   _MyDrawerState createState() => _MyDrawerState();
@@ -34,87 +34,86 @@ class _MyDrawerState extends State<MyDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.watch<ThemeState>().darkMode;
+    
     return Drawer(
+      elevation: 16.0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+      ),
       child: Column(
         children: [
-          _buildHeader2(context),
-          ListTile(
-            leading: const Icon(Icons.rule_folder_outlined, size: 35),
-            title: Text('文件管理'),
-            onTap: () => {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.list_alt, size: 35),
-            title: Text('白名单'),
-            onTap: () => Navigator.of(context).pushNamed('white_list'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.rule, size: 35),
-            title: Text('清理规则'),
-            onTap: () => Navigator.of(context).pushNamed('rule'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.history, size: 35),
-            title: Text('历史记录'),
-            onTap: () => Navigator.of(context).pushNamed('history'),
-          ),
-          Divider(height: 1, thickness: 1),
-          SwitchListTile(
-            secondary: const Icon(Icons.dark_mode_outlined, size: 35),
-            title: const Text('暗色模式'),
-            value: context.watch<ThemeState>().darkMode,
-            onChanged: (bool? value) => context.read<ThemeState>().darkMode = value ?? false,
-          ),
-          SwitchListTile(
-            secondary: const Icon(Icons.adb, size: 35),
-            title: const Text('MD3主题 (beta)'),
-            value: context.watch<ThemeState>().material3,
-            onChanged: (bool? value) => context.read<ThemeState>().material3 = value ?? false,
-          ),
-          Divider(height: 1, thickness: 1),
-          ListTile(
-            leading: const Icon(Icons.help_outline, size: 35),
-            title: Text('帮助'),
-            onTap: () => Navigator.of(context).pushReplacementNamed('introview'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.info_outline, size: 35),
-            title: Text('关于'),
-            onTap: () => Navigator.of(context).pushNamed('about'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      color: Theme.of(context).primaryColor,
-      padding: const EdgeInsets.only(top: 40, bottom: 20, right: 10),
-      child: Row(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: ClipOval(
-              child: Image.asset('assets/icon/icon.png', width: 60),
-            ),
-          ),
+          _buildHeader(context),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // 用户名
-                Text(
-                  _currentHitokoto.creator,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                  overflow: TextOverflow.ellipsis,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildMenuItem(
+                  icon: Icons.folder_outlined,
+                  title: '文件管理',
+                  onTap: () => {},
                 ),
-                // 个性签名
-                Text(
-                  _currentHitokoto.hitokoto,
-                  style: TextStyle(fontSize: 12, color: Colors.white),
-                  softWrap: true,
-                  maxLines: 2,
+                _buildMenuItem(
+                  icon: Icons.shield_outlined,
+                  title: '白名单',
+                  onTap: () => Navigator.of(context).pushNamed('white_list'),
+                ),
+                _buildMenuItem(
+                  icon: Icons.rule,
+                  title: '清理规则',
+                  onTap: () => Navigator.of(context).pushNamed('rule'),
+                ),
+                _buildMenuItem(
+                  icon: Icons.history,
+                  title: '历史记录',
+                  onTap: () => Navigator.of(context).pushNamed('history'),
+                ),
+                const Divider(height: 1, thickness: 1),
+                SwitchListTile(
+                  secondary: Icon(
+                    isDarkMode ? Icons.dark_mode : Icons.light_mode, 
+                    size: 28, 
+                    color: isDarkMode ? Theme.of(context).colorScheme.primary : Colors.amber,
+                  ),
+                  title: Text(
+                    '暗色模式',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  value: context.watch<ThemeState>().darkMode,
+                  onChanged: (bool? value) => context.read<ThemeState>().darkMode = value ?? false,
+                ),
+                SwitchListTile(
+                  secondary: Icon(
+                    Icons.design_services,
+                    size: 28,
+                    color: context.watch<ThemeState>().material3 
+                      ? Theme.of(context).colorScheme.primary 
+                      : Colors.grey,
+                  ),
+                  title: const Text(
+                    'Material 3',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  value: context.watch<ThemeState>().material3,
+                  onChanged: (bool? value) => context.read<ThemeState>().material3 = value ?? false,
+                ),
+                const Divider(height: 1, thickness: 1),
+                _buildMenuItem(
+                  icon: Icons.help_outline,
+                  title: '帮助',
+                  onTap: () => Navigator.of(context).pushReplacementNamed('introview'),
+                ),
+                _buildMenuItem(
+                  icon: Icons.info_outline,
+                  title: '关于',
+                  onTap: () => Navigator.of(context).pushNamed('about'),
                 ),
               ],
             ),
@@ -124,28 +123,82 @@ class _MyDrawerState extends State<MyDrawer> {
     );
   }
 
-  Widget _buildHeader2(BuildContext context) {
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      leading: Icon(icon, size: 28),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
     return UserAccountsDrawerHeader(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.primary.withOpacity(0.7),
+          ],
+        ),
+        image: DecorationImage(
+          image: NetworkImage(_backgroundImageUrl),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.3),
+            BlendMode.darken,
+          ),
+        ),
+      ),
       accountName: Text(
         _currentHitokoto.creator,
-        style: TextStyle(fontSize: 20),
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          shadows: [
+            Shadow(
+              offset: Offset(1, 1),
+              blurRadius: 3,
+              color: Colors.black38,
+            ),
+          ],
+        ),
       ),
       accountEmail: Container(
-        padding: EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.only(right: 10),
         child: Text(
           _currentHitokoto.hitokoto,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 12),
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.white,
+            shadows: [
+              Shadow(
+                offset: Offset(1, 1),
+                blurRadius: 3,
+                color: Colors.black38,
+              ),
+            ],
+          ),
         ),
       ),
-      currentAccountPicture: Image.asset('assets/icon/icon.png', width: 40),
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        image: DecorationImage(
-          image: NetworkImage(_backgroundImageUrl),
-          fit: BoxFit.cover,
-        ),
+      currentAccountPicture: CircleAvatar(
+        backgroundImage: AssetImage('assets/icon/icon.png'),
+        backgroundColor: Colors.white,
       ),
     );
   }

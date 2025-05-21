@@ -3,15 +3,33 @@ import 'package:flutter/material.dart';
 class StarTextButton extends StatelessWidget {
   final Icon icon;
   final String text;
+  final VoidCallback? onPressed;
 
-  StarTextButton({required this.icon, required this.text});
+  const StarTextButton({
+    Key? key,
+    required this.icon,
+    required this.text,
+    this.onPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: [icon, VerticalDivider(width: 10), Text(text)],
-      ),
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: icon,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: icon.color ?? Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ],
     );
   }
 }
