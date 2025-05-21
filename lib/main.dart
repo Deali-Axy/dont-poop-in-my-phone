@@ -7,9 +7,16 @@ import 'package:provider/provider.dart';
 import 'states/index.dart';
 import 'pages/index.dart';
 import 'common/global.dart';
-import 'utils/theme.dart';
+import 'common/routes.dart';
+import 'utils/index.dart';
 
 void main() {
+  // 捕获全局Flutter错误
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    ErrorHandler().handleGeneralError(null, details.exception);
+  };
+
   Global.init().then((value) {
     runApp(
       MultiProvider(
@@ -49,16 +56,8 @@ class MyApp extends StatelessWidget {
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
       home: SplashPage(),
-      routes: {
-        'about': (ctx) => const AboutPage(),
-        'clean': (ctx) => const CleanPage(),
-        'history': (ctx) => const HistoryPage(),
-        'home': (ctx) => HomePage(),
-        'introview': (ctx) => IntroViewPage(),
-        'rule': (ctx) => const RulePage(),
-        'splash': (ctx) => SplashPage(),
-        'white_list': (ctx) => const WhitelistPage(),
-      },
+      routes: AppRoutes.routes,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
 
