@@ -119,13 +119,32 @@ class _DebugPageState extends State<DebugPage> {
     
     _log('开始生成测试文件...');
     
-    if (_externalStoragePath == null) {
-      _log('错误: 未能获取存储路径');
-      setState(() => _isGeneratingFiles = false);
-      return;
+    String targetBaseDir;
+
+    if (Platform.isAndroid) {
+      targetBaseDir = StarFileSystem.SDCARD_ROOT;
+      _log('Android 平台：测试文件将在 $targetBaseDir/$_testDirName 下生成');
+    } else if (Platform.isIOS) {
+      if (_externalStoragePath == null) {
+        _log('错误: iOS未能获取应用文档目录路径');
+        setState(() => _isGeneratingFiles = false);
+        return;
+      }
+      targetBaseDir = _externalStoragePath!;
+      _log('iOS 平台：测试文件将在 $targetBaseDir/$_testDirName 下生成');
+    } else {
+      // Fallback for other platforms
+      if (_externalStoragePath == null) {
+        _log('错误: 未能获取存储路径用于不受支持的平台');
+        setState(() => _isGeneratingFiles = false);
+        return;
+      }
+      targetBaseDir = _externalStoragePath!;
+      _log('警告: 在不受支持的平台上使用默认存储路径: $targetBaseDir/$_testDirName');
     }
     
-    final testBasePath = path.join(_externalStoragePath!, _testDirName);
+    final testBasePath = path.join(targetBaseDir, _testDirName);
+    
     try {
       // 创建测试根目录
       final baseDir = Directory(testBasePath);
