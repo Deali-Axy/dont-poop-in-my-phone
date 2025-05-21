@@ -30,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
 
   final _scrollController = ScrollController();
+  final _listScrollController = ScrollController();
+  final _scrollPositions = <String, double>{};
 
   FolderItem get currentFolder {
     if (_folderStack.isEmpty) {
@@ -50,6 +52,13 @@ class _HomePageState extends State<HomePage> {
     // 启动就打开根目录
     _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
     AppUpdate.checkUpdate(context);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _listScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> requestPermission() async {
@@ -311,6 +320,7 @@ class _HomePageState extends State<HomePage> {
         if (_folderStack.length > 1) _buildBreadCrumb(),
         Expanded(
           child: ListView.builder(
+            controller: _listScrollController,
             padding: const EdgeInsets.only(bottom: 72, top: 4),
             itemCount: listviewChildren.length,
             itemBuilder: (context, index) => listviewChildren[index],
@@ -484,6 +494,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _goToPath(FolderItem folderItem) async {
     if (!mounted) return;
+    
+    // 保存当前目录的滚动位置
+    if (_folderStack.isNotEmpty && _listScrollController.hasClients) {
+      _scrollPositions[currentFolder.folderPath] = _listScrollController.offset;
+    }
 
     setState(() {
       _isLoading = true;
@@ -550,6 +565,20 @@ class _HomePageState extends State<HomePage> {
             }
         });
       }
+      
+      // 恢复目录的滚动位置
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_listScrollController.hasClients) {
+          double? savedPosition = _scrollPositions[folderItem.folderPath];
+          if (savedPosition != null) {
+            _listScrollController.jumpTo(
+              savedPosition.clamp(0.0, _listScrollController.position.maxScrollExtent)
+            );
+          } else {
+            _listScrollController.jumpTo(0.0);
+          }
+        }
+      });
 
     } catch (e) {
       if (!mounted) return;
