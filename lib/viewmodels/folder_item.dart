@@ -33,7 +33,7 @@ class FolderItem {
 
   /// 异步初始化白名单状态
   Future<void> initWhitelistStatus() async {
-    _isInWhiteList = await WhitelistDao.contains(folderPath);
+    _isInWhiteList = await WhitelistDao.containsPath(folderPath);
     if (_isInWhiteList) {
       _label = '重要文件，不支持清理';
     }

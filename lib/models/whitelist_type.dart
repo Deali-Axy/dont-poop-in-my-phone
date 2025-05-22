@@ -1,0 +1,4 @@
+enum WhitelistType {
+  path,
+  regex,
+} 

@@ -1,5 +1,7 @@
 # dont_poop_in_my_phone
 
+一个用于Android文件清理的Flutter应用。
+
 别在我的手机里拉屎！
 
 ## Build
@@ -95,3 +97,31 @@ flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi
 
 ### 1.1.0
 - 第一个版本发布
+
+## 错误修复：数据库访问
+
+修复了运行时出现的 `UnimplementedError: 应该通过database_manager.dart中的扩展方法实现` 错误。
+
+### 问题原因
+
+原来的设计中，我们尝试使用Dart的扩展方法（extension methods）来扩展AppDatabase类的功能，但是这种方式无法覆盖原始类中的方法实现。当代码尝试访问AppDatabase的方法时，仍然调用的是原始类中的方法，而这些方法只抛出异常。
+
+### 解决方案
+
+1. 重构了数据库访问层设计模式：
+   - 用一个完整的 `DatabaseService` 类替代扩展方法
+   - 将 `DatabaseManager` 作为一个静态访问点，提供 `service` 属性
+
+2. 修改了DAO层：
+   - 将所有 `DatabaseManager.database` 的引用改为 `DatabaseManager.service`
+
+3. 简化了 `AppDatabase` 类：
+   - 移除了所有抛出 `UnimplementedError` 的方法
+
+### 主要变更
+
+- `database_manager.dart`: 创建新的 `DatabaseService` 类代替扩展方法
+- `database.dart`: 移除不需要的方法声明
+- `dao/*.dart`: 更新所有DAO类使用新的 `DatabaseService`
+
+这种设计模式更符合依赖注入和单一职责原则，并且解决了扩展方法不能覆盖基类方法的技术限制。

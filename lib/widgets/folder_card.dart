@@ -117,7 +117,7 @@ class _FolderCardState extends State<FolderCard> {
                   break;
                 case 3:
                   String result = await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (ctx) => AddRulePage(path: widget.folderItem.folderPath),
+                    builder: (ctx) => AddRulePage(initialPath: widget.folderItem.folderPath),
                   ));
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(result),

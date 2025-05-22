@@ -1,8 +1,9 @@
 export 'about.dart';
 export 'add_rule.dart';
+export 'add_whitelist_page.dart';
 export 'clean.dart';
 export 'debug.dart';
-export 'history.dart';
+export 'history_page.dart';
 export 'home.dart';
 export 'introview.dart';
 export 'rule.dart';

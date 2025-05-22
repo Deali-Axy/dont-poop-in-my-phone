@@ -2,11 +2,14 @@ import 'index.dart';
 
 class Rule {
   static const String defaultRuleName = 'default';
+  static const String recommendRuleName = 'recommend';
+  static const String customRuleName = 'custom';
 
   Rule({
     this.id,
     required this.name,
     required this.rules,
+    this.isSystemRule = false,
   });
 
   Rule.fromJson(dynamic json) {
@@ -18,11 +21,13 @@ class Rule {
         rules.add(RuleItem.fromJson(v));
       });
     }
+    isSystemRule = json['isSystemRule'] ?? false;
   }
 
   int? id;
   late String name;
   late List<RuleItem> rules;
+  late bool isSystemRule;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -31,6 +36,7 @@ class Rule {
     if (rules != null) {
       map['rules'] = rules.map((v) => v.toJson()).toList();
     }
+    map['isSystemRule'] = isSystemRule;
     return map;
   }
 }
