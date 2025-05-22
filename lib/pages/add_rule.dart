@@ -12,9 +12,10 @@ enum AppRuleType { whileList, delete, deleteAndReplace }
 class AppRuleTypeItem {
   AppRuleType ruleType;
   String verboseName;
+  IconData icon;
   models.ActionType? actionType; // For mapping to actual ActionType
 
-  AppRuleTypeItem(this.ruleType, this.verboseName, {this.actionType});
+  AppRuleTypeItem(this.ruleType, this.verboseName, this.icon, {this.actionType});
 }
 
 class AddRulePage extends StatefulWidget {
@@ -41,10 +42,16 @@ class _AddRulePageState extends State<AddRulePage> {
   
   // UI representation of rule types. This mapping needs care.
   final List<AppRuleTypeItem> _appRuleTypeList = [
-    AppRuleTypeItem(AppRuleType.whileList, '白名单'), // Whitelist is handled separately now usually
-    AppRuleTypeItem(AppRuleType.deleteAndReplace, '删除并替换为空文件', actionType: models.ActionType.deleteAndReplace),
-    AppRuleTypeItem(AppRuleType.delete, '仅删除目录/文件', actionType: models.ActionType.delete),
+    AppRuleTypeItem(AppRuleType.whileList, '白名单', Icons.shield_outlined), // Whitelist is handled separately now usually
+    AppRuleTypeItem(AppRuleType.deleteAndReplace, '删除并替换为空文件', Icons.find_replace_rounded, actionType: models.ActionType.deleteAndReplace),
+    AppRuleTypeItem(AppRuleType.delete, '仅删除目录/文件', Icons.delete_outline_rounded, actionType: models.ActionType.delete),
     // Consider adding deleteFolder, deleteFile specific options if AppRuleType is to be fine-grained
+  ];
+
+  final List<Map<String, dynamic>> _pathMatchTypeList = [
+    {'type': models.PathMatchType.exact, 'name': '精确路径', 'icon': Icons.folder_outlined, 'description': '完全匹配指定路径'},
+    {'type': models.PathMatchType.fuzzy, 'name': '模糊匹配', 'icon': Icons.folder_special_outlined, 'description': '匹配相似的路径'},
+    {'type': models.PathMatchType.regex, 'name': '正则表达式', 'icon': Icons.code_rounded, 'description': '使用正则表达式匹配路径'},
   ];
 
   bool get _isEditMode => widget.ruleItemToEdit != null;
@@ -89,8 +96,9 @@ class _AddRulePageState extends State<AddRulePage> {
         title: Text(_isEditMode ? '编辑规则' : '添加规则'),
         actions: [
           IconButton(
-            icon: Icon(Icons.check),
+            icon: Icon(Icons.check_circle_rounded),
             onPressed: _saveRule, // Changed to a method
+            tooltip: '保存规则',
           ),
         ],
       ),
@@ -165,133 +173,244 @@ class _AddRulePageState extends State<AddRulePage> {
   }
 
   Widget _buildBody() {
-    var panelTitleStyle = TextStyle(fontWeight: FontWeight.bold);
-    var panels = ExpansionPanelList(
-      expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _expandedStatusList[index] = !isExpanded;
-        });
-      },
-      children: [
-        ExpansionPanel(
-          isExpanded: _expandedStatusList[0],
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(title: Text('路径', style: panelTitleStyle));
-          },
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              controller: _pathController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '输入目标路径',
-              ),
-            ),
-          ),
-        ),
-        ExpansionPanel(
-          isExpanded: _expandedStatusList[1],
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(title: Text('规则类型 (操作)', style: panelTitleStyle));
-          },
-          body: _buildRuleTypePanel(), // Renamed
-        ),
-        ExpansionPanel(
-          isExpanded: _expandedStatusList[2],
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(title: Text('路径匹配方式与优先级', style: panelTitleStyle));
-          },
-          body: _buildMatchingAndPriorityPanel(), // New Panel
-        ),
-        ExpansionPanel(
-          isExpanded: _expandedStatusList[3],
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(title: Text('标注 (可选)', style: panelTitleStyle));
-          },
-          body: _buildAnnotationPanel(),
-        ),
-      ],
-    );
     return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: panels,
-      ),
-    );
-  }
-
-  Widget _buildRuleTypePanel() { // Renamed and modified
-    return Column(
-      children: _appRuleTypeList.map((e) {
-        // If this page no longer handles whitelist, filter it out.
-        // For now, assuming it might, or for user clarity.
-        // if (e.ruleType == AppRuleType.whileList && _isEditMode && widget.ruleItemToEdit != null) return SizedBox.shrink(); 
-
-        return RadioListTile<AppRuleType>(
-          title: Text(e.verboseName),
-          value: e.ruleType,
-          groupValue: _selectedAppRuleType,
-          onChanged: (AppRuleType? value) {
-            setState(() {
-              _selectedAppRuleType = value;
-            });
-          },
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildMatchingAndPriorityPanel() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('路径匹配方式:', style: TextStyle(fontWeight: FontWeight.bold)),
-          DropdownButton<models.PathMatchType>(
-            value: _selectedPathMatchType,
-            isExpanded: true,
-            items: models.PathMatchType.values.map((models.PathMatchType value) {
-              return DropdownMenuItem<models.PathMatchType>(
-                value: value,
-                child: Text(value.toString().split('.').last), // Simple display name
-              );
-            }).toList(),
-            onChanged: (models.PathMatchType? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedPathMatchType = newValue;
-                });
-              }
-            },
-          ),
-          SizedBox(height: 20),
-          Text('优先级 (数字越大越高):', style: TextStyle(fontWeight: FontWeight.bold)),
-          TextFormField(
-            initialValue: _priority.toString(),
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value) {
-              _priority = int.tryParse(value) ?? 0;
-            },
-          ),
+          _buildPathSection(),
+          SizedBox(height: 16),
+          _buildRuleTypeSection(),
+          SizedBox(height: 16),
+          _buildMatchingAndPrioritySection(),
+          SizedBox(height: 16),
+          _buildAnnotationSection(),
+          SizedBox(height: 32),
+          _buildSaveButton(),
         ],
       ),
     );
   }
 
-  Widget _buildAnnotationPanel() {
-    return Padding(
-       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: TextField(
-        controller: _annotationController,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: '输入标注信息',
+  Widget _buildPathSection() {
+    return Card(
+      elevation: 2.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(Icons.folder_open_rounded, '目标路径'),
+            SizedBox(height: 16),
+            TextField(
+              controller: _pathController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                labelText: '输入目标路径',
+                prefixIcon: Icon(Icons.folder_outlined),
+                hintText: '例如：/data/app/...',
+                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
+              maxLines: 2,
+              minLines: 1,
+            ),
+          ],
         ),
-        // onEditingComplete is handled by _saveRule now for controllers
+      ),
+    );
+  }
+
+  Widget _buildRuleTypeSection() {
+    return Card(
+      elevation: 2.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(Icons.settings_applications_outlined, '规则类型（操作）'),
+            SizedBox(height: 8),
+            ..._appRuleTypeList.map((e) {
+              return RadioListTile<AppRuleType>(
+                title: Row(
+                  children: [
+                    Icon(e.icon, size: 22, color: Theme.of(context).colorScheme.secondary),
+                    SizedBox(width: 12),
+                    Text(e.verboseName),
+                  ],
+                ),
+                value: e.ruleType,
+                groupValue: _selectedAppRuleType,
+                onChanged: (AppRuleType? value) {
+                  setState(() {
+                    _selectedAppRuleType = value;
+                  });
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+                selected: _selectedAppRuleType == e.ruleType,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMatchingAndPrioritySection() {
+    return Card(
+      elevation: 2.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(Icons.compare_arrows_outlined, '路径匹配方式与优先级'),
+            SizedBox(height: 16),
+            Text('路径匹配方式:', style: TextStyle(fontWeight: FontWeight.w500)),
+            SizedBox(height: 8),
+            _buildPathMatchTypeSelector(),
+            SizedBox(height: 20),
+            Text('优先级 (数字越大越高):', style: TextStyle(fontWeight: FontWeight.w500)),
+            SizedBox(height: 8),
+            _buildPriorityInput(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPathMatchTypeSelector() {
+    return Column(
+      children: _pathMatchTypeList.map((option) {
+        return RadioListTile<models.PathMatchType>(
+          title: Row(
+            children: [
+              Icon(option['icon'], size: 22, color: Theme.of(context).colorScheme.secondary),
+              SizedBox(width: 12),
+              Text(option['name']),
+            ],
+          ),
+          subtitle: Text(
+            option['description'],
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+          ),
+          value: option['type'],
+          groupValue: _selectedPathMatchType,
+          onChanged: (models.PathMatchType? newValue) {
+            if (newValue != null) {
+              setState(() {
+                _selectedPathMatchType = newValue;
+              });
+            }
+          },
+          activeColor: Theme.of(context).colorScheme.primary,
+          selected: _selectedPathMatchType == option['type'],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildPriorityInput() {
+    return Row(
+      children: [
+        Icon(Icons.priority_high_rounded, size: 22, color: Theme.of(context).colorScheme.secondary),
+        SizedBox(width: 12),
+        Expanded(
+          child: TextFormField(
+            initialValue: _priority.toString(),
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              hintText: '输入数字，默认为0',
+              contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            ),
+            onChanged: (value) {
+              setState(() {
+                _priority = int.tryParse(value) ?? 0;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAnnotationSection() {
+    return Card(
+      elevation: 2.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(Icons.comment_outlined, '标注（可选）'),
+            SizedBox(height: 16),
+            TextField(
+              controller: _annotationController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                labelText: '输入标注信息',
+                hintText: '为此规则添加注解说明...',
+                prefixIcon: Icon(Icons.short_text_rounded),
+                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(IconData icon, String title) {
+    return Row(
+      children: [
+        Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
+        SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        icon: Icon(Icons.save_rounded),
+        label: Text(_isEditMode ? '保存修改' : '创建规则'),
+        onPressed: _saveRule,
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 14),
+          textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
       ),
     );
   }
