@@ -3,7 +3,7 @@ import 'package:dont_poop_in_my_phone/database/database_manager.dart';
 
 abstract class RuleDao {
   static Future<Rule> getByName(String name) async {
-    return await DatabaseManager.database.getRuleByName(name);
+    return await DatabaseManager.service.getRuleByName(name);
   }
 
   static Future<Rule> getDefault() async {
@@ -11,10 +11,10 @@ abstract class RuleDao {
   }
 
   static Future<bool> hasRule(String path) async {
-    return await DatabaseManager.database.hasRule(path);
+    return await DatabaseManager.service.hasRule(path);
   }
 
   static Future<Rule> add(String ruleName, RuleItem ruleItem) async {
-    return await DatabaseManager.database.addRuleItem(ruleName, ruleItem);
+    return await DatabaseManager.service.addRuleItem(ruleName, ruleItem);
   }
 }

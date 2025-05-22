@@ -3,12 +3,12 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $WhitelistsTable extends Whitelists
-    with TableInfo<$WhitelistsTable, models.Whitelist> {
+class $WhitelistEntitiesTable extends WhitelistEntities
+    with TableInfo<$WhitelistEntitiesTable, WhitelistEntity> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $WhitelistsTable(this.attachedDatabase, [this._alias]);
+  $WhitelistEntitiesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -64,9 +64,9 @@ class $WhitelistsTable extends Whitelists
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'whitelists';
+  static const String $name = 'whitelist_entities';
   @override
-  VerificationContext validateIntegrity(Insertable<models.Whitelist> instance,
+  VerificationContext validateIntegrity(Insertable<WhitelistEntity> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -103,9 +103,9 @@ class $WhitelistsTable extends Whitelists
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  models.Whitelist map(Map<String, dynamic> data, {String? tablePrefix}) {
+  WhitelistEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Whitelist(
+    return WhitelistEntity(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       path: attachedDatabase.typeMapping
@@ -122,19 +122,19 @@ class $WhitelistsTable extends Whitelists
   }
 
   @override
-  $WhitelistsTable createAlias(String alias) {
-    return $WhitelistsTable(attachedDatabase, alias);
+  $WhitelistEntitiesTable createAlias(String alias) {
+    return $WhitelistEntitiesTable(attachedDatabase, alias);
   }
 }
 
-class Whitelist extends DataClass implements Insertable<models.Whitelist> {
+class WhitelistEntity extends DataClass implements Insertable<WhitelistEntity> {
   final int id;
   final String path;
   final String annotation;
   final bool readOnly;
   final DateTime createdAt;
   final DateTime updatedAt;
-  const Whitelist(
+  const WhitelistEntity(
       {required this.id,
       required this.path,
       required this.annotation,
@@ -153,8 +153,8 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
     return map;
   }
 
-  WhitelistsCompanion toCompanion(bool nullToAbsent) {
-    return WhitelistsCompanion(
+  WhitelistEntitiesCompanion toCompanion(bool nullToAbsent) {
+    return WhitelistEntitiesCompanion(
       id: Value(id),
       path: Value(path),
       annotation: Value(annotation),
@@ -164,10 +164,10 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
     );
   }
 
-  factory Whitelist.fromJson(Map<String, dynamic> json,
+  factory WhitelistEntity.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Whitelist(
+    return WhitelistEntity(
       id: serializer.fromJson<int>(json['id']),
       path: serializer.fromJson<String>(json['path']),
       annotation: serializer.fromJson<String>(json['annotation']),
@@ -189,14 +189,14 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
     };
   }
 
-  Whitelist copyWith(
+  WhitelistEntity copyWith(
           {int? id,
           String? path,
           String? annotation,
           bool? readOnly,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
-      Whitelist(
+      WhitelistEntity(
         id: id ?? this.id,
         path: path ?? this.path,
         annotation: annotation ?? this.annotation,
@@ -204,8 +204,8 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
-  Whitelist copyWithCompanion(WhitelistsCompanion data) {
-    return Whitelist(
+  WhitelistEntity copyWithCompanion(WhitelistEntitiesCompanion data) {
+    return WhitelistEntity(
       id: data.id.present ? data.id.value : this.id,
       path: data.path.present ? data.path.value : this.path,
       annotation:
@@ -218,7 +218,7 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
 
   @override
   String toString() {
-    return (StringBuffer('Whitelist(')
+    return (StringBuffer('WhitelistEntity(')
           ..write('id: $id, ')
           ..write('path: $path, ')
           ..write('annotation: $annotation, ')
@@ -235,7 +235,7 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Whitelist &&
+      (other is WhitelistEntity &&
           other.id == this.id &&
           other.path == this.path &&
           other.annotation == this.annotation &&
@@ -244,14 +244,14 @@ class Whitelist extends DataClass implements Insertable<models.Whitelist> {
           other.updatedAt == this.updatedAt);
 }
 
-class WhitelistsCompanion extends UpdateCompanion<models.Whitelist> {
+class WhitelistEntitiesCompanion extends UpdateCompanion<WhitelistEntity> {
   final Value<int> id;
   final Value<String> path;
   final Value<String> annotation;
   final Value<bool> readOnly;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
-  const WhitelistsCompanion({
+  const WhitelistEntitiesCompanion({
     this.id = const Value.absent(),
     this.path = const Value.absent(),
     this.annotation = const Value.absent(),
@@ -259,7 +259,7 @@ class WhitelistsCompanion extends UpdateCompanion<models.Whitelist> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
-  WhitelistsCompanion.insert({
+  WhitelistEntitiesCompanion.insert({
     this.id = const Value.absent(),
     required String path,
     this.annotation = const Value.absent(),
@@ -267,7 +267,7 @@ class WhitelistsCompanion extends UpdateCompanion<models.Whitelist> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : path = Value(path);
-  static Insertable<models.Whitelist> custom({
+  static Insertable<WhitelistEntity> custom({
     Expression<int>? id,
     Expression<String>? path,
     Expression<String>? annotation,
@@ -285,14 +285,14 @@ class WhitelistsCompanion extends UpdateCompanion<models.Whitelist> {
     });
   }
 
-  WhitelistsCompanion copyWith(
+  WhitelistEntitiesCompanion copyWith(
       {Value<int>? id,
       Value<String>? path,
       Value<String>? annotation,
       Value<bool>? readOnly,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt}) {
-    return WhitelistsCompanion(
+    return WhitelistEntitiesCompanion(
       id: id ?? this.id,
       path: path ?? this.path,
       annotation: annotation ?? this.annotation,
@@ -328,7 +328,7 @@ class WhitelistsCompanion extends UpdateCompanion<models.Whitelist> {
 
   @override
   String toString() {
-    return (StringBuffer('WhitelistsCompanion(')
+    return (StringBuffer('WhitelistEntitiesCompanion(')
           ..write('id: $id, ')
           ..write('path: $path, ')
           ..write('annotation: $annotation, ')
@@ -340,11 +340,12 @@ class WhitelistsCompanion extends UpdateCompanion<models.Whitelist> {
   }
 }
 
-class $RulesTable extends Rules with TableInfo<$RulesTable, models.Rule> {
+class $RuleEntitiesTable extends RuleEntities
+    with TableInfo<$RuleEntitiesTable, RuleEntity> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $RulesTable(this.attachedDatabase, [this._alias]);
+  $RuleEntitiesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -381,9 +382,9 @@ class $RulesTable extends Rules with TableInfo<$RulesTable, models.Rule> {
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'rules';
+  static const String $name = 'rule_entities';
   @override
-  VerificationContext validateIntegrity(Insertable<models.Rule> instance,
+  VerificationContext validateIntegrity(Insertable<RuleEntity> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -410,9 +411,9 @@ class $RulesTable extends Rules with TableInfo<$RulesTable, models.Rule> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  models.Rule map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RuleEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Rule(
+    return RuleEntity(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
@@ -425,17 +426,17 @@ class $RulesTable extends Rules with TableInfo<$RulesTable, models.Rule> {
   }
 
   @override
-  $RulesTable createAlias(String alias) {
-    return $RulesTable(attachedDatabase, alias);
+  $RuleEntitiesTable createAlias(String alias) {
+    return $RuleEntitiesTable(attachedDatabase, alias);
   }
 }
 
-class Rule extends DataClass implements Insertable<models.Rule> {
+class RuleEntity extends DataClass implements Insertable<RuleEntity> {
   final int id;
   final String name;
   final DateTime createdAt;
   final DateTime updatedAt;
-  const Rule(
+  const RuleEntity(
       {required this.id,
       required this.name,
       required this.createdAt,
@@ -450,8 +451,8 @@ class Rule extends DataClass implements Insertable<models.Rule> {
     return map;
   }
 
-  RulesCompanion toCompanion(bool nullToAbsent) {
-    return RulesCompanion(
+  RuleEntitiesCompanion toCompanion(bool nullToAbsent) {
+    return RuleEntitiesCompanion(
       id: Value(id),
       name: Value(name),
       createdAt: Value(createdAt),
@@ -459,10 +460,10 @@ class Rule extends DataClass implements Insertable<models.Rule> {
     );
   }
 
-  factory Rule.fromJson(Map<String, dynamic> json,
+  factory RuleEntity.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Rule(
+    return RuleEntity(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -480,16 +481,16 @@ class Rule extends DataClass implements Insertable<models.Rule> {
     };
   }
 
-  Rule copyWith(
+  RuleEntity copyWith(
           {int? id, String? name, DateTime? createdAt, DateTime? updatedAt}) =>
-      Rule(
+      RuleEntity(
         id: id ?? this.id,
         name: name ?? this.name,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
-  Rule copyWithCompanion(RulesCompanion data) {
-    return Rule(
+  RuleEntity copyWithCompanion(RuleEntitiesCompanion data) {
+    return RuleEntity(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -499,7 +500,7 @@ class Rule extends DataClass implements Insertable<models.Rule> {
 
   @override
   String toString() {
-    return (StringBuffer('Rule(')
+    return (StringBuffer('RuleEntity(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
@@ -513,31 +514,31 @@ class Rule extends DataClass implements Insertable<models.Rule> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Rule &&
+      (other is RuleEntity &&
           other.id == this.id &&
           other.name == this.name &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
 
-class RulesCompanion extends UpdateCompanion<models.Rule> {
+class RuleEntitiesCompanion extends UpdateCompanion<RuleEntity> {
   final Value<int> id;
   final Value<String> name;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
-  const RulesCompanion({
+  const RuleEntitiesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
-  RulesCompanion.insert({
+  RuleEntitiesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : name = Value(name);
-  static Insertable<models.Rule> custom({
+  static Insertable<RuleEntity> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<DateTime>? createdAt,
@@ -551,12 +552,12 @@ class RulesCompanion extends UpdateCompanion<models.Rule> {
     });
   }
 
-  RulesCompanion copyWith(
+  RuleEntitiesCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt}) {
-    return RulesCompanion(
+    return RuleEntitiesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
@@ -584,7 +585,7 @@ class RulesCompanion extends UpdateCompanion<models.Rule> {
 
   @override
   String toString() {
-    return (StringBuffer('RulesCompanion(')
+    return (StringBuffer('RuleEntitiesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
@@ -594,12 +595,12 @@ class RulesCompanion extends UpdateCompanion<models.Rule> {
   }
 }
 
-class $RuleItemsTable extends RuleItems
-    with TableInfo<$RuleItemsTable, models.RuleItem> {
+class $RuleItemEntitiesTable extends RuleItemEntities
+    with TableInfo<$RuleItemEntitiesTable, RuleItemEntity> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $RuleItemsTable(this.attachedDatabase, [this._alias]);
+  $RuleItemEntitiesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -616,7 +617,7 @@ class $RuleItemsTable extends RuleItems
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES rules (id) ON DELETE CASCADE'));
+          'REFERENCES rule_entities (id) ON DELETE CASCADE'));
   static const VerificationMeta _pathMeta = const VerificationMeta('path');
   @override
   late final GeneratedColumn<String> path = GeneratedColumn<String>(
@@ -659,9 +660,9 @@ class $RuleItemsTable extends RuleItems
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'rule_items';
+  static const String $name = 'rule_item_entities';
   @override
-  VerificationContext validateIntegrity(Insertable<models.RuleItem> instance,
+  VerificationContext validateIntegrity(Insertable<RuleItemEntity> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -708,9 +709,9 @@ class $RuleItemsTable extends RuleItems
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  models.RuleItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RuleItemEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return RuleItem(
+    return RuleItemEntity(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       ruleId: attachedDatabase.typeMapping
@@ -729,12 +730,12 @@ class $RuleItemsTable extends RuleItems
   }
 
   @override
-  $RuleItemsTable createAlias(String alias) {
-    return $RuleItemsTable(attachedDatabase, alias);
+  $RuleItemEntitiesTable createAlias(String alias) {
+    return $RuleItemEntitiesTable(attachedDatabase, alias);
   }
 }
 
-class RuleItem extends DataClass implements Insertable<models.RuleItem> {
+class RuleItemEntity extends DataClass implements Insertable<RuleItemEntity> {
   final int id;
   final int ruleId;
   final String path;
@@ -742,7 +743,7 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
   final String annotation;
   final DateTime createdAt;
   final DateTime updatedAt;
-  const RuleItem(
+  const RuleItemEntity(
       {required this.id,
       required this.ruleId,
       required this.path,
@@ -763,8 +764,8 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
     return map;
   }
 
-  RuleItemsCompanion toCompanion(bool nullToAbsent) {
-    return RuleItemsCompanion(
+  RuleItemEntitiesCompanion toCompanion(bool nullToAbsent) {
+    return RuleItemEntitiesCompanion(
       id: Value(id),
       ruleId: Value(ruleId),
       path: Value(path),
@@ -775,10 +776,10 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
     );
   }
 
-  factory RuleItem.fromJson(Map<String, dynamic> json,
+  factory RuleItemEntity.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return RuleItem(
+    return RuleItemEntity(
       id: serializer.fromJson<int>(json['id']),
       ruleId: serializer.fromJson<int>(json['ruleId']),
       path: serializer.fromJson<String>(json['path']),
@@ -802,7 +803,7 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
     };
   }
 
-  RuleItem copyWith(
+  RuleItemEntity copyWith(
           {int? id,
           int? ruleId,
           String? path,
@@ -810,7 +811,7 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
           String? annotation,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
-      RuleItem(
+      RuleItemEntity(
         id: id ?? this.id,
         ruleId: ruleId ?? this.ruleId,
         path: path ?? this.path,
@@ -819,8 +820,8 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
-  RuleItem copyWithCompanion(RuleItemsCompanion data) {
-    return RuleItem(
+  RuleItemEntity copyWithCompanion(RuleItemEntitiesCompanion data) {
+    return RuleItemEntity(
       id: data.id.present ? data.id.value : this.id,
       ruleId: data.ruleId.present ? data.ruleId.value : this.ruleId,
       path: data.path.present ? data.path.value : this.path,
@@ -835,7 +836,7 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
 
   @override
   String toString() {
-    return (StringBuffer('RuleItem(')
+    return (StringBuffer('RuleItemEntity(')
           ..write('id: $id, ')
           ..write('ruleId: $ruleId, ')
           ..write('path: $path, ')
@@ -853,7 +854,7 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is RuleItem &&
+      (other is RuleItemEntity &&
           other.id == this.id &&
           other.ruleId == this.ruleId &&
           other.path == this.path &&
@@ -863,7 +864,7 @@ class RuleItem extends DataClass implements Insertable<models.RuleItem> {
           other.updatedAt == this.updatedAt);
 }
 
-class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
+class RuleItemEntitiesCompanion extends UpdateCompanion<RuleItemEntity> {
   final Value<int> id;
   final Value<int> ruleId;
   final Value<String> path;
@@ -871,7 +872,7 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
   final Value<String> annotation;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
-  const RuleItemsCompanion({
+  const RuleItemEntitiesCompanion({
     this.id = const Value.absent(),
     this.ruleId = const Value.absent(),
     this.path = const Value.absent(),
@@ -880,7 +881,7 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
-  RuleItemsCompanion.insert({
+  RuleItemEntitiesCompanion.insert({
     this.id = const Value.absent(),
     required int ruleId,
     required String path,
@@ -891,7 +892,7 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
   })  : ruleId = Value(ruleId),
         path = Value(path),
         actionType = Value(actionType);
-  static Insertable<models.RuleItem> custom({
+  static Insertable<RuleItemEntity> custom({
     Expression<int>? id,
     Expression<int>? ruleId,
     Expression<String>? path,
@@ -911,7 +912,7 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
     });
   }
 
-  RuleItemsCompanion copyWith(
+  RuleItemEntitiesCompanion copyWith(
       {Value<int>? id,
       Value<int>? ruleId,
       Value<String>? path,
@@ -919,7 +920,7 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
       Value<String>? annotation,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt}) {
-    return RuleItemsCompanion(
+    return RuleItemEntitiesCompanion(
       id: id ?? this.id,
       ruleId: ruleId ?? this.ruleId,
       path: path ?? this.path,
@@ -959,7 +960,7 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
 
   @override
   String toString() {
-    return (StringBuffer('RuleItemsCompanion(')
+    return (StringBuffer('RuleItemEntitiesCompanion(')
           ..write('id: $id, ')
           ..write('ruleId: $ruleId, ')
           ..write('path: $path, ')
@@ -972,12 +973,12 @@ class RuleItemsCompanion extends UpdateCompanion<models.RuleItem> {
   }
 }
 
-class $HistoriesTable extends Histories
-    with TableInfo<$HistoriesTable, models.History> {
+class $HistoryEntitiesTable extends HistoryEntities
+    with TableInfo<$HistoryEntitiesTable, HistoryEntity> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $HistoriesTable(this.attachedDatabase, [this._alias]);
+  $HistoryEntitiesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1023,9 +1024,9 @@ class $HistoriesTable extends Histories
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'histories';
+  static const String $name = 'history_entities';
   @override
-  VerificationContext validateIntegrity(Insertable<models.History> instance,
+  VerificationContext validateIntegrity(Insertable<HistoryEntity> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1068,9 +1069,9 @@ class $HistoriesTable extends Histories
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  models.History map(Map<String, dynamic> data, {String? tablePrefix}) {
+  HistoryEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return History(
+    return HistoryEntity(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
@@ -1087,19 +1088,19 @@ class $HistoriesTable extends Histories
   }
 
   @override
-  $HistoriesTable createAlias(String alias) {
-    return $HistoriesTable(attachedDatabase, alias);
+  $HistoryEntitiesTable createAlias(String alias) {
+    return $HistoryEntitiesTable(attachedDatabase, alias);
   }
 }
 
-class History extends DataClass implements Insertable<models.History> {
+class HistoryEntity extends DataClass implements Insertable<HistoryEntity> {
   final int id;
   final String name;
   final String path;
   final DateTime time;
   final int actionType;
   final DateTime createdAt;
-  const History(
+  const HistoryEntity(
       {required this.id,
       required this.name,
       required this.path,
@@ -1118,8 +1119,8 @@ class History extends DataClass implements Insertable<models.History> {
     return map;
   }
 
-  HistoriesCompanion toCompanion(bool nullToAbsent) {
-    return HistoriesCompanion(
+  HistoryEntitiesCompanion toCompanion(bool nullToAbsent) {
+    return HistoryEntitiesCompanion(
       id: Value(id),
       name: Value(name),
       path: Value(path),
@@ -1129,10 +1130,10 @@ class History extends DataClass implements Insertable<models.History> {
     );
   }
 
-  factory History.fromJson(Map<String, dynamic> json,
+  factory HistoryEntity.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return History(
+    return HistoryEntity(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       path: serializer.fromJson<String>(json['path']),
@@ -1154,14 +1155,14 @@ class History extends DataClass implements Insertable<models.History> {
     };
   }
 
-  History copyWith(
+  HistoryEntity copyWith(
           {int? id,
           String? name,
           String? path,
           DateTime? time,
           int? actionType,
           DateTime? createdAt}) =>
-      History(
+      HistoryEntity(
         id: id ?? this.id,
         name: name ?? this.name,
         path: path ?? this.path,
@@ -1169,8 +1170,8 @@ class History extends DataClass implements Insertable<models.History> {
         actionType: actionType ?? this.actionType,
         createdAt: createdAt ?? this.createdAt,
       );
-  History copyWithCompanion(HistoriesCompanion data) {
-    return History(
+  HistoryEntity copyWithCompanion(HistoryEntitiesCompanion data) {
+    return HistoryEntity(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       path: data.path.present ? data.path.value : this.path,
@@ -1183,7 +1184,7 @@ class History extends DataClass implements Insertable<models.History> {
 
   @override
   String toString() {
-    return (StringBuffer('History(')
+    return (StringBuffer('HistoryEntity(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('path: $path, ')
@@ -1199,7 +1200,7 @@ class History extends DataClass implements Insertable<models.History> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is History &&
+      (other is HistoryEntity &&
           other.id == this.id &&
           other.name == this.name &&
           other.path == this.path &&
@@ -1208,14 +1209,14 @@ class History extends DataClass implements Insertable<models.History> {
           other.createdAt == this.createdAt);
 }
 
-class HistoriesCompanion extends UpdateCompanion<models.History> {
+class HistoryEntitiesCompanion extends UpdateCompanion<HistoryEntity> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> path;
   final Value<DateTime> time;
   final Value<int> actionType;
   final Value<DateTime> createdAt;
-  const HistoriesCompanion({
+  const HistoryEntitiesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.path = const Value.absent(),
@@ -1223,7 +1224,7 @@ class HistoriesCompanion extends UpdateCompanion<models.History> {
     this.actionType = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
-  HistoriesCompanion.insert({
+  HistoryEntitiesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required String path,
@@ -1234,7 +1235,7 @@ class HistoriesCompanion extends UpdateCompanion<models.History> {
         path = Value(path),
         time = Value(time),
         actionType = Value(actionType);
-  static Insertable<models.History> custom({
+  static Insertable<HistoryEntity> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? path,
@@ -1252,14 +1253,14 @@ class HistoriesCompanion extends UpdateCompanion<models.History> {
     });
   }
 
-  HistoriesCompanion copyWith(
+  HistoryEntitiesCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
       Value<String>? path,
       Value<DateTime>? time,
       Value<int>? actionType,
       Value<DateTime>? createdAt}) {
-    return HistoriesCompanion(
+    return HistoryEntitiesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       path: path ?? this.path,
@@ -1295,7 +1296,7 @@ class HistoriesCompanion extends UpdateCompanion<models.History> {
 
   @override
   String toString() {
-    return (StringBuffer('HistoriesCompanion(')
+    return (StringBuffer('HistoryEntitiesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('path: $path, ')
@@ -1310,31 +1311,35 @@ class HistoriesCompanion extends UpdateCompanion<models.History> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $WhitelistsTable whitelists = $WhitelistsTable(this);
-  late final $RulesTable rules = $RulesTable(this);
-  late final $RuleItemsTable ruleItems = $RuleItemsTable(this);
-  late final $HistoriesTable histories = $HistoriesTable(this);
+  late final $WhitelistEntitiesTable whitelistEntities =
+      $WhitelistEntitiesTable(this);
+  late final $RuleEntitiesTable ruleEntities = $RuleEntitiesTable(this);
+  late final $RuleItemEntitiesTable ruleItemEntities =
+      $RuleItemEntitiesTable(this);
+  late final $HistoryEntitiesTable historyEntities =
+      $HistoryEntitiesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [whitelists, rules, ruleItems, histories];
+      [whitelistEntities, ruleEntities, ruleItemEntities, historyEntities];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
           WritePropagation(
-            on: TableUpdateQuery.onTableName('rules',
+            on: TableUpdateQuery.onTableName('rule_entities',
                 limitUpdateKind: UpdateKind.delete),
             result: [
-              TableUpdate('rule_items', kind: UpdateKind.delete),
+              TableUpdate('rule_item_entities', kind: UpdateKind.delete),
             ],
           ),
         ],
       );
 }
 
-typedef $$WhitelistsTableCreateCompanionBuilder = WhitelistsCompanion Function({
+typedef $$WhitelistEntitiesTableCreateCompanionBuilder
+    = WhitelistEntitiesCompanion Function({
   Value<int> id,
   required String path,
   Value<String> annotation,
@@ -1342,7 +1347,8 @@ typedef $$WhitelistsTableCreateCompanionBuilder = WhitelistsCompanion Function({
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
 });
-typedef $$WhitelistsTableUpdateCompanionBuilder = WhitelistsCompanion Function({
+typedef $$WhitelistEntitiesTableUpdateCompanionBuilder
+    = WhitelistEntitiesCompanion Function({
   Value<int> id,
   Value<String> path,
   Value<String> annotation,
@@ -1351,9 +1357,9 @@ typedef $$WhitelistsTableUpdateCompanionBuilder = WhitelistsCompanion Function({
   Value<DateTime> updatedAt,
 });
 
-class $$WhitelistsTableFilterComposer
-    extends Composer<_$AppDatabase, $WhitelistsTable> {
-  $$WhitelistsTableFilterComposer({
+class $$WhitelistEntitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $WhitelistEntitiesTable> {
+  $$WhitelistEntitiesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1379,9 +1385,9 @@ class $$WhitelistsTableFilterComposer
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$WhitelistsTableOrderingComposer
-    extends Composer<_$AppDatabase, $WhitelistsTable> {
-  $$WhitelistsTableOrderingComposer({
+class $$WhitelistEntitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $WhitelistEntitiesTable> {
+  $$WhitelistEntitiesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1407,9 +1413,9 @@ class $$WhitelistsTableOrderingComposer
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$WhitelistsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $WhitelistsTable> {
-  $$WhitelistsTableAnnotationComposer({
+class $$WhitelistEntitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WhitelistEntitiesTable> {
+  $$WhitelistEntitiesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1435,31 +1441,33 @@ class $$WhitelistsTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$WhitelistsTableTableManager extends RootTableManager<
+class $$WhitelistEntitiesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $WhitelistsTable,
-    models.Whitelist,
-    $$WhitelistsTableFilterComposer,
-    $$WhitelistsTableOrderingComposer,
-    $$WhitelistsTableAnnotationComposer,
-    $$WhitelistsTableCreateCompanionBuilder,
-    $$WhitelistsTableUpdateCompanionBuilder,
+    $WhitelistEntitiesTable,
+    WhitelistEntity,
+    $$WhitelistEntitiesTableFilterComposer,
+    $$WhitelistEntitiesTableOrderingComposer,
+    $$WhitelistEntitiesTableAnnotationComposer,
+    $$WhitelistEntitiesTableCreateCompanionBuilder,
+    $$WhitelistEntitiesTableUpdateCompanionBuilder,
     (
-      models.Whitelist,
-      BaseReferences<_$AppDatabase, $WhitelistsTable, models.Whitelist>
+      WhitelistEntity,
+      BaseReferences<_$AppDatabase, $WhitelistEntitiesTable, WhitelistEntity>
     ),
-    models.Whitelist,
+    WhitelistEntity,
     PrefetchHooks Function()> {
-  $$WhitelistsTableTableManager(_$AppDatabase db, $WhitelistsTable table)
+  $$WhitelistEntitiesTableTableManager(
+      _$AppDatabase db, $WhitelistEntitiesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$WhitelistsTableFilterComposer($db: db, $table: table),
+              $$WhitelistEntitiesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$WhitelistsTableOrderingComposer($db: db, $table: table),
+              $$WhitelistEntitiesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$WhitelistsTableAnnotationComposer($db: db, $table: table),
+              $$WhitelistEntitiesTableAnnotationComposer(
+                  $db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> path = const Value.absent(),
@@ -1468,7 +1476,7 @@ class $$WhitelistsTableTableManager extends RootTableManager<
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              WhitelistsCompanion(
+              WhitelistEntitiesCompanion(
             id: id,
             path: path,
             annotation: annotation,
@@ -1484,7 +1492,7 @@ class $$WhitelistsTableTableManager extends RootTableManager<
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              WhitelistsCompanion.insert(
+              WhitelistEntitiesCompanion.insert(
             id: id,
             path: path,
             annotation: annotation,
@@ -1499,55 +1507,61 @@ class $$WhitelistsTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$WhitelistsTableProcessedTableManager = ProcessedTableManager<
+typedef $$WhitelistEntitiesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $WhitelistsTable,
-    models.Whitelist,
-    $$WhitelistsTableFilterComposer,
-    $$WhitelistsTableOrderingComposer,
-    $$WhitelistsTableAnnotationComposer,
-    $$WhitelistsTableCreateCompanionBuilder,
-    $$WhitelistsTableUpdateCompanionBuilder,
+    $WhitelistEntitiesTable,
+    WhitelistEntity,
+    $$WhitelistEntitiesTableFilterComposer,
+    $$WhitelistEntitiesTableOrderingComposer,
+    $$WhitelistEntitiesTableAnnotationComposer,
+    $$WhitelistEntitiesTableCreateCompanionBuilder,
+    $$WhitelistEntitiesTableUpdateCompanionBuilder,
     (
-      models.Whitelist,
-      BaseReferences<_$AppDatabase, $WhitelistsTable, models.Whitelist>
+      WhitelistEntity,
+      BaseReferences<_$AppDatabase, $WhitelistEntitiesTable, WhitelistEntity>
     ),
-    models.Whitelist,
+    WhitelistEntity,
     PrefetchHooks Function()>;
-typedef $$RulesTableCreateCompanionBuilder = RulesCompanion Function({
+typedef $$RuleEntitiesTableCreateCompanionBuilder = RuleEntitiesCompanion
+    Function({
   Value<int> id,
   required String name,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
 });
-typedef $$RulesTableUpdateCompanionBuilder = RulesCompanion Function({
+typedef $$RuleEntitiesTableUpdateCompanionBuilder = RuleEntitiesCompanion
+    Function({
   Value<int> id,
   Value<String> name,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
 });
 
-final class $$RulesTableReferences
-    extends BaseReferences<_$AppDatabase, $RulesTable, models.Rule> {
-  $$RulesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$RuleEntitiesTableReferences
+    extends BaseReferences<_$AppDatabase, $RuleEntitiesTable, RuleEntity> {
+  $$RuleEntitiesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$RuleItemsTable, List<models.RuleItem>>
-      _ruleItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-          db.ruleItems,
-          aliasName: $_aliasNameGenerator(db.rules.id, db.ruleItems.ruleId));
+  static MultiTypedResultKey<$RuleItemEntitiesTable, List<RuleItemEntity>>
+      _ruleItemEntitiesRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.ruleItemEntities,
+              aliasName: $_aliasNameGenerator(
+                  db.ruleEntities.id, db.ruleItemEntities.ruleId));
 
-  $$RuleItemsTableProcessedTableManager get ruleItemsRefs {
-    final manager = $$RuleItemsTableTableManager($_db, $_db.ruleItems)
-        .filter((f) => f.ruleId.id.sqlEquals($_itemColumn<int>('id')!));
+  $$RuleItemEntitiesTableProcessedTableManager get ruleItemEntitiesRefs {
+    final manager =
+        $$RuleItemEntitiesTableTableManager($_db, $_db.ruleItemEntities)
+            .filter((f) => f.ruleId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_ruleItemsRefsTable($_db));
+    final cache =
+        $_typedResult.readTableOrNull(_ruleItemEntitiesRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
 }
 
-class $$RulesTableFilterComposer extends Composer<_$AppDatabase, $RulesTable> {
-  $$RulesTableFilterComposer({
+class $$RuleEntitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $RuleEntitiesTable> {
+  $$RuleEntitiesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1566,19 +1580,19 @@ class $$RulesTableFilterComposer extends Composer<_$AppDatabase, $RulesTable> {
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
-  Expression<bool> ruleItemsRefs(
-      Expression<bool> Function($$RuleItemsTableFilterComposer f) f) {
-    final $$RuleItemsTableFilterComposer composer = $composerBuilder(
+  Expression<bool> ruleItemEntitiesRefs(
+      Expression<bool> Function($$RuleItemEntitiesTableFilterComposer f) f) {
+    final $$RuleItemEntitiesTableFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
-        referencedTable: $db.ruleItems,
+        referencedTable: $db.ruleItemEntities,
         getReferencedColumn: (t) => t.ruleId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$RuleItemsTableFilterComposer(
+            $$RuleItemEntitiesTableFilterComposer(
               $db: $db,
-              $table: $db.ruleItems,
+              $table: $db.ruleItemEntities,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1588,9 +1602,9 @@ class $$RulesTableFilterComposer extends Composer<_$AppDatabase, $RulesTable> {
   }
 }
 
-class $$RulesTableOrderingComposer
-    extends Composer<_$AppDatabase, $RulesTable> {
-  $$RulesTableOrderingComposer({
+class $$RuleEntitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $RuleEntitiesTable> {
+  $$RuleEntitiesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1610,9 +1624,9 @@ class $$RulesTableOrderingComposer
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$RulesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $RulesTable> {
-  $$RulesTableAnnotationComposer({
+class $$RuleEntitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RuleEntitiesTable> {
+  $$RuleEntitiesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1631,19 +1645,19 @@ class $$RulesTableAnnotationComposer
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  Expression<T> ruleItemsRefs<T extends Object>(
-      Expression<T> Function($$RuleItemsTableAnnotationComposer a) f) {
-    final $$RuleItemsTableAnnotationComposer composer = $composerBuilder(
+  Expression<T> ruleItemEntitiesRefs<T extends Object>(
+      Expression<T> Function($$RuleItemEntitiesTableAnnotationComposer a) f) {
+    final $$RuleItemEntitiesTableAnnotationComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
-        referencedTable: $db.ruleItems,
+        referencedTable: $db.ruleItemEntities,
         getReferencedColumn: (t) => t.ruleId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$RuleItemsTableAnnotationComposer(
+            $$RuleItemEntitiesTableAnnotationComposer(
               $db: $db,
-              $table: $db.ruleItems,
+              $table: $db.ruleItemEntities,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1653,35 +1667,35 @@ class $$RulesTableAnnotationComposer
   }
 }
 
-class $$RulesTableTableManager extends RootTableManager<
+class $$RuleEntitiesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $RulesTable,
-    models.Rule,
-    $$RulesTableFilterComposer,
-    $$RulesTableOrderingComposer,
-    $$RulesTableAnnotationComposer,
-    $$RulesTableCreateCompanionBuilder,
-    $$RulesTableUpdateCompanionBuilder,
-    (models.Rule, $$RulesTableReferences),
-    models.Rule,
-    PrefetchHooks Function({bool ruleItemsRefs})> {
-  $$RulesTableTableManager(_$AppDatabase db, $RulesTable table)
+    $RuleEntitiesTable,
+    RuleEntity,
+    $$RuleEntitiesTableFilterComposer,
+    $$RuleEntitiesTableOrderingComposer,
+    $$RuleEntitiesTableAnnotationComposer,
+    $$RuleEntitiesTableCreateCompanionBuilder,
+    $$RuleEntitiesTableUpdateCompanionBuilder,
+    (RuleEntity, $$RuleEntitiesTableReferences),
+    RuleEntity,
+    PrefetchHooks Function({bool ruleItemEntitiesRefs})> {
+  $$RuleEntitiesTableTableManager(_$AppDatabase db, $RuleEntitiesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$RulesTableFilterComposer($db: db, $table: table),
+              $$RuleEntitiesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$RulesTableOrderingComposer($db: db, $table: table),
+              $$RuleEntitiesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$RulesTableAnnotationComposer($db: db, $table: table),
+              $$RuleEntitiesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              RulesCompanion(
+              RuleEntitiesCompanion(
             id: id,
             name: name,
             createdAt: createdAt,
@@ -1693,31 +1707,36 @@ class $$RulesTableTableManager extends RootTableManager<
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              RulesCompanion.insert(
+              RuleEntitiesCompanion.insert(
             id: id,
             name: name,
             createdAt: createdAt,
             updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$RulesTableReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable(table),
+                    $$RuleEntitiesTableReferences(db, table, e)
+                  ))
               .toList(),
-          prefetchHooksCallback: ({ruleItemsRefs = false}) {
+          prefetchHooksCallback: ({ruleItemEntitiesRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (ruleItemsRefs) db.ruleItems],
+              explicitlyWatchedTables: [
+                if (ruleItemEntitiesRefs) db.ruleItemEntities
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (ruleItemsRefs)
-                    await $_getPrefetchedData<models.Rule, $RulesTable,
-                            models.RuleItem>(
+                  if (ruleItemEntitiesRefs)
+                    await $_getPrefetchedData<RuleEntity, $RuleEntitiesTable,
+                            RuleItemEntity>(
                         currentTable: table,
-                        referencedTable:
-                            $$RulesTableReferences._ruleItemsRefsTable(db),
+                        referencedTable: $$RuleEntitiesTableReferences
+                            ._ruleItemEntitiesRefsTable(db),
                         managerFromTypedResult: (p0) =>
-                            $$RulesTableReferences(db, table, p0).ruleItemsRefs,
+                            $$RuleEntitiesTableReferences(db, table, p0)
+                                .ruleItemEntitiesRefs,
                         referencedItemsForCurrentItem: (item,
                                 referencedItems) =>
                             referencedItems.where((e) => e.ruleId == item.id),
@@ -1729,19 +1748,20 @@ class $$RulesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$RulesTableProcessedTableManager = ProcessedTableManager<
+typedef $$RuleEntitiesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $RulesTable,
-    models.Rule,
-    $$RulesTableFilterComposer,
-    $$RulesTableOrderingComposer,
-    $$RulesTableAnnotationComposer,
-    $$RulesTableCreateCompanionBuilder,
-    $$RulesTableUpdateCompanionBuilder,
-    (models.Rule, $$RulesTableReferences),
-    models.Rule,
-    PrefetchHooks Function({bool ruleItemsRefs})>;
-typedef $$RuleItemsTableCreateCompanionBuilder = RuleItemsCompanion Function({
+    $RuleEntitiesTable,
+    RuleEntity,
+    $$RuleEntitiesTableFilterComposer,
+    $$RuleEntitiesTableOrderingComposer,
+    $$RuleEntitiesTableAnnotationComposer,
+    $$RuleEntitiesTableCreateCompanionBuilder,
+    $$RuleEntitiesTableUpdateCompanionBuilder,
+    (RuleEntity, $$RuleEntitiesTableReferences),
+    RuleEntity,
+    PrefetchHooks Function({bool ruleItemEntitiesRefs})>;
+typedef $$RuleItemEntitiesTableCreateCompanionBuilder
+    = RuleItemEntitiesCompanion Function({
   Value<int> id,
   required int ruleId,
   required String path,
@@ -1750,7 +1770,8 @@ typedef $$RuleItemsTableCreateCompanionBuilder = RuleItemsCompanion Function({
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
 });
-typedef $$RuleItemsTableUpdateCompanionBuilder = RuleItemsCompanion Function({
+typedef $$RuleItemEntitiesTableUpdateCompanionBuilder
+    = RuleItemEntitiesCompanion Function({
   Value<int> id,
   Value<int> ruleId,
   Value<String> path,
@@ -1760,17 +1781,19 @@ typedef $$RuleItemsTableUpdateCompanionBuilder = RuleItemsCompanion Function({
   Value<DateTime> updatedAt,
 });
 
-final class $$RuleItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $RuleItemsTable, models.RuleItem> {
-  $$RuleItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$RuleItemEntitiesTableReferences extends BaseReferences<
+    _$AppDatabase, $RuleItemEntitiesTable, RuleItemEntity> {
+  $$RuleItemEntitiesTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
 
-  static $RulesTable _ruleIdTable(_$AppDatabase db) => db.rules
-      .createAlias($_aliasNameGenerator(db.ruleItems.ruleId, db.rules.id));
+  static $RuleEntitiesTable _ruleIdTable(_$AppDatabase db) =>
+      db.ruleEntities.createAlias(
+          $_aliasNameGenerator(db.ruleItemEntities.ruleId, db.ruleEntities.id));
 
-  $$RulesTableProcessedTableManager get ruleId {
+  $$RuleEntitiesTableProcessedTableManager get ruleId {
     final $_column = $_itemColumn<int>('rule_id')!;
 
-    final manager = $$RulesTableTableManager($_db, $_db.rules)
+    final manager = $$RuleEntitiesTableTableManager($_db, $_db.ruleEntities)
         .filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_ruleIdTable($_db));
     if (item == null) return manager;
@@ -1779,9 +1802,9 @@ final class $$RuleItemsTableReferences
   }
 }
 
-class $$RuleItemsTableFilterComposer
-    extends Composer<_$AppDatabase, $RuleItemsTable> {
-  $$RuleItemsTableFilterComposer({
+class $$RuleItemEntitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $RuleItemEntitiesTable> {
+  $$RuleItemEntitiesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1806,18 +1829,18 @@ class $$RuleItemsTableFilterComposer
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
-  $$RulesTableFilterComposer get ruleId {
-    final $$RulesTableFilterComposer composer = $composerBuilder(
+  $$RuleEntitiesTableFilterComposer get ruleId {
+    final $$RuleEntitiesTableFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.ruleId,
-        referencedTable: $db.rules,
+        referencedTable: $db.ruleEntities,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$RulesTableFilterComposer(
+            $$RuleEntitiesTableFilterComposer(
               $db: $db,
-              $table: $db.rules,
+              $table: $db.ruleEntities,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1827,9 +1850,9 @@ class $$RuleItemsTableFilterComposer
   }
 }
 
-class $$RuleItemsTableOrderingComposer
-    extends Composer<_$AppDatabase, $RuleItemsTable> {
-  $$RuleItemsTableOrderingComposer({
+class $$RuleItemEntitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $RuleItemEntitiesTable> {
+  $$RuleItemEntitiesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1854,18 +1877,18 @@ class $$RuleItemsTableOrderingComposer
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
-  $$RulesTableOrderingComposer get ruleId {
-    final $$RulesTableOrderingComposer composer = $composerBuilder(
+  $$RuleEntitiesTableOrderingComposer get ruleId {
+    final $$RuleEntitiesTableOrderingComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.ruleId,
-        referencedTable: $db.rules,
+        referencedTable: $db.ruleEntities,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$RulesTableOrderingComposer(
+            $$RuleEntitiesTableOrderingComposer(
               $db: $db,
-              $table: $db.rules,
+              $table: $db.ruleEntities,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1875,9 +1898,9 @@ class $$RuleItemsTableOrderingComposer
   }
 }
 
-class $$RuleItemsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $RuleItemsTable> {
-  $$RuleItemsTableAnnotationComposer({
+class $$RuleItemEntitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RuleItemEntitiesTable> {
+  $$RuleItemEntitiesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1902,18 +1925,18 @@ class $$RuleItemsTableAnnotationComposer
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  $$RulesTableAnnotationComposer get ruleId {
-    final $$RulesTableAnnotationComposer composer = $composerBuilder(
+  $$RuleEntitiesTableAnnotationComposer get ruleId {
+    final $$RuleEntitiesTableAnnotationComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.ruleId,
-        referencedTable: $db.rules,
+        referencedTable: $db.ruleEntities,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$RulesTableAnnotationComposer(
+            $$RuleEntitiesTableAnnotationComposer(
               $db: $db,
-              $table: $db.rules,
+              $table: $db.ruleEntities,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1923,28 +1946,29 @@ class $$RuleItemsTableAnnotationComposer
   }
 }
 
-class $$RuleItemsTableTableManager extends RootTableManager<
+class $$RuleItemEntitiesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $RuleItemsTable,
-    models.RuleItem,
-    $$RuleItemsTableFilterComposer,
-    $$RuleItemsTableOrderingComposer,
-    $$RuleItemsTableAnnotationComposer,
-    $$RuleItemsTableCreateCompanionBuilder,
-    $$RuleItemsTableUpdateCompanionBuilder,
-    (models.RuleItem, $$RuleItemsTableReferences),
-    models.RuleItem,
+    $RuleItemEntitiesTable,
+    RuleItemEntity,
+    $$RuleItemEntitiesTableFilterComposer,
+    $$RuleItemEntitiesTableOrderingComposer,
+    $$RuleItemEntitiesTableAnnotationComposer,
+    $$RuleItemEntitiesTableCreateCompanionBuilder,
+    $$RuleItemEntitiesTableUpdateCompanionBuilder,
+    (RuleItemEntity, $$RuleItemEntitiesTableReferences),
+    RuleItemEntity,
     PrefetchHooks Function({bool ruleId})> {
-  $$RuleItemsTableTableManager(_$AppDatabase db, $RuleItemsTable table)
+  $$RuleItemEntitiesTableTableManager(
+      _$AppDatabase db, $RuleItemEntitiesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$RuleItemsTableFilterComposer($db: db, $table: table),
+              $$RuleItemEntitiesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$RuleItemsTableOrderingComposer($db: db, $table: table),
+              $$RuleItemEntitiesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$RuleItemsTableAnnotationComposer($db: db, $table: table),
+              $$RuleItemEntitiesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> ruleId = const Value.absent(),
@@ -1954,7 +1978,7 @@ class $$RuleItemsTableTableManager extends RootTableManager<
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              RuleItemsCompanion(
+              RuleItemEntitiesCompanion(
             id: id,
             ruleId: ruleId,
             path: path,
@@ -1972,7 +1996,7 @@ class $$RuleItemsTableTableManager extends RootTableManager<
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              RuleItemsCompanion.insert(
+              RuleItemEntitiesCompanion.insert(
             id: id,
             ruleId: ruleId,
             path: path,
@@ -1984,7 +2008,7 @@ class $$RuleItemsTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable(table),
-                    $$RuleItemsTableReferences(db, table, e)
+                    $$RuleItemEntitiesTableReferences(db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: ({ruleId = false}) {
@@ -2009,9 +2033,9 @@ class $$RuleItemsTableTableManager extends RootTableManager<
                     currentTable: table,
                     currentColumn: table.ruleId,
                     referencedTable:
-                        $$RuleItemsTableReferences._ruleIdTable(db),
+                        $$RuleItemEntitiesTableReferences._ruleIdTable(db),
                     referencedColumn:
-                        $$RuleItemsTableReferences._ruleIdTable(db).id,
+                        $$RuleItemEntitiesTableReferences._ruleIdTable(db).id,
                   ) as T;
                 }
 
@@ -2025,19 +2049,20 @@ class $$RuleItemsTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$RuleItemsTableProcessedTableManager = ProcessedTableManager<
+typedef $$RuleItemEntitiesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $RuleItemsTable,
-    models.RuleItem,
-    $$RuleItemsTableFilterComposer,
-    $$RuleItemsTableOrderingComposer,
-    $$RuleItemsTableAnnotationComposer,
-    $$RuleItemsTableCreateCompanionBuilder,
-    $$RuleItemsTableUpdateCompanionBuilder,
-    (models.RuleItem, $$RuleItemsTableReferences),
-    models.RuleItem,
+    $RuleItemEntitiesTable,
+    RuleItemEntity,
+    $$RuleItemEntitiesTableFilterComposer,
+    $$RuleItemEntitiesTableOrderingComposer,
+    $$RuleItemEntitiesTableAnnotationComposer,
+    $$RuleItemEntitiesTableCreateCompanionBuilder,
+    $$RuleItemEntitiesTableUpdateCompanionBuilder,
+    (RuleItemEntity, $$RuleItemEntitiesTableReferences),
+    RuleItemEntity,
     PrefetchHooks Function({bool ruleId})>;
-typedef $$HistoriesTableCreateCompanionBuilder = HistoriesCompanion Function({
+typedef $$HistoryEntitiesTableCreateCompanionBuilder = HistoryEntitiesCompanion
+    Function({
   Value<int> id,
   required String name,
   required String path,
@@ -2045,7 +2070,8 @@ typedef $$HistoriesTableCreateCompanionBuilder = HistoriesCompanion Function({
   required int actionType,
   Value<DateTime> createdAt,
 });
-typedef $$HistoriesTableUpdateCompanionBuilder = HistoriesCompanion Function({
+typedef $$HistoryEntitiesTableUpdateCompanionBuilder = HistoryEntitiesCompanion
+    Function({
   Value<int> id,
   Value<String> name,
   Value<String> path,
@@ -2054,9 +2080,9 @@ typedef $$HistoriesTableUpdateCompanionBuilder = HistoriesCompanion Function({
   Value<DateTime> createdAt,
 });
 
-class $$HistoriesTableFilterComposer
-    extends Composer<_$AppDatabase, $HistoriesTable> {
-  $$HistoriesTableFilterComposer({
+class $$HistoryEntitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $HistoryEntitiesTable> {
+  $$HistoryEntitiesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2082,9 +2108,9 @@ class $$HistoriesTableFilterComposer
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$HistoriesTableOrderingComposer
-    extends Composer<_$AppDatabase, $HistoriesTable> {
-  $$HistoriesTableOrderingComposer({
+class $$HistoryEntitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $HistoryEntitiesTable> {
+  $$HistoryEntitiesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2110,9 +2136,9 @@ class $$HistoriesTableOrderingComposer
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$HistoriesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $HistoriesTable> {
-  $$HistoriesTableAnnotationComposer({
+class $$HistoryEntitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HistoryEntitiesTable> {
+  $$HistoryEntitiesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2138,31 +2164,32 @@ class $$HistoriesTableAnnotationComposer
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
-class $$HistoriesTableTableManager extends RootTableManager<
+class $$HistoryEntitiesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $HistoriesTable,
-    models.History,
-    $$HistoriesTableFilterComposer,
-    $$HistoriesTableOrderingComposer,
-    $$HistoriesTableAnnotationComposer,
-    $$HistoriesTableCreateCompanionBuilder,
-    $$HistoriesTableUpdateCompanionBuilder,
+    $HistoryEntitiesTable,
+    HistoryEntity,
+    $$HistoryEntitiesTableFilterComposer,
+    $$HistoryEntitiesTableOrderingComposer,
+    $$HistoryEntitiesTableAnnotationComposer,
+    $$HistoryEntitiesTableCreateCompanionBuilder,
+    $$HistoryEntitiesTableUpdateCompanionBuilder,
     (
-      models.History,
-      BaseReferences<_$AppDatabase, $HistoriesTable, models.History>
+      HistoryEntity,
+      BaseReferences<_$AppDatabase, $HistoryEntitiesTable, HistoryEntity>
     ),
-    models.History,
+    HistoryEntity,
     PrefetchHooks Function()> {
-  $$HistoriesTableTableManager(_$AppDatabase db, $HistoriesTable table)
+  $$HistoryEntitiesTableTableManager(
+      _$AppDatabase db, $HistoryEntitiesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$HistoriesTableFilterComposer($db: db, $table: table),
+              $$HistoryEntitiesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$HistoriesTableOrderingComposer($db: db, $table: table),
+              $$HistoryEntitiesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$HistoriesTableAnnotationComposer($db: db, $table: table),
+              $$HistoryEntitiesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
@@ -2171,7 +2198,7 @@ class $$HistoriesTableTableManager extends RootTableManager<
             Value<int> actionType = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
-              HistoriesCompanion(
+              HistoryEntitiesCompanion(
             id: id,
             name: name,
             path: path,
@@ -2187,7 +2214,7 @@ class $$HistoriesTableTableManager extends RootTableManager<
             required int actionType,
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
-              HistoriesCompanion.insert(
+              HistoryEntitiesCompanion.insert(
             id: id,
             name: name,
             path: path,
@@ -2202,31 +2229,31 @@ class $$HistoriesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$HistoriesTableProcessedTableManager = ProcessedTableManager<
+typedef $$HistoryEntitiesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $HistoriesTable,
-    models.History,
-    $$HistoriesTableFilterComposer,
-    $$HistoriesTableOrderingComposer,
-    $$HistoriesTableAnnotationComposer,
-    $$HistoriesTableCreateCompanionBuilder,
-    $$HistoriesTableUpdateCompanionBuilder,
+    $HistoryEntitiesTable,
+    HistoryEntity,
+    $$HistoryEntitiesTableFilterComposer,
+    $$HistoryEntitiesTableOrderingComposer,
+    $$HistoryEntitiesTableAnnotationComposer,
+    $$HistoryEntitiesTableCreateCompanionBuilder,
+    $$HistoryEntitiesTableUpdateCompanionBuilder,
     (
-      models.History,
-      BaseReferences<_$AppDatabase, $HistoriesTable, models.History>
+      HistoryEntity,
+      BaseReferences<_$AppDatabase, $HistoryEntitiesTable, HistoryEntity>
     ),
-    models.History,
+    HistoryEntity,
     PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$WhitelistsTableTableManager get whitelists =>
-      $$WhitelistsTableTableManager(_db, _db.whitelists);
-  $$RulesTableTableManager get rules =>
-      $$RulesTableTableManager(_db, _db.rules);
-  $$RuleItemsTableTableManager get ruleItems =>
-      $$RuleItemsTableTableManager(_db, _db.ruleItems);
-  $$HistoriesTableTableManager get histories =>
-      $$HistoriesTableTableManager(_db, _db.histories);
+  $$WhitelistEntitiesTableTableManager get whitelistEntities =>
+      $$WhitelistEntitiesTableTableManager(_db, _db.whitelistEntities);
+  $$RuleEntitiesTableTableManager get ruleEntities =>
+      $$RuleEntitiesTableTableManager(_db, _db.ruleEntities);
+  $$RuleItemEntitiesTableTableManager get ruleItemEntities =>
+      $$RuleItemEntitiesTableTableManager(_db, _db.ruleItemEntities);
+  $$HistoryEntitiesTableTableManager get historyEntities =>
+      $$HistoryEntitiesTableTableManager(_db, _db.historyEntities);
 }

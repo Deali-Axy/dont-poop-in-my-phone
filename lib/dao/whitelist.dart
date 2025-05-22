@@ -3,15 +3,15 @@ import 'package:dont_poop_in_my_phone/database/database_manager.dart';
 
 abstract class WhitelistDao {
   static Future<List<Whitelist>> getAll() async {
-    return await DatabaseManager.database.getAllWhitelists();
+    return await DatabaseManager.service.getAllWhitelists();
   }
 
   static Future<bool> contains(String path) async {
-    return await DatabaseManager.database.whitelistContains(path);
+    return await DatabaseManager.service.whitelistContains(path);
   }
 
   static Future<Whitelist?> add(Whitelist whitelist) async {
-    return await DatabaseManager.database.addWhitelist(whitelist);
+    return await DatabaseManager.service.addWhitelist(whitelist);
   }
 
   static Future<Whitelist?> addPath(String path, {String annotation = ''}) async {
@@ -20,6 +20,6 @@ abstract class WhitelistDao {
   }
 
   static Future<void> delete(String path) async {
-    await DatabaseManager.database.deleteWhitelist(path);
+    await DatabaseManager.service.deleteWhitelist(path);
   }
 }

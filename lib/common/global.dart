@@ -14,7 +14,7 @@ abstract class Global {
     _prefs = await SharedPreferences.getInstance();
 
     // 初始化数据库
-    await DatabaseManager.initialize();
+    await DatabaseManager.init();
 
     // 读取App配置（仅保留简单配置项，如主题设置）
     var configJson = _prefs.getString('config');

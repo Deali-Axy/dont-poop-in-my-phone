@@ -531,7 +531,7 @@ class _HomePageState extends State<HomePage> {
         return;
       }
       
-      var tempFolders = FolderItem.getFolderItems(folderItem.folderPath);
+      var tempFolders = await FolderItem.getFolderItems(folderItem.folderPath);
       var tempFiles = FileItem.getFileItems(folderItem.folderPath);
 
       if (!mounted) return;

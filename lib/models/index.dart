@@ -4,3 +4,4 @@ export 'history.dart';
 export 'rule.dart';
 export 'rule_item.dart';
 export 'whitelist.dart';
+export 'adapters.dart';

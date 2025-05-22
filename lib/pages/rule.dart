@@ -26,23 +26,39 @@ class _RulePageState extends State<RulePage> {
   }
 
   Widget _buildBody() {
-    var rule = RuleDao.getDefault();
-
-    if (rule.rules.isEmpty) {
-      return Empty(
-        content: '没有清理规则',
-        buttonText: '返回',
-        onButtonPressed: () => Navigator.of(context).pop(),
-      );
-    }
-
-    return ListView(
-      children: rule.rules.map((e) {
-        return ListTile(
-          title: Text(e.path),
-          subtitle: Text('${e.actionType}\n${e.annotation}'),
+    return FutureBuilder<Rule>(
+      future: RuleDao.getDefault(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (snapshot.hasError) {
+          return Empty(
+            content: '加载规则失败',
+            buttonText: '返回',
+            onButtonPressed: () => Navigator.of(context).pop(),
+          );
+        }
+        
+        if (!snapshot.hasData || snapshot.data!.rules.isEmpty) {
+          return Empty(
+            content: '没有清理规则',
+            buttonText: '返回',
+            onButtonPressed: () => Navigator.of(context).pop(),
+          );
+        }
+        
+        final rule = snapshot.data!;
+        return ListView(
+          children: rule.rules.map((e) {
+            return ListTile(
+              title: Text(e.path),
+              subtitle: Text('${e.actionType}\n${e.annotation}'),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 }
