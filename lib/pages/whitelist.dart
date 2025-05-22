@@ -47,7 +47,7 @@ class _WhitelistPageState extends State<WhitelistPage> {
             });
         },
         label: const Text('添加白名单'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_circle_outline_rounded),
       ),
     );
   }
@@ -62,6 +62,7 @@ class _WhitelistPageState extends State<WhitelistPage> {
         
         if (snapshot.hasError) {
           return Empty(
+            icon: Icons.error_outline_rounded,
             content: '加载白名单失败: ${snapshot.error}',
             buttonText: '重试',
             onButtonPressed: () => setState(() {}),
@@ -70,8 +71,9 @@ class _WhitelistPageState extends State<WhitelistPage> {
         
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Empty(
-            content: '白名单为空',
-            buttonText: '添加白名单',
+            icon: Icons.shield_outlined,
+            content: '白名单当前为空，您可以添加一些信任的路径。',
+            buttonText: '立即添加',
             onButtonPressed: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddWhitelistPage())).
                 then((value) {
@@ -83,51 +85,71 @@ class _WhitelistPageState extends State<WhitelistPage> {
         
         final whitelistItems = snapshot.data!;
         return ListView.builder(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(10.0), // Slightly increased padding
           itemCount: whitelistItems.length,
           itemBuilder: (context, index) {
             final item = whitelistItems[index];
             return Card(
-              elevation: 2.0,
-              margin: const EdgeInsets.symmetric(vertical: 6.0),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+              elevation: 2.5,
+              margin: const EdgeInsets.symmetric(vertical: 7.0),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 12.0, 12.0, 8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      item.path,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: item.readOnly ? Theme.of(context).disabledColor : null),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.path,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold, 
+                              fontSize: 16,
+                              color: item.readOnly ? Theme.of(context).disabledColor.withOpacity(0.7) : null,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (item.readOnly)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Icon(Icons.lock_outline_rounded, size: 18, color: Theme.of(context).colorScheme.secondary.withOpacity(0.7)),
+                          ),
+                      ],
                     ),
-                    SizedBox(height: 8),
-                    _buildDetailRow('类型:', item.type.toString().split('.').last, item.readOnly),
-                    if (item.annotation.isNotEmpty)
-                       _buildDetailRow('标注:', item.annotation, item.readOnly),
-                    if (item.readOnly)
-                       _buildDetailRow('状态:', '只读 (系统内置)', item.readOnly, valueColor: Theme.of(context).colorScheme.primary),
                     SizedBox(height: 10),
+                    _buildDetailIconRow(
+                      item.type == models.WhitelistType.path ? Icons.folder_zip_outlined : Icons.code_rounded, 
+                      '类型', 
+                      item.type == models.WhitelistType.path ? '精确路径' : '正则表达式', 
+                      item.readOnly
+                    ),
+                    if (item.annotation.isNotEmpty)
+                       _buildDetailIconRow(Icons.short_text_rounded, '标注', item.annotation, item.readOnly, maxLines: 2),
+                    if (item.readOnly)
+                       _buildDetailIconRow(Icons.verified_user_outlined, '来源', '系统内置', item.readOnly, valueColor: Theme.of(context).colorScheme.primary),
+                    
                     if (!item.readOnly)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      ButtonBar(
+                        alignment: MainAxisAlignment.end,
                         children: [
                           TextButton.icon(
-                            style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                            icon: Icon(Icons.edit_outlined, size: 20),
+                            icon: Icon(Icons.edit_note_rounded, size: 20),
                             label: Text('编辑'),
-                            onPressed: () {
-                              _editWhitelistItem(item);
-                            },
+                            onPressed: () => _editWhitelistItem(item),
+                             style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant)
                           ),
-                          SizedBox(width: 8),
                           TextButton.icon(
-                            style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                            icon: Icon(Icons.delete_outline, size: 20, color: Colors.redAccent),
-                            label: Text('删除', style: TextStyle(color: Colors.redAccent)),
+                            icon: Icon(Icons.delete_forever_rounded, size: 20, color: Theme.of(context).colorScheme.error),
+                            label: Text('删除', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                             onPressed: () => _deleteWhitelistItem(item),
                           ),
                         ],
                       )
+                    else 
+                        SizedBox(height: 8), // Add some space for read-only items if no buttons
                   ],
                 ),
               ),
@@ -138,15 +160,20 @@ class _WhitelistPageState extends State<WhitelistPage> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, bool isReadOnly, {Color? valueColor}) {
-    final Color textColor = isReadOnly ? Theme.of(context).disabledColor : (valueColor ?? Theme.of(context).textTheme.bodyMedium!.color! );
+  Widget _buildDetailIconRow(IconData icon, String label, String value, bool isReadOnly, {Color? valueColor, int maxLines = 1}) {
+    final Color effectiveColor = isReadOnly ? Theme.of(context).disabledColor : (valueColor ?? Theme.of(context).textTheme.bodySmall!.color! );
+    final Color iconColor = isReadOnly ? Theme.of(context).disabledColor.withOpacity(0.6) : Theme.of(context).colorScheme.secondary;
+    final Color labelColor = isReadOnly ? Theme.of(context).disabledColor.withOpacity(0.8) : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7) ?? Colors.grey;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
-          Text('$label ', style: TextStyle(fontWeight: FontWeight.w500, color: isReadOnly ? Theme.of(context).disabledColor: null)),
-          Expanded(child: Text(value, style: TextStyle(color: textColor))),
+          Icon(icon, size: 16, color: iconColor),
+          SizedBox(width: 8),
+          Text('$label: ', style: TextStyle(fontWeight: FontWeight.normal, color: labelColor, fontSize: 13)),
+          Expanded(child: Text(value, style: TextStyle(color: effectiveColor, fontSize: 13, fontWeight: FontWeight.w500), maxLines: maxLines, overflow: TextOverflow.ellipsis,)),
         ],
       ),
     );
@@ -161,15 +188,17 @@ class _WhitelistPageState extends State<WhitelistPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('确认删除'),
-          content: Text('确定要删除白名单 "${item.path}"?'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+          title: Row(children: [Icon(Icons.warning_amber_rounded, color: Colors.orange), SizedBox(width:10), Text('确认删除')]),
+          content: Text('您确定要从白名单中移除 "${item.path}"?'),
           actions: <Widget>[
             TextButton(
               child: Text('取消'),
               onPressed: () => Navigator.of(context).pop(false),
             ),
-            TextButton(
-              child: Text('删除', style: TextStyle(color: Colors.red.shade700)),
+            ElevatedButton(
+              child: Text('删除', style: TextStyle(color: Colors.white)),
+               style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -180,10 +209,10 @@ class _WhitelistPageState extends State<WhitelistPage> {
     if (confirm == true) {
       try {
         await WhitelistDao.deleteByPath(item.path);
-        BotToast.showText(text: '白名单 "${item.path}" 已删除');
+        BotToast.showText(text: '白名单 "${item.path}" 已移除');
         setState(() {}); 
       } catch (e) {
-        BotToast.showText(text: '删除失败: $e');
+        BotToast.showText(text: '移除失败: $e');
       }
     }
   }

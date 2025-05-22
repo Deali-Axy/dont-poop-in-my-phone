@@ -22,52 +22,55 @@ class _RulePageState extends State<RulePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('清理规则'),
-        // Actions for batch operations can be added here later
+        title: Text('清理规则管理'),
+        actions: [
+          // IconButton for batch operations can be added here later if needed
+        ],
       ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => AddRulePage(initialPath: '')), // Changed path to initialPath
+            MaterialPageRoute(builder: (context) => AddRulePage(initialPath: '')),
           ).then((value) {
-            if (value == true || value is String) { // Assuming AddRulePage might return true or a message on success
+            if (value == true) {
                 setState(() {});
             }
           });
         },
-        label: const Text('添加规则'),
-        icon: const Icon(Icons.add),
+        label: const Text('添加新规则'),
+        icon: const Icon(Icons.add_circle_outline_rounded),
       ),
     );
   }
 
   Widget _buildBody() {
-    return FutureBuilder<List<models.Rule>>( // Changed to List<models.Rule>
-      future: RuleDao.getAllRuleGroups(), // Changed to getAllRuleGroups
+    return FutureBuilder<List<models.Rule>>(
+      future: RuleDao.getAllRuleGroups(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
-          print(snapshot.error); // For debugging
           return Empty(
+            icon: Icons.error_outline,
             content: '加载规则失败: ${snapshot.error}',
             buttonText: '重试',
-            onButtonPressed: () => setState(() {}), // Basic retry
+            onButtonPressed: () => setState(() {}),
           );
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Empty(
-            content: '没有规则组',
-            buttonText: '添加新规则', // Changed button text
+            icon: Icons.playlist_add_check_circle_outlined,
+            content: '尚无任何规则组',
+            buttonText: '去添加规则',
             onButtonPressed: () {
                Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => AddRulePage(initialPath: '')), // Changed path to initialPath
+                MaterialPageRoute(builder: (context) => AddRulePage(initialPath: ''))
               ).then((value) {
-                if (value == true || value is String) setState(() {});
+                if (value == true) setState(() {});
               });
             },
           );
@@ -78,24 +81,25 @@ class _RulePageState extends State<RulePage> {
         bool allEmpty = ruleGroups.every((group) => group.rules.isEmpty);
         if (allEmpty) {
              return Empty(
-                content: '所有规则组均为空',
-                buttonText: '添加新规则',
+                icon: Icons.rule_folder_outlined,
+                content: '所有规则组均为空，请添加一些规则吧！',
+                buttonText: '立即添加规则',
                 onButtonPressed: () {
                    Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => AddRulePage(initialPath: '')), // Changed path to initialPath
+                    MaterialPageRoute(builder: (context) => AddRulePage(initialPath: ''))
                   ).then((value) {
-                    if (value == true || value is String) setState(() {});
+                    if (value == true) setState(() {});
                   });
                 },
             );
         }
 
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.all(8.0),
           itemCount: ruleGroups.length,
           itemBuilder: (context, groupIndex) {
             final group = ruleGroups[groupIndex];
-            if (group.rules.isEmpty && !group.isSystemRule) { // Don't show empty custom groups unless they are system (which might be a placeholder)
-                 // Or show a message like "Custom group is empty"
+            if (group.rules.isEmpty && !group.isSystemRule) {
                  return SizedBox.shrink(); 
             }
 
@@ -103,136 +107,140 @@ class _RulePageState extends State<RulePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0), // Adjusted padding
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0), 
                   child: Text(
-                    '${group.name.toUpperCase()} ${group.isSystemRule ? "(系统)" : "(自定义)"}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                    '${group.name.toUpperCase()} ${group.isSystemRule ? "(系统推荐)" : "(用户自定义)"}',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600, 
+                          color: Theme.of(context).colorScheme.secondary
+                        ),
                   ),
                 ),
                 if (group.rules.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Center(child: Text('此规则组中没有规则项', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey[600]))),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: Text('此规则组中还没有任何规则项', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey[700])),
+                    )
                   )
                 else
                   ListView.builder(
-                    shrinkWrap: true, // Important for nested ListViews
-                    physics: NeverScrollableScrollPhysics(), // Important for nested ListViews
+                    shrinkWrap: true, 
+                    physics: NeverScrollableScrollPhysics(), 
                     itemCount: group.rules.length,
                     itemBuilder: (context, itemIndex) {
                       final item = group.rules[itemIndex];
                       return Card(
-                        elevation: 2.0,
-                        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.path,
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: item.enabled ? null : Colors.grey),
-                              ),
-                              SizedBox(height: 8),
-                              _buildDetailRow('类型:', item.actionType.toString().split('.').last, item.enabled),
-                              _buildDetailRow('匹配:', item.pathMatchType.toString().split('.').last, item.enabled),
-                              _buildDetailRow('优先级:', '${item.priority}', item.enabled),
-                              _buildDetailRow('状态:', item.enabled ? '已启用' : '已禁用', item.enabled, valueColor: item.enabled ? Colors.green : Colors.orange),
-                              if (item.annotation.isNotEmpty)
-                                _buildDetailRow('标注:', item.annotation, item.enabled),
-                              _buildDetailRow('触发:', '${item.triggerCount} 次', item.enabled),
-                              _buildDetailRow('上次:', item.lastTriggeredAt?.toLocal()?.toString().substring(0, 16) ?? '-', item.enabled),
-                              SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                        elevation: 3.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                        child: Column(
+                          children: [
+                            ListTile(
+                                leading: Icon(
+                                   item.enabled ? Icons.play_circle_fill_rounded : Icons.pause_circle_filled_rounded,
+                                   color: item.enabled ? Theme.of(context).colorScheme.primary : Colors.grey,
+                                   size: 36,
+                                ),
+                                title: Text(
+                                  item.path,
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: item.enabled ? null : Colors.grey.shade600),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                     SizedBox(height: 4),
+                                    _buildDetailIconRow(Icons.settings_applications_outlined, '类型', item.actionType.toString().split('.').last, item.enabled),
+                                    _buildDetailIconRow(Icons.compare_arrows_outlined, '匹配', item.pathMatchType.toString().split('.').last, item.enabled),
+                                  ],
+                                ),
+                                trailing: Switch(
+                                  value: item.enabled,
+                                  onChanged: (bool value) {
+                                    _toggleRuleItemEnabled(item.copyWith(enabled: value));
+                                  },
+                                  activeColor: Theme.of(context).colorScheme.primary,
+                                ),
+                                contentPadding: EdgeInsets.fromLTRB(16, 12, 12, 8),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Column(
+                                  children: [
+                                    _buildDetailIconRow(Icons.priority_high_rounded, '优先级', '${item.priority}', item.enabled),
+                                    if (item.annotation.isNotEmpty)
+                                        _buildDetailIconRow(Icons.comment_outlined, '标注', item.annotation, item.enabled, maxLines: 2),
+                                    _buildDetailIconRow(Icons.update_outlined, '触发', '${item.triggerCount} 次', item.enabled),
+                                    _buildDetailIconRow(Icons.history_toggle_off_outlined, '上次', item.lastTriggeredAt?.toLocal()?.toString().substring(0, 16) ?? '-', item.enabled),
+                                  ]
+                                )
+                            ),
+                            ButtonBar(
+                                alignment: MainAxisAlignment.end,
                                 children: [
                                   TextButton.icon(
-                                    style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                                    icon: Icon(item.enabled ? Icons.toggle_off_outlined : Icons.toggle_on_outlined, size: 20, color: item.enabled ? Colors.orangeAccent : Colors.greenAccent),
-                                    label: Text(item.enabled ? '禁用' : '启用', style: TextStyle(color: item.enabled ? Colors.orangeAccent : Colors.greenAccent)),
-                                    onPressed: () => _toggleRuleItemEnabled(item),
-                                  ),
-                                  SizedBox(width: 8),
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                                    icon: Icon(Icons.edit_outlined, size: 20),
+                                    icon: Icon(Icons.edit_note_rounded, size: 20),
                                     label: Text('编辑'),
                                     onPressed: () => _editRuleItem(item),
+                                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant)
                                   ),
-                                  SizedBox(width: 8),
                                   TextButton.icon(
-                                     style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                                    icon: Icon(Icons.delete_outline, size: 20, color: Colors.redAccent),
-                                    label: Text('删除', style: TextStyle(color: Colors.redAccent)),
+                                    icon: Icon(Icons.delete_forever_rounded, size: 20, color: Theme.of(context).colorScheme.error),
+                                    label: Text('删除', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                     onPressed: () => _deleteRuleItem(item),
                                   ),
                                 ],
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       );
                     },
                   ),
-                if (groupIndex < ruleGroups.length -1 && !(group.rules.isEmpty && !group.isSystemRule) ) // Add divider if not the last group and not an empty custom group
-                    Divider(height: 20, thickness: 1, indent: 16, endIndent: 16),
               ],
             );
           },
+          separatorBuilder: (context, index) => Divider(height: 25, thickness: 1, indent: 10, endIndent: 10),
         );
       },
     );
   }
 
-  Widget _buildDetailRow(String label, String value, bool enabled, {Color? valueColor}) {
-    final Color textColor = enabled ? (valueColor ?? Theme.of(context).textTheme.bodyMedium!.color!) : Colors.grey;
+  Widget _buildDetailIconRow(IconData icon, String label, String value, bool enabled, {Color? valueColor, int maxLines = 1}) {
+    final Color effectiveColor = enabled ? (valueColor ?? Theme.of(context).textTheme.bodySmall!.color!) : Colors.grey.shade600;
+    final Color iconColor = enabled ? Theme.of(context).colorScheme.secondary : Colors.grey.shade500;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3.0),
+      padding: const EdgeInsets.symmetric(vertical: 2.5),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
-          Text('$label ', style: TextStyle(fontWeight: FontWeight.w500, color: enabled ? null : Colors.grey)),
-          Expanded(child: Text(value, style: TextStyle(color: textColor))),
+          Icon(icon, size: 16, color: iconColor),
+          SizedBox(width: 8),
+          Text('$label: ', style: TextStyle(fontWeight: FontWeight.normal, color: enabled ? Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7) : Colors.grey.shade500, fontSize: 13)),
+          Expanded(child: Text(value, style: TextStyle(color: effectiveColor, fontSize: 13, fontWeight: FontWeight.w500), maxLines: maxLines, overflow: TextOverflow.ellipsis,)),
         ],
       ),
     );
   }
 
   void _toggleRuleItemEnabled(models.RuleItem item) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('确认操作'),
-          content: Text('确定要${item.enabled ? "禁用" : "启用"}规则 \"${item.path}\" 吗?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('取消'),
-              onPressed: () => Navigator.of(context).pop(false),
-            ),
-            TextButton(
-              child: Text('确定'),
-              onPressed: () => Navigator.of(context).pop(true),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirm == true) {
-      final updatedItem = item.copyWith(enabled: !item.enabled); // Use copyWith
+    final updatedItem = item;
+    try {
       await RuleDao.updateRuleItem(updatedItem);
-      BotToast.showText(text: '规则状态已更新为: ${updatedItem.enabled ? "启用" : "禁用"}');
+      BotToast.showText(text: '规则 "${updatedItem.path}" 已${updatedItem.enabled ? "启用" : "禁用"}');
       setState(() {});
+    } catch (e) {
+      BotToast.showText(text: '状态更新失败: $e');
+      setState(() {}); 
     }
   }
 
   void _editRuleItem(models.RuleItem item) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => AddRulePage(initialPath: item.path, ruleItemToEdit: item)), // Pass item for editing
+      MaterialPageRoute(builder: (context) => AddRulePage(initialPath: item.path, ruleItemToEdit: item)),
     ).then((value) {
-       if (value == true) { // Check if AddRulePage indicated success (saved)
+       if (value == true) {
            setState(() {}); 
        }
     });
@@ -243,15 +251,17 @@ class _RulePageState extends State<RulePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('确认删除'),
-          content: Text('确定要删除规则 \"${item.path}\"?\n此操作不可撤销。'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+          title: Row(children: [Icon(Icons.warning_amber_rounded, color: Colors.orange), SizedBox(width:10), Text('确认删除')]),
+          content: Text('您确定要永久删除规则 \"${item.path}\"?\n此操作无法撤销。'),
           actions: <Widget>[
             TextButton(
               child: Text('取消'),
               onPressed: () => Navigator.of(context).pop(false),
             ),
-            TextButton(
-              child: Text('删除', style: TextStyle(color: Colors.red.shade700)),
+            ElevatedButton(
+              child: Text('删除', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -271,5 +281,4 @@ class _RulePageState extends State<RulePage> {
         BotToast.showText(text: '无法删除：规则项ID为空');
     }
   }
-
 }
