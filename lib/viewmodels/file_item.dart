@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
-import 'package:dont_poop_in_my_phone/common/global.dart';
+import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
 import 'package:open_filex/open_filex.dart';
@@ -38,14 +38,15 @@ class FileItem {
       await StarFileSystem.createFile(filepath);
     }
 
-    var history = new History(
+    var history = History(
       name: '${replace ? '替换' : '删除'}文件: $fileName',
       path: filepath,
       time: DateTime.now(),
       actionType: replace ? ActionType.deleteAndReplace : ActionType.delete,
     );
-    Global.appConfig.history.add(history);
-    Global.saveAppConfig();
+
+    // 使用数据库存储历史记录
+    await HistoryDao.add(history);
 
     return entity;
   }

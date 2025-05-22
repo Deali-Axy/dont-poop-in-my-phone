@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:path/path.dart' as path;
@@ -27,18 +26,29 @@ class FolderItem {
     _dir = Directory(folderPath);
     _dirName = path.basename(folderPath);
     _isRootPath = folderPath == StarFileSystem.SDCARD_ROOT;
-    _isInWhiteList = WhitelistDao.contains(folderPath);
-    if (isInWhiteList) {
+    // 白名单检查现在是异步的，需要单独调用
+    _isInWhiteList = false;
+    _label = '';
+  }
+
+  /// 异步初始化白名单状态
+  Future<void> initWhitelistStatus() async {
+    _isInWhiteList = await WhitelistDao.contains(folderPath);
+    if (_isInWhiteList) {
       _label = '重要文件，不支持清理';
     }
   }
 
-  static List<FolderItem> getFolderItems(String parentPath) {
+  static Future<List<FolderItem>> getFolderItems(String parentPath) async {
     var list = StarFileSystem.listDir(parentPath)
         // 只拿出目录
         .where((e) => FileSystemEntity.isDirectorySync(e.path))
         .map((e) => FolderItem(e.path))
         .toList();
+
+    // 异步初始化白名单状态
+    await Future.wait(list.map((item) => item.initWhitelistStatus()));
+
     // 根据名称排序
     list.sort((a, b) => a.dirName.compareTo(b.dirName));
     return list;
@@ -50,14 +60,15 @@ class FolderItem {
       await StarFileSystem.createFile(folderPath);
     }
 
-    var history = new History(
+    var history = History(
       name: '${replace ? '替换' : '删除'}目录: $dirName',
       path: folderPath,
       time: DateTime.now(),
       actionType: replace ? ActionType.deleteAndReplace : ActionType.delete,
     );
-    Global.appConfig.history.add(history);
-    Global.saveAppConfig();
+
+    // 使用数据库存储历史记录
+    await HistoryDao.add(history);
 
     return entity;
   }

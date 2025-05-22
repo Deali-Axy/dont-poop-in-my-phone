@@ -1,40 +1,25 @@
-import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
+import 'package:dont_poop_in_my_phone/database/database_manager.dart';
 
 abstract class WhitelistDao {
-  static List<Whitelist> getAll() {
-    return Global.appConfig.whiteList;
+  static Future<List<Whitelist>> getAll() async {
+    return await DatabaseManager.database.getAllWhitelists();
   }
 
-  static bool contains(String path) {
-    var result = false;
-    var list = getAll();
-    for (var item in list) {
-      if (item.path == path.toLowerCase()) {
-        result = true;
-      }
-    }
-
-    return result;
+  static Future<bool> contains(String path) async {
+    return await DatabaseManager.database.whitelistContains(path);
   }
 
-  static Whitelist? add(Whitelist whitelist) {
-    if (contains(whitelist.path)) {
-      return null;
-    }
-    Global.appConfig.whiteList.add(whitelist);
-    Global.saveAppConfig();
-
-    return whitelist;
+  static Future<Whitelist?> add(Whitelist whitelist) async {
+    return await DatabaseManager.database.addWhitelist(whitelist);
   }
 
-  static Whitelist? addPath(String path, {String annotation = ''}) {
-    var item = Whitelist(path: path.toLowerCase(), annotation: annotation); 
-    return add(item);
+  static Future<Whitelist?> addPath(String path, {String annotation = ''}) async {
+    var item = Whitelist(path: path.toLowerCase(), annotation: annotation);
+    return await add(item);
   }
 
-  static void delete(String path) {
-    Global.appConfig.whiteList.removeWhere((e) => e.path == path);
-    Global.saveAppConfig();
+  static Future<void> delete(String path) async {
+    await DatabaseManager.database.deleteWhitelist(path);
   }
 }
