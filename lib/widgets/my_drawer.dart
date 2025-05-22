@@ -16,6 +16,7 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   static const _backgroundImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/600/450';
+  static const _avatarImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/200/200';
   var _currentHitokoto = Hitokoto(
     hitokoto: '（正在加载一言）',
     creator: '别在我的手机里拉屎！',
@@ -148,7 +149,8 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return UserAccountsDrawerHeader(
+    return Container(
+      height: 230,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -167,43 +169,90 @@ class _MyDrawerState extends State<MyDrawer> {
           ),
         ),
       ),
-      accountName: Text(
-        _currentHitokoto.creator,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          shadows: [
-            Shadow(
-              offset: Offset(1, 1),
-              blurRadius: 3,
-              color: Colors.black38,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 40.0, left: 16.0, right: 16.0),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8.0,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage('${_avatarImageUrl}?rand=${DateTime.now().millisecondsSinceEpoch}'),
+                    backgroundColor: Colors.white,
+                    radius: 35,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: _loadHitokoto,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white.withOpacity(0.8),
+                    radius: 16,
+                    child: Icon(
+                      Icons.refresh,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      accountEmail: Container(
-        padding: const EdgeInsets.only(right: 10),
-        child: Text(
-          _currentHitokoto.hitokoto,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                offset: Offset(1, 1),
-                blurRadius: 3,
-                color: Colors.black38,
-              ),
-            ],
           ),
-        ),
-      ),
-      currentAccountPicture: CircleAvatar(
-        backgroundImage: AssetImage('assets/icon/icon.png'),
-        backgroundColor: Colors.white,
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _currentHitokoto.creator,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    offset: Offset(1, 1),
+                    blurRadius: 3,
+                    color: Colors.black38,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _currentHitokoto.hitokoto,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    offset: Offset(1, 1),
+                    blurRadius: 3,
+                    color: Colors.black38,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
