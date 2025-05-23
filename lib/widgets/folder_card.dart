@@ -60,15 +60,23 @@ class _FolderCardState extends State<FolderCard> {
   }
 
   Widget _buildIcon() {
-    final iconColor = widget.folderItem.isInWhiteList
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.secondary.withOpacity(0.7);
-
     IconData icon;
+    Color iconColor;
+    
     if (widget.folderItem.isInWhiteList) {
       icon = Icons.folder_special_rounded;
+      iconColor = Theme.of(context).colorScheme.primary;
+    } else if (widget.folderItem.annotation.isNotEmpty) {
+      if (widget.folderItem.suggestDelete) {
+        icon = Icons.delete_outline;
+        iconColor = Colors.red;
+      } else {
+        icon = Icons.label_outline;
+        iconColor = Theme.of(context).colorScheme.tertiary;
+      }
     } else {
       icon = Icons.folder_rounded;
+      iconColor = Theme.of(context).colorScheme.secondary.withOpacity(0.7);
     }
 
     return Container(
@@ -82,6 +90,21 @@ class _FolderCardState extends State<FolderCard> {
   }
 
   Widget? _buildSubtitle() {
+    // 优先显示标注信息
+    if (widget.folderItem.annotation.isNotEmpty) {
+      final double fontSize = 14;
+      final TextStyle style = TextStyle(
+        color: widget.folderItem.suggestDelete 
+          ? Colors.red.withOpacity(0.8) 
+          : Theme.of(context).colorScheme.tertiary.withOpacity(0.8),
+        fontSize: fontSize,
+        fontStyle: FontStyle.italic,
+      );
+
+      return Text(widget.folderItem.annotation, style: style);
+    }
+    
+    // 没有标注则显示原来的label
     if (widget.folderItem.label.isEmpty) {
       return null;
     }
@@ -126,12 +149,32 @@ class _FolderCardState extends State<FolderCard> {
                     action: SnackBarAction(label: '知道啦', onPressed: () {}),
                   ));
                   break;
+                case 4:
+                  final result = await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => AddAnnotationPage(initialPath: widget.folderItem.folderPath),
+                  ));
+                  if (result == true) {
+                    // 刷新标注信息
+                    if (mounted) {
+                      setState(() {
+                        widget.folderItem.initAnnotationStatus();
+                      });
+                    }
+                  }
+                  break;
               }
             },
             itemBuilder: (context) => <PopupMenuItem<int>>[
               PopupMenuItem(value: 1, child: StarTextButton(icon: const Icon(Icons.do_not_disturb, color: Colors.red), text: '删除并替换')),
               PopupMenuItem(value: 2, child: StarTextButton(icon: const Icon(Icons.delete_outline, color: Colors.orange), text: '仅删除')),
               PopupMenuItem(value: 3, child: StarTextButton(icon: const Icon(Icons.addchart, color: Colors.blue), text: '添加规则')),
+              PopupMenuItem(value: 4, child: StarTextButton(
+                icon: Icon(
+                  widget.folderItem.annotation.isEmpty ? Icons.label_outline : Icons.label,
+                  color: Colors.purple
+                ), 
+                text: widget.folderItem.annotation.isEmpty ? '添加标注' : '编辑标注'
+              )),
             ],
           );
   }

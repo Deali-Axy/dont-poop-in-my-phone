@@ -11,17 +11,37 @@ class FileItem {
   late File _file;
   late String _fileSize;
   late String _fileName;
+  
+  // 标注相关属性
+  String _annotation = '';
+  bool _suggestDelete = false;
 
   File get file => _file;
 
   String get fileSize => _fileSize;
 
   String get fileName => _fileName;
+  
+  // 标注相关getter
+  String get annotation => _annotation;
+  bool get suggestDelete => _suggestDelete;
 
   FileItem(this.filepath) {
     _file = File(filepath);
     _fileSize = StarFileSystem.formatFileSize(_file.lengthSync());
     _fileName = path.basename(filepath);
+    // 标注初始化
+    _annotation = '';
+    _suggestDelete = false;
+  }
+  
+  /// 异步初始化标注状态
+  Future<void> initAnnotationStatus() async {
+    final annotation = await PathAnnotationDao.getByPath(filepath);
+    if (annotation != null) {
+      _annotation = annotation.description;
+      _suggestDelete = annotation.suggestDelete;
+    }
   }
 
   launch() async {
@@ -57,6 +77,14 @@ class FileItem {
         .where((e) => FileSystemEntity.isFileSync(e.path))
         .map((e) => FileItem(e.path))
         .toList();
+    
+    // 异步初始化标注状态
+    // 注意：这里使用了异步操作，但返回的是同步结果
+    // 标注数据将在UI渲染后异步加载
+    for (var file in list) {
+      file.initAnnotationStatus();
+    }
+    
     list.sort((a, b) => a.fileName.compareTo(b.fileName));
     return list;
   }

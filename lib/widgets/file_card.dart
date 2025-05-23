@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:dont_poop_in_my_phone/viewmodels/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
+import 'package:dont_poop_in_my_phone/pages/index.dart';
 
 typedef void FileActionEvent(FileItem fileItem);
 
@@ -30,6 +31,9 @@ class _FileCardState extends State<FileCard> {
         elevation: _isHovered ? 4.0 : 1.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
+          side: widget.fileItem.annotation.isNotEmpty && widget.fileItem.suggestDelete
+              ? BorderSide(color: Colors.red.withOpacity(0.5), width: 1.5)
+              : BorderSide.none,
         ),
         child: InkWell(
           onTap: widget.fileItem.launch,
@@ -40,8 +44,9 @@ class _FileCardState extends State<FileCard> {
           leading: _buildFileIcon(),
               title: Text(
                 widget.fileItem.fileName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
+                  fontWeight: widget.fileItem.annotation.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
           subtitle: _buildSubtitle(),
@@ -57,6 +62,31 @@ class _FileCardState extends State<FileCard> {
   /// MIME-Type 参考 https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
   /// 但手机上的文件与HTTP的不完全一致，比如 chemical 就是在HTTP文档中没有的
   Widget _buildFileIcon() {
+    // 如果有标注，并且建议删除，则显示特殊图标
+    if (widget.fileItem.annotation.isNotEmpty && widget.fileItem.suggestDelete) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        padding: const EdgeInsets.all(8.0),
+        child: const Icon(Icons.delete_outline, size: 36, color: Colors.red),
+      );
+    }
+    
+    // 如果有标注，但不建议删除，显示标签图标
+    if (widget.fileItem.annotation.isNotEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(Icons.label_outline, size: 36, color: Theme.of(context).colorScheme.tertiary),
+      );
+    }
+    
+    // 默认根据MIME类型显示图标
     final fullMime = lookupMimeType(widget.fileItem.filepath) ?? 'unknown';
     final tempArray = fullMime.split('/');
     final majorMime = tempArray.isEmpty ? fullMime : tempArray[0];
@@ -113,6 +143,32 @@ class _FileCardState extends State<FileCard> {
   }
 
   Widget _buildSubtitle() {
+    // 如果有标注，则显示标注信息
+    if (widget.fileItem.annotation.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.fileItem.annotation,
+            style: TextStyle(
+              fontSize: 14,
+              fontStyle: FontStyle.italic,
+              color: widget.fileItem.suggestDelete
+                ? Colors.red.withOpacity(0.8)
+                : Theme.of(context).colorScheme.tertiary.withOpacity(0.8),
+            ),
+          ),
+          const SizedBox(height: 4),
+          _buildFileInfo(),
+        ],
+      );
+    }
+    
+    // 否则只显示文件信息
+    return _buildFileInfo();
+  }
+  
+  Widget _buildFileInfo() {
     final lastModified = DateFormat('yyyy-MM-dd HH:mm').format(widget.fileItem.file.lastModifiedSync());
     
     return Row(
@@ -169,11 +225,31 @@ class _FileCardState extends State<FileCard> {
           case 2:
             widget.onDelete(widget.fileItem);
             break;
+          case 3:
+            final result = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (ctx) => AddAnnotationPage(initialPath: widget.fileItem.filepath),
+            ));
+            if (result == true) {
+              // 刷新标注信息
+              if (mounted) {
+                setState(() {
+                  widget.fileItem.initAnnotationStatus();
+                });
+              }
+            }
+            break;
         }
       },
       itemBuilder: (context) => <PopupMenuItem<int>>[
         PopupMenuItem(value: 1, child: StarTextButton(icon: const Icon(Icons.do_not_disturb, color: Colors.red), text: '删除并替换')),
         PopupMenuItem(value: 2, child: StarTextButton(icon: const Icon(Icons.delete_outline, color: Colors.orange), text: '仅删除')),
+        PopupMenuItem(value: 3, child: StarTextButton(
+          icon: Icon(
+            widget.fileItem.annotation.isEmpty ? Icons.label_outline : Icons.label,
+            color: Colors.purple
+          ), 
+          text: widget.fileItem.annotation.isEmpty ? '添加标注' : '编辑标注'
+        )),
       ],
     );
   }

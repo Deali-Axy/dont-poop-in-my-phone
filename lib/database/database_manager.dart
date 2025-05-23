@@ -41,6 +41,20 @@ class DatabaseManager {
     // 初始化用户自定义规则组
     await _service.ensureRuleGroupExists(models.Rule.customRuleName, isSystemRule: false);
 
+    // 初始化内置路径标注
+    final existingAnnotations = await _service.getAllPathAnnotations();
+    if (existingAnnotations.isEmpty) {
+      // 添加内置标注
+      await _service.addPathAnnotation(models.PathAnnotation(
+        path: StarFileSystem.SDCARD_ROOT + '/tencent',
+        description: '[内置标注]腾讯相关app的文件，不建议清理',
+        suggestDelete: false,
+        isBuiltIn: true,
+      ));
+      
+      // 可以添加更多内置标注...
+    }
+
     // 可选：在这里添加一些默认的系统推荐规则项
     // Example:
     // final recommendRuleGroup = await _service.getRuleByName(models.Rule.recommendRuleName);
@@ -304,5 +318,89 @@ class DatabaseService {
             name: Value(ruleGroup.name),
             isSystemRule: Value(ruleGroup.isSystemRule),
         ));
+  }
+
+  // 路径标注相关方法
+  Future<List<models.PathAnnotation>> getAllPathAnnotations() async {
+    final query = _db.select(_db.pathAnnotationEntities);
+    final results = await query.get();
+    return results.map(_convertToPathAnnotation).toList();
+  }
+
+  Future<models.PathAnnotation?> getPathAnnotationByPath(String path) async {
+    final query = _db.select(_db.pathAnnotationEntities)
+      ..where((tbl) => tbl.path.equals(path));
+    final result = await query.getSingleOrNull();
+    if (result == null) return null;
+    return _convertToPathAnnotation(result);
+  }
+
+  Future<models.PathAnnotation?> addPathAnnotation(models.PathAnnotation annotation) async {
+    // 检查路径是否已存在标注
+    final existingAnnotation = await getPathAnnotationByPath(annotation.path);
+    if (existingAnnotation != null) {
+      // 如果是内置标注且当前不是内置标注，则不允许覆盖
+      if (existingAnnotation.isBuiltIn && !annotation.isBuiltIn) {
+        return null;
+      }
+      // 否则更新现有标注
+      return await updatePathAnnotation(annotation.copyWith(id: existingAnnotation.id));
+    }
+
+    final companion = PathAnnotationEntitiesCompanion(
+      path: Value(annotation.path),
+      description: Value(annotation.description),
+      suggestDelete: Value(annotation.suggestDelete),
+      isBuiltIn: Value(annotation.isBuiltIn),
+      pathMatchType: Value(annotation.pathMatchType.index),
+    );
+    final newId = await _db.into(_db.pathAnnotationEntities).insert(companion);
+    final newEntity = await (_db.select(_db.pathAnnotationEntities)..where((tbl) => tbl.id.equals(newId))).getSingle();
+    return _convertToPathAnnotation(newEntity);
+  }
+
+  Future<models.PathAnnotation?> updatePathAnnotation(models.PathAnnotation annotation) async {
+    if (annotation.id == null) throw Exception("PathAnnotation ID cannot be null for update.");
+    
+    // 检查是否是内置标注
+    final existingAnnotation = await (_db.select(_db.pathAnnotationEntities)..where((tbl) => tbl.id.equals(annotation.id!))).getSingleOrNull();
+    if (existingAnnotation != null && existingAnnotation.isBuiltIn && !annotation.isBuiltIn) {
+      // 不允许将内置标注修改为非内置
+      return null;
+    }
+    
+    await (_db.update(_db.pathAnnotationEntities)..where((tbl) => tbl.id.equals(annotation.id!)))
+      .write(PathAnnotationEntitiesCompanion(
+        path: Value(annotation.path),
+        description: Value(annotation.description),
+        suggestDelete: Value(annotation.suggestDelete),
+        pathMatchType: Value(annotation.pathMatchType.index),
+        updatedAt: Value(DateTime.now()),
+      ));
+    return await getPathAnnotationByPath(annotation.path);
+  }
+
+  Future<void> deletePathAnnotation(int id) async {
+    // 检查是否是内置标注
+    final annotation = await (_db.select(_db.pathAnnotationEntities)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+    if (annotation != null && annotation.isBuiltIn) {
+      // 不允许删除内置标注
+      return;
+    }
+    
+    await (_db.delete(_db.pathAnnotationEntities)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  models.PathAnnotation _convertToPathAnnotation(PathAnnotationEntity data) {
+    return models.PathAnnotation(
+      id: data.id,
+      path: data.path,
+      description: data.description,
+      suggestDelete: data.suggestDelete,
+      isBuiltIn: data.isBuiltIn,
+      pathMatchType: models.PathMatchType.values[data.pathMatchType],
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    );
   }
 }

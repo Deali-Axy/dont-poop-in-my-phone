@@ -1775,6 +1775,438 @@ class HistoryEntitiesCompanion extends UpdateCompanion<HistoryEntity> {
   }
 }
 
+class $PathAnnotationEntitiesTable extends PathAnnotationEntities
+    with TableInfo<$PathAnnotationEntitiesTable, PathAnnotationEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PathAnnotationEntitiesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _pathMeta = const VerificationMeta('path');
+  @override
+  late final GeneratedColumn<String> path = GeneratedColumn<String>(
+      'path', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _suggestDeleteMeta =
+      const VerificationMeta('suggestDelete');
+  @override
+  late final GeneratedColumn<bool> suggestDelete = GeneratedColumn<bool>(
+      'suggest_delete', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("suggest_delete" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _isBuiltInMeta =
+      const VerificationMeta('isBuiltIn');
+  @override
+  late final GeneratedColumn<bool> isBuiltIn = GeneratedColumn<bool>(
+      'is_built_in', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_built_in" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _pathMatchTypeMeta =
+      const VerificationMeta('pathMatchType');
+  @override
+  late final GeneratedColumn<int> pathMatchType = GeneratedColumn<int>(
+      'path_match_type', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        path,
+        description,
+        suggestDelete,
+        isBuiltIn,
+        pathMatchType,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'path_annotation_entities';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<PathAnnotationEntity> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('path')) {
+      context.handle(
+          _pathMeta, path.isAcceptableOrUnknown(data['path']!, _pathMeta));
+    } else if (isInserting) {
+      context.missing(_pathMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('suggest_delete')) {
+      context.handle(
+          _suggestDeleteMeta,
+          suggestDelete.isAcceptableOrUnknown(
+              data['suggest_delete']!, _suggestDeleteMeta));
+    }
+    if (data.containsKey('is_built_in')) {
+      context.handle(
+          _isBuiltInMeta,
+          isBuiltIn.isAcceptableOrUnknown(
+              data['is_built_in']!, _isBuiltInMeta));
+    }
+    if (data.containsKey('path_match_type')) {
+      context.handle(
+          _pathMatchTypeMeta,
+          pathMatchType.isAcceptableOrUnknown(
+              data['path_match_type']!, _pathMatchTypeMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PathAnnotationEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PathAnnotationEntity(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      path: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}path'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      suggestDelete: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}suggest_delete'])!,
+      isBuiltIn: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_built_in'])!,
+      pathMatchType: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}path_match_type'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $PathAnnotationEntitiesTable createAlias(String alias) {
+    return $PathAnnotationEntitiesTable(attachedDatabase, alias);
+  }
+}
+
+class PathAnnotationEntity extends DataClass
+    implements Insertable<PathAnnotationEntity> {
+  final int id;
+  final String path;
+  final String description;
+  final bool suggestDelete;
+  final bool isBuiltIn;
+  final int pathMatchType;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const PathAnnotationEntity(
+      {required this.id,
+      required this.path,
+      required this.description,
+      required this.suggestDelete,
+      required this.isBuiltIn,
+      required this.pathMatchType,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['path'] = Variable<String>(path);
+    map['description'] = Variable<String>(description);
+    map['suggest_delete'] = Variable<bool>(suggestDelete);
+    map['is_built_in'] = Variable<bool>(isBuiltIn);
+    map['path_match_type'] = Variable<int>(pathMatchType);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PathAnnotationEntitiesCompanion toCompanion(bool nullToAbsent) {
+    return PathAnnotationEntitiesCompanion(
+      id: Value(id),
+      path: Value(path),
+      description: Value(description),
+      suggestDelete: Value(suggestDelete),
+      isBuiltIn: Value(isBuiltIn),
+      pathMatchType: Value(pathMatchType),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PathAnnotationEntity.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PathAnnotationEntity(
+      id: serializer.fromJson<int>(json['id']),
+      path: serializer.fromJson<String>(json['path']),
+      description: serializer.fromJson<String>(json['description']),
+      suggestDelete: serializer.fromJson<bool>(json['suggestDelete']),
+      isBuiltIn: serializer.fromJson<bool>(json['isBuiltIn']),
+      pathMatchType: serializer.fromJson<int>(json['pathMatchType']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'path': serializer.toJson<String>(path),
+      'description': serializer.toJson<String>(description),
+      'suggestDelete': serializer.toJson<bool>(suggestDelete),
+      'isBuiltIn': serializer.toJson<bool>(isBuiltIn),
+      'pathMatchType': serializer.toJson<int>(pathMatchType),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  PathAnnotationEntity copyWith(
+          {int? id,
+          String? path,
+          String? description,
+          bool? suggestDelete,
+          bool? isBuiltIn,
+          int? pathMatchType,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      PathAnnotationEntity(
+        id: id ?? this.id,
+        path: path ?? this.path,
+        description: description ?? this.description,
+        suggestDelete: suggestDelete ?? this.suggestDelete,
+        isBuiltIn: isBuiltIn ?? this.isBuiltIn,
+        pathMatchType: pathMatchType ?? this.pathMatchType,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  PathAnnotationEntity copyWithCompanion(PathAnnotationEntitiesCompanion data) {
+    return PathAnnotationEntity(
+      id: data.id.present ? data.id.value : this.id,
+      path: data.path.present ? data.path.value : this.path,
+      description:
+          data.description.present ? data.description.value : this.description,
+      suggestDelete: data.suggestDelete.present
+          ? data.suggestDelete.value
+          : this.suggestDelete,
+      isBuiltIn: data.isBuiltIn.present ? data.isBuiltIn.value : this.isBuiltIn,
+      pathMatchType: data.pathMatchType.present
+          ? data.pathMatchType.value
+          : this.pathMatchType,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PathAnnotationEntity(')
+          ..write('id: $id, ')
+          ..write('path: $path, ')
+          ..write('description: $description, ')
+          ..write('suggestDelete: $suggestDelete, ')
+          ..write('isBuiltIn: $isBuiltIn, ')
+          ..write('pathMatchType: $pathMatchType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, path, description, suggestDelete,
+      isBuiltIn, pathMatchType, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PathAnnotationEntity &&
+          other.id == this.id &&
+          other.path == this.path &&
+          other.description == this.description &&
+          other.suggestDelete == this.suggestDelete &&
+          other.isBuiltIn == this.isBuiltIn &&
+          other.pathMatchType == this.pathMatchType &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PathAnnotationEntitiesCompanion
+    extends UpdateCompanion<PathAnnotationEntity> {
+  final Value<int> id;
+  final Value<String> path;
+  final Value<String> description;
+  final Value<bool> suggestDelete;
+  final Value<bool> isBuiltIn;
+  final Value<int> pathMatchType;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const PathAnnotationEntitiesCompanion({
+    this.id = const Value.absent(),
+    this.path = const Value.absent(),
+    this.description = const Value.absent(),
+    this.suggestDelete = const Value.absent(),
+    this.isBuiltIn = const Value.absent(),
+    this.pathMatchType = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  PathAnnotationEntitiesCompanion.insert({
+    this.id = const Value.absent(),
+    required String path,
+    this.description = const Value.absent(),
+    this.suggestDelete = const Value.absent(),
+    this.isBuiltIn = const Value.absent(),
+    this.pathMatchType = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : path = Value(path);
+  static Insertable<PathAnnotationEntity> custom({
+    Expression<int>? id,
+    Expression<String>? path,
+    Expression<String>? description,
+    Expression<bool>? suggestDelete,
+    Expression<bool>? isBuiltIn,
+    Expression<int>? pathMatchType,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (path != null) 'path': path,
+      if (description != null) 'description': description,
+      if (suggestDelete != null) 'suggest_delete': suggestDelete,
+      if (isBuiltIn != null) 'is_built_in': isBuiltIn,
+      if (pathMatchType != null) 'path_match_type': pathMatchType,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  PathAnnotationEntitiesCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? path,
+      Value<String>? description,
+      Value<bool>? suggestDelete,
+      Value<bool>? isBuiltIn,
+      Value<int>? pathMatchType,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt}) {
+    return PathAnnotationEntitiesCompanion(
+      id: id ?? this.id,
+      path: path ?? this.path,
+      description: description ?? this.description,
+      suggestDelete: suggestDelete ?? this.suggestDelete,
+      isBuiltIn: isBuiltIn ?? this.isBuiltIn,
+      pathMatchType: pathMatchType ?? this.pathMatchType,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (path.present) {
+      map['path'] = Variable<String>(path.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (suggestDelete.present) {
+      map['suggest_delete'] = Variable<bool>(suggestDelete.value);
+    }
+    if (isBuiltIn.present) {
+      map['is_built_in'] = Variable<bool>(isBuiltIn.value);
+    }
+    if (pathMatchType.present) {
+      map['path_match_type'] = Variable<int>(pathMatchType.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PathAnnotationEntitiesCompanion(')
+          ..write('id: $id, ')
+          ..write('path: $path, ')
+          ..write('description: $description, ')
+          ..write('suggestDelete: $suggestDelete, ')
+          ..write('isBuiltIn: $isBuiltIn, ')
+          ..write('pathMatchType: $pathMatchType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1785,12 +2217,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $RuleItemEntitiesTable(this);
   late final $HistoryEntitiesTable historyEntities =
       $HistoryEntitiesTable(this);
+  late final $PathAnnotationEntitiesTable pathAnnotationEntities =
+      $PathAnnotationEntitiesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [whitelistEntities, ruleEntities, ruleItemEntities, historyEntities];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        whitelistEntities,
+        ruleEntities,
+        ruleItemEntities,
+        historyEntities,
+        pathAnnotationEntities
+      ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
@@ -3068,6 +3507,227 @@ typedef $$HistoryEntitiesTableProcessedTableManager = ProcessedTableManager<
     (HistoryEntity, $$HistoryEntitiesTableReferences),
     HistoryEntity,
     PrefetchHooks Function({bool ruleId})>;
+typedef $$PathAnnotationEntitiesTableCreateCompanionBuilder
+    = PathAnnotationEntitiesCompanion Function({
+  Value<int> id,
+  required String path,
+  Value<String> description,
+  Value<bool> suggestDelete,
+  Value<bool> isBuiltIn,
+  Value<int> pathMatchType,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+});
+typedef $$PathAnnotationEntitiesTableUpdateCompanionBuilder
+    = PathAnnotationEntitiesCompanion Function({
+  Value<int> id,
+  Value<String> path,
+  Value<String> description,
+  Value<bool> suggestDelete,
+  Value<bool> isBuiltIn,
+  Value<int> pathMatchType,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+});
+
+class $$PathAnnotationEntitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $PathAnnotationEntitiesTable> {
+  $$PathAnnotationEntitiesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get path => $composableBuilder(
+      column: $table.path, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get suggestDelete => $composableBuilder(
+      column: $table.suggestDelete, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isBuiltIn => $composableBuilder(
+      column: $table.isBuiltIn, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pathMatchType => $composableBuilder(
+      column: $table.pathMatchType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$PathAnnotationEntitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PathAnnotationEntitiesTable> {
+  $$PathAnnotationEntitiesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get path => $composableBuilder(
+      column: $table.path, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get suggestDelete => $composableBuilder(
+      column: $table.suggestDelete,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isBuiltIn => $composableBuilder(
+      column: $table.isBuiltIn, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get pathMatchType => $composableBuilder(
+      column: $table.pathMatchType,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$PathAnnotationEntitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PathAnnotationEntitiesTable> {
+  $$PathAnnotationEntitiesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get path =>
+      $composableBuilder(column: $table.path, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<bool> get suggestDelete => $composableBuilder(
+      column: $table.suggestDelete, builder: (column) => column);
+
+  GeneratedColumn<bool> get isBuiltIn =>
+      $composableBuilder(column: $table.isBuiltIn, builder: (column) => column);
+
+  GeneratedColumn<int> get pathMatchType => $composableBuilder(
+      column: $table.pathMatchType, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PathAnnotationEntitiesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $PathAnnotationEntitiesTable,
+    PathAnnotationEntity,
+    $$PathAnnotationEntitiesTableFilterComposer,
+    $$PathAnnotationEntitiesTableOrderingComposer,
+    $$PathAnnotationEntitiesTableAnnotationComposer,
+    $$PathAnnotationEntitiesTableCreateCompanionBuilder,
+    $$PathAnnotationEntitiesTableUpdateCompanionBuilder,
+    (
+      PathAnnotationEntity,
+      BaseReferences<_$AppDatabase, $PathAnnotationEntitiesTable,
+          PathAnnotationEntity>
+    ),
+    PathAnnotationEntity,
+    PrefetchHooks Function()> {
+  $$PathAnnotationEntitiesTableTableManager(
+      _$AppDatabase db, $PathAnnotationEntitiesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PathAnnotationEntitiesTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PathAnnotationEntitiesTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PathAnnotationEntitiesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> path = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<bool> suggestDelete = const Value.absent(),
+            Value<bool> isBuiltIn = const Value.absent(),
+            Value<int> pathMatchType = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+          }) =>
+              PathAnnotationEntitiesCompanion(
+            id: id,
+            path: path,
+            description: description,
+            suggestDelete: suggestDelete,
+            isBuiltIn: isBuiltIn,
+            pathMatchType: pathMatchType,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String path,
+            Value<String> description = const Value.absent(),
+            Value<bool> suggestDelete = const Value.absent(),
+            Value<bool> isBuiltIn = const Value.absent(),
+            Value<int> pathMatchType = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+          }) =>
+              PathAnnotationEntitiesCompanion.insert(
+            id: id,
+            path: path,
+            description: description,
+            suggestDelete: suggestDelete,
+            isBuiltIn: isBuiltIn,
+            pathMatchType: pathMatchType,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$PathAnnotationEntitiesTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $PathAnnotationEntitiesTable,
+        PathAnnotationEntity,
+        $$PathAnnotationEntitiesTableFilterComposer,
+        $$PathAnnotationEntitiesTableOrderingComposer,
+        $$PathAnnotationEntitiesTableAnnotationComposer,
+        $$PathAnnotationEntitiesTableCreateCompanionBuilder,
+        $$PathAnnotationEntitiesTableUpdateCompanionBuilder,
+        (
+          PathAnnotationEntity,
+          BaseReferences<_$AppDatabase, $PathAnnotationEntitiesTable,
+              PathAnnotationEntity>
+        ),
+        PathAnnotationEntity,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3080,4 +3740,7 @@ class $AppDatabaseManager {
       $$RuleItemEntitiesTableTableManager(_db, _db.ruleItemEntities);
   $$HistoryEntitiesTableTableManager get historyEntities =>
       $$HistoryEntitiesTableTableManager(_db, _db.historyEntities);
+  $$PathAnnotationEntitiesTableTableManager get pathAnnotationEntities =>
+      $$PathAnnotationEntitiesTableTableManager(
+          _db, _db.pathAnnotationEntities);
 }

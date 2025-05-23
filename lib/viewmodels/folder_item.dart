@@ -11,6 +11,10 @@ class FolderItem {
   String _label = '';
   late bool _isRootPath;
   bool _isInWhiteList = false;
+  
+  // 标注相关属性
+  String _annotation = '';
+  bool _suggestDelete = false;
 
   Directory get directory => _dir;
 
@@ -21,6 +25,10 @@ class FolderItem {
   bool get isInWhiteList => _isInWhiteList;
 
   bool get isRootPath => _isRootPath;
+  
+  // 标注相关getter
+  String get annotation => _annotation;
+  bool get suggestDelete => _suggestDelete;
 
   FolderItem(this.folderPath) {
     _dir = Directory(folderPath);
@@ -29,6 +37,9 @@ class FolderItem {
     // 白名单检查现在是异步的，需要单独调用
     _isInWhiteList = false;
     _label = '';
+    // 标注初始化
+    _annotation = '';
+    _suggestDelete = false;
   }
 
   /// 异步初始化白名单状态
@@ -36,6 +47,15 @@ class FolderItem {
     _isInWhiteList = await WhitelistDao.containsPath(folderPath);
     if (_isInWhiteList) {
       _label = '重要文件，不支持清理';
+    }
+  }
+  
+  /// 异步初始化标注状态
+  Future<void> initAnnotationStatus() async {
+    final annotation = await PathAnnotationDao.getByPath(folderPath);
+    if (annotation != null) {
+      _annotation = annotation.description;
+      _suggestDelete = annotation.suggestDelete;
     }
   }
 
@@ -46,8 +66,11 @@ class FolderItem {
         .map((e) => FolderItem(e.path))
         .toList();
 
-    // 异步初始化白名单状态
-    await Future.wait(list.map((item) => item.initWhitelistStatus()));
+    // 异步初始化白名单状态和标注状态
+    await Future.wait(list.map((item) async {
+      await item.initWhitelistStatus();
+      await item.initAnnotationStatus();
+    }));
 
     // 根据名称排序
     list.sort((a, b) => a.dirName.compareTo(b.dirName));

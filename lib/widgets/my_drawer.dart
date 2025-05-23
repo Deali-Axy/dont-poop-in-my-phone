@@ -68,6 +68,11 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () => Navigator.of(context).pushNamed('rule'),
                 ),
                 _buildMenuItem(
+                  icon: Icons.label_outline,
+                  title: '路径标注',
+                  onTap: () => Navigator.of(context).pushNamed('path_annotation'),
+                ),
+                _buildMenuItem(
                   icon: Icons.history,
                   title: '历史记录',
                   onTap: () => Navigator.of(context).pushNamed('history'),

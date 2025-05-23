@@ -60,12 +60,24 @@ class HistoryEntities extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [WhitelistEntities, RuleEntities, RuleItemEntities, HistoryEntities])
+// 路径标注表
+class PathAnnotationEntities extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get path => text()();
+  TextColumn get description => text().withDefault(const Constant(''))();
+  BoolColumn get suggestDelete => boolean().withDefault(const Constant(false))();
+  BoolColumn get isBuiltIn => boolean().withDefault(const Constant(false))();
+  IntColumn get pathMatchType => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+@DriftDatabase(tables: [WhitelistEntities, RuleEntities, RuleItemEntities, HistoryEntities, PathAnnotationEntities])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -89,6 +101,9 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(historyEntities, historyEntities.spaceChange);
             await m.addColumn(historyEntities, historyEntities.ruleId);
             await m.addColumn(historyEntities, historyEntities.status);
+          }
+          if (from < 5) {
+            await m.createAll();
           }
         },
       );
