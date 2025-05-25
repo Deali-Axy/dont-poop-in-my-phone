@@ -15,8 +15,8 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  static const _backgroundImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/600/450';
-  static const _avatarImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/200/200';
+  var _backgroundImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/600/450';
+  var _avatarImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/200/200';
   var _currentHitokoto = Hitokoto(
     hitokoto: '（正在加载一言）',
     creator: '别在我的手机里拉屎！',
@@ -30,6 +30,8 @@ class _MyDrawerState extends State<MyDrawer> {
 
   void _loadHitokoto() async {
     _currentHitokoto = await HitokotoGenerator.getHitokoto(context);
+    _backgroundImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/${_currentHitokoto.creator}/600/450';
+    _avatarImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/${_currentHitokoto.creator}/200/200';
     setState(() {});
   }
 
