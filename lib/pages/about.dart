@@ -41,7 +41,7 @@ class AboutPageState extends State<AboutPage> {
 
   Widget _buildBody(PackageInfo? packageInfo) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('关于应用'),
@@ -67,21 +67,21 @@ class AboutPageState extends State<AboutPage> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Color.fromRGBO(27, 60, 168, 0),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.asset('assets/icon/icon.png'),
+                      child: Image.asset('assets/icon/icon-old-circle.png'),
                     ),
                   ),
                   const SizedBox(height: 16),
-            const Text(
-              '别在我手机里拉屎',
+                  const Text(
+                    '别在我手机里拉屎',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-            ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     '${packageInfo?.version} (Build ${packageInfo?.buildNumber})',
@@ -102,7 +102,7 @@ class AboutPageState extends State<AboutPage> {
                 ],
               ),
             ),
-            
+
             // 中间详情部分
             Padding(
               padding: const EdgeInsets.all(24.0),
@@ -116,64 +116,69 @@ class AboutPageState extends State<AboutPage> {
                       _buildInfoRow(icon: Icons.chat, text: '微信公众号：程序设计实验室'),
                     ],
                   ),
-                  
                   const SizedBox(height: 20),
-                  
                   _buildInfoCard(
                     title: '应用功能',
                     children: [
                       _buildActionButton(
                         icon: Icons.help_outline,
                         text: '功能介绍',
-                        onTap: () => Navigator.of(context).pushNamed('introview'),
-            ),
+                        onTap: () =>
+                            Navigator.of(context).pushNamed('introview'),
+                      ),
                       _buildActionButton(
                         icon: Icons.send,
                         text: '意见反馈',
                         onTap: () async {
-                const url = 'mailto:feedback@deali.cn?subject=别在我手机里拉屎App反馈&body=反馈内容：';
-                if (await canLaunchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url));
-                } else {
-                  BotToast.showText(text: '无法启动邮件客户端');
-                }
-              },
-            ),
+                          const url =
+                              'mailto:feedback@deali.cn?subject=别在我手机里拉屎App反馈&body=反馈内容：';
+                          if (await canLaunchUrl(Uri.parse(url))) {
+                            await launchUrl(Uri.parse(url));
+                          } else {
+                            BotToast.showText(text: '无法启动邮件客户端');
+                          }
+                        },
+                      ),
                       _buildActionButton(
-                        icon: isUpToDate ? Icons.check_circle_outline : Icons.refresh,
+                        icon: isUpToDate
+                            ? Icons.check_circle_outline
+                            : Icons.refresh,
                         text: isUpToDate ? '已是最新版本' : '检查更新',
-                        onTap: isUpToDate 
-                            ? null 
+                        onTap: isUpToDate
+                            ? null
                             : () async {
-                  showLoading(context, text: '检查更新');
-                  var hasUpdate = await AppUpdate.checkUpdate(context);
-                  Navigator.of(context).pop();
+                                showLoading(context, text: '检查更新');
+                                var hasUpdate =
+                                    await AppUpdate.checkUpdate(context);
+                                Navigator.of(context).pop();
                                 if (!hasUpdate) {
                                   BotToast.showText(text: '已经是最新版本');
-                  setState(() {
-                    isUpToDate = true;
-                  });
+                                  setState(() {
+                                    isUpToDate = true;
+                                  });
                                 }
-                },
-              ),
+                              },
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             // 底部隐私条款部分
             Divider(color: Colors.grey.withOpacity(0.3), height: 1),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
+                children: <Widget>[
                   TextButton.icon(
-                    icon: Icon(Icons.gavel, size: 18, color: Theme.of(context).colorScheme.primary),
+                    icon: Icon(Icons.gavel,
+                        size: 18, color: Theme.of(context).colorScheme.primary),
                     label: const Text('软件许可'),
                     onPressed: () async {
-                      var uri = Uri.parse('http://www.sblt.deali.cn:9000/APP许可协议.html');
+                      var uri = Uri.parse(
+                          'http://www.sblt.deali.cn:9000/APP许可协议.html');
                       if (await canLaunchUrl(uri)) {
                         await launchUrl(uri);
                       } else {
@@ -182,10 +187,12 @@ class AboutPageState extends State<AboutPage> {
                     },
                   ),
                   TextButton.icon(
-                    icon: Icon(Icons.privacy_tip, size: 18, color: Theme.of(context).colorScheme.primary),
+                    icon: Icon(Icons.privacy_tip,
+                        size: 18, color: Theme.of(context).colorScheme.primary),
                     label: const Text('隐私政策'),
                     onPressed: () async {
-                      var uri = Uri.parse('http://www.sblt.deali.cn:9000/APP隐私政策.html');
+                      var uri = Uri.parse(
+                          'http://www.sblt.deali.cn:9000/APP隐私政策.html');
                       if (await canLaunchUrl(uri)) {
                         await launchUrl(uri);
                       } else {
@@ -193,8 +200,8 @@ class AboutPageState extends State<AboutPage> {
                       }
                     },
                   ),
-              ],
-            ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             Center(
@@ -212,8 +219,9 @@ class AboutPageState extends State<AboutPage> {
       ),
     );
   }
-  
-  Widget _buildInfoCard({required String title, required List<Widget> children}) {
+
+  Widget _buildInfoCard(
+      {required String title, required List<Widget> children}) {
     return Card(
       elevation: 2,
       margin: EdgeInsets.zero,
@@ -238,7 +246,7 @@ class AboutPageState extends State<AboutPage> {
       ),
     );
   }
-  
+
   Widget _buildInfoRow({required IconData icon, required String text}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -256,7 +264,7 @@ class AboutPageState extends State<AboutPage> {
       ),
     );
   }
-  
+
   Widget _buildActionButton({
     required IconData icon,
     required String text,
@@ -266,8 +274,8 @@ class AboutPageState extends State<AboutPage> {
       contentPadding: EdgeInsets.zero,
       leading: Icon(
         icon,
-        color: onTap == null 
-            ? Colors.green 
+        color: onTap == null
+            ? Colors.green
             : Theme.of(context).colorScheme.secondary,
       ),
       title: Text(

@@ -16,7 +16,7 @@ class IntroViewPage extends StatelessWidget {
     PageViewModel(
       pageColor: const Color(0xFF03A9F4),
       // iconImageAssetPath: 'assets/air-hostess.png',
-      bubble: Image.asset('assets/icon/icon.png'),
+      // bubble: Image.asset('assets/icon/icon.png'),
       body: const Text('清理流氓App在存储根目录里创建的垃圾文件夹'),
       title: const Text('清理'),
       titleTextStyle: const TextStyle(fontFamily: 'MyFont', color: Colors.white),
@@ -25,7 +25,7 @@ class IntroViewPage extends StatelessWidget {
     ),
     PageViewModel(
       pageColor: const Color(0xFF8BC34A),
-      iconImageAssetPath: 'assets/icon/icon.png',
+      // iconImageAssetPath: 'assets/icon/icon.png',
       body: const Text('使用空白文件替换流氓App创建的垃圾文件夹'),
       title: const Text('占坑'),
       mainImage: Icon(Icons.do_not_disturb, size: 285, color: const Color(0xFFACD8FF)),
@@ -34,7 +34,7 @@ class IntroViewPage extends StatelessWidget {
     ),
     PageViewModel(
       pageColor: const Color(0xFF2B5641),
-      iconImageAssetPath: 'assets/icon/icon.png',
+      // iconImageAssetPath: 'assets/icon/icon.png',
       body: const Text('创建自定义的清理规则，自动清理'),
       title: const Text('规则'),
       mainImage: Icon(Icons.rule, size: 285, color: const Color(0xFFACD8FF)),
@@ -56,7 +56,7 @@ class IntroViewPage extends StatelessWidget {
           ),
         ),
       ),
-      iconImageAssetPath: 'assets/icon/icon.png',
+      // iconImageAssetPath: 'assets/icon/icon.png',
       body: const Text('搞清楚某个目录是没用的再使用占坑功能'),
       title: const Text('注意'),
       mainImage: Icon(Icons.warning, size: 285, color: const Color(0xFFACD8FF)),
