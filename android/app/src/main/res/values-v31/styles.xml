@@ -1,0 +1,9 @@
+<resources>
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- 真·完全透明 -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+        <!-- 遗留兼容：也保留 windowTranslucentNavigation -->
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+</resources>

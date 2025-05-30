@@ -11,6 +11,8 @@ import 'common/routes.dart';
 import 'utils/index.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // 捕获全局Flutter错误
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
@@ -29,12 +31,16 @@ void main() {
   });
 
   if (Platform.isAndroid) {
-    // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
-    var systemUiOverlayStyle = const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Color(0x002196f3),
-    );
-    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+    // 设置沉浸式样式
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // 顶部状态栏透明
+      systemNavigationBarColor: Colors.transparent, // 底部导航栏透明
+      systemNavigationBarDividerColor: Colors.transparent, // 分隔线也透明
+      systemNavigationBarIconBrightness: Brightness.light, // 图标颜色
+      statusBarIconBrightness: Brightness.light, // 状态栏图标颜色
+    ));
+
+    // 设置内容全屏
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 }

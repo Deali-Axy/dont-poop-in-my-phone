@@ -15,7 +15,8 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
 
     // 隐藏状态栏
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom]);
 
     Future.delayed(Duration(seconds: 1)).then((e) {
       if (Global.firstRun)
@@ -27,6 +28,19 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Image.asset('assets/icon/icon.png'));
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          // 背景图
+          Positioned.fill(child: Image.asset(
+            'assets/images/splash.jpg',
+            fit: BoxFit.cover,
+          )),
+        ],
+      ),
+    );
   }
 }

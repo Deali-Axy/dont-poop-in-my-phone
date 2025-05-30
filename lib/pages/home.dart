@@ -121,6 +121,8 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: const MyDrawer(),
+      extendBodyBehindAppBar: true,
+      extendBody: true,
       body: PopScope(
         canPop: false,
         onPopInvoked: (didPop) async {

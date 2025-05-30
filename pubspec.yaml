@@ -120,3 +120,5 @@ flutter:
   assets:
     - assets/icon/
     - assets/json/
+    - assets/images/
+
