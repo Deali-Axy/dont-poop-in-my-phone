@@ -32,15 +32,17 @@ void main() {
 
   if (Platform.isAndroid) {
     // 设置沉浸式样式
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent, // 顶部状态栏透明
+      statusBarIconBrightness: Brightness.dark, // 状态栏图标颜色（深色图标）
+      statusBarBrightness: Brightness.light, // iOS状态栏亮度
       systemNavigationBarColor: Colors.transparent, // 底部导航栏透明
       systemNavigationBarDividerColor: Colors.transparent, // 分隔线也透明
-      systemNavigationBarIconBrightness: Brightness.light, // 图标颜色
-      statusBarIconBrightness: Brightness.light, // 状态栏图标颜色
+      systemNavigationBarIconBrightness: Brightness.dark, // 导航栏图标颜色（深色图标）
+      systemNavigationBarContrastEnforced: false, // 禁用系统强制对比度
     ));
 
-    // 设置内容全屏
+    // 设置边到边全屏显示
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 }

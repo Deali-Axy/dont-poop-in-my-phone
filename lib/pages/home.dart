@@ -44,11 +44,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // 显示状态栏
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
-    var systemUiOverlayStyle = const SystemUiOverlayStyle(statusBarColor: Colors.transparent);
-    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-
     // 启动就打开根目录
     _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
     AppUpdate.checkUpdate(context);

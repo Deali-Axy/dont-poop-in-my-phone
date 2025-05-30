@@ -14,9 +14,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
 
-    // 隐藏状态栏
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: [SystemUiOverlay.bottom]);
+    // 使用全局的边到边显示配置，不在此处覆盖
 
     Future.delayed(Duration(seconds: 1)).then((e) {
       if (Global.firstRun)
