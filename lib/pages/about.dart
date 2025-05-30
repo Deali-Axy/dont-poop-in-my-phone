@@ -55,7 +55,8 @@ class AboutPageState extends State<AboutPage> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                // color: Theme.of(context).colorScheme.primary,
+                color: Color.fromRGBO(134, 229, 206, 1),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
@@ -67,15 +68,15 @@ class AboutPageState extends State<AboutPage> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Color.fromRGBO(27, 60, 168, 0),
+                    backgroundColor: Color.fromRGBO(134, 229, 206, 1),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.asset('assets/icon/icon-old-circle.png'),
+                      child: Image.asset('assets/icon/icon.png'),
                     ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    '别在我手机里拉屎',
+                    '扫地喵',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -87,16 +88,16 @@ class AboutPageState extends State<AboutPage> {
                     '${packageInfo?.version} (Build ${packageInfo?.buildNumber})',
                     style: const TextStyle(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    '清理流氓APP产生的垃圾，并且把坑占了，不让它们再生产垃圾！',
+                    '🐾 扫地喵到，垃圾全跑！',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white70,
+                      color: Colors.white,
                     ),
                   ),
                 ],
