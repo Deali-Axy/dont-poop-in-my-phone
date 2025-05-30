@@ -36,7 +36,7 @@ class _SplashPageState extends State<SplashPage> {
         children: [
           // 背景图
           Positioned.fill(child: Image.asset(
-            'assets/images/splash.jpg',
+            'assets/images/splash.png',
             fit: BoxFit.cover,
           )),
         ],
