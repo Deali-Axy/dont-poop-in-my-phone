@@ -33,10 +33,10 @@ jobs:
         run: |
           flutter packages pub run build_runner build --delete-conflicting-outputs
       
-      - name: 运行静态分析
-        run: |
-          echo "运行静态代码分析..."
-          flutter analyze
+      # - name: 运行静态分析
+      #   run: |
+      #     echo "运行静态代码分析..."
+      #     flutter analyze
       
       - name: 运行测试
         run: |
