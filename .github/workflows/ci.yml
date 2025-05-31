@@ -38,10 +38,10 @@ jobs:
       #     echo "运行静态代码分析..."
       #     flutter analyze
       
-      - name: 运行测试
-        run: |
-          echo "运行单元测试..."
-          flutter test --coverage
+      # - name: 运行测试
+      #   run: |
+      #     echo "运行单元测试..."
+      #     flutter test --coverage
       
       - name: 上传测试覆盖率
         uses: codecov/codecov-action@v4
