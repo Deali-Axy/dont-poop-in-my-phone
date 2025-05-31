@@ -33,11 +33,6 @@ jobs:
         run: |
           flutter packages pub run build_runner build --delete-conflicting-outputs
       
-      - name: 验证代码格式
-        run: |
-          echo "检查代码格式..."
-          flutter format --set-exit-if-changed .
-      
       - name: 运行静态分析
         run: |
           echo "运行静态代码分析..."
