@@ -1,0 +1,195 @@
+name: 构建并发布APK
+
+on:
+  push:
+    tags:
+      - "v*.*.*"  # 匹配 v1.0.0 格式的标签
+
+jobs:
+  build-apk:
+    name: 构建多架构APK
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target-platform:
+          - android-arm64
+          - android-arm
+          - android-x64
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Java环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: 设置Flutter环境
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取Flutter依赖
+        run: flutter pub get
+      
+      - name: 运行代码生成
+        run: |
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: 构建APK - ${{ matrix.target-platform }}
+        run: |
+          case "${{ matrix.target-platform }}" in
+            "android-arm64")
+              flutter build apk --release --target-platform android-arm64 --split-per-abi
+              ;;
+            "android-arm")
+              flutter build apk --release --target-platform android-arm --split-per-abi
+              ;;
+            "android-x64")
+              flutter build apk --release --target-platform android-x64 --split-per-abi
+              ;;
+          esac
+      
+      - name: 重命名APK文件
+        run: |
+          cd build/app/outputs/flutter-apk/
+          case "${{ matrix.target-platform }}" in
+            "android-arm64")
+              if [ -f "app-arm64-v8a-release.apk" ]; then
+                mv app-arm64-v8a-release.apk dont-poop-in-my-phone-arm64-v8a.apk
+              fi
+              ;;
+            "android-arm")
+              if [ -f "app-armeabi-v7a-release.apk" ]; then
+                mv app-armeabi-v7a-release.apk dont-poop-in-my-phone-armeabi-v7a.apk
+              fi
+              ;;
+            "android-x64")
+              if [ -f "app-x86_64-release.apk" ]; then
+                mv app-x86_64-release.apk dont-poop-in-my-phone-x86_64.apk
+              fi
+              ;;
+          esac
+      
+      - name: 上传APK构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-${{ matrix.target-platform }}
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 1
+
+  build-universal-apk:
+    name: 构建通用APK
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Java环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: 设置Flutter环境
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取Flutter依赖
+        run: flutter pub get
+      
+      - name: 运行代码生成
+        run: |
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: 构建通用APK
+        run: flutter build apk --release
+      
+      - name: 重命名通用APK
+        run: |
+          cd build/app/outputs/flutter-apk/
+          mv app-release.apk dont-poop-in-my-phone-universal.apk
+      
+      - name: 上传通用APK构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-universal
+          path: build/app/outputs/flutter-apk/dont-poop-in-my-phone-universal.apk
+          retention-days: 1
+
+  release:
+    name: 发布到GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-apk, build-universal-apk]
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 提取版本号
+        id: get_version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: 下载所有APK构建产物
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      
+      - name: 整理APK文件
+        run: |
+          mkdir -p ./release-files
+          find ./artifacts -name "*.apk" -exec cp {} ./release-files/ \;
+          ls -la ./release-files/
+      
+      - name: 计算APK文件哈希
+        run: |
+          cd ./release-files
+          sha256sum *.apk > checksums.txt
+          cat checksums.txt
+      
+      - name: 创建Release说明
+        run: |
+          cat > release-notes.md << 'EOF'
+          ## 🎉 扫地喵 v${{ steps.get_version.outputs.VERSION }} 发布
+          
+          ### 📱 APK下载
+          
+          **推荐下载：**
+          - `dont-poop-in-my-phone-universal.apk` - 通用版本，适用于所有设备
+          
+          **按架构下载（文件更小）：**
+          - `dont-poop-in-my-phone-arm64-v8a.apk` - 适用于现代64位ARM设备（推荐）
+          - `dont-poop-in-my-phone-armeabi-v7a.apk` - 适用于32位ARM设备
+          - `dont-poop-in-my-phone-x86_64.apk` - 适用于x86_64设备（模拟器等）
+          
+          ### 🔒 安全验证
+          请下载 `checksums.txt` 文件验证APK完整性。
+          
+          ### 📋 更新内容
+          详见下方自动生成的更新日志。
+          EOF
+      
+      - name: 发布到GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            ./release-files/*.apk
+            ./release-files/checksums.txt
+          tag_name: ${{ github.ref }}
+          name: 扫地喵 v${{ steps.get_version.outputs.VERSION }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          fail_on_unmatched_files: false

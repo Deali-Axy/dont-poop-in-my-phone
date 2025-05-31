@@ -45,3 +45,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android signing files
+/android/key.properties
+/android/*.jks
+/android/*.keystore
+
+# GitHub Actions artifacts
+/artifacts/
+/release-files/

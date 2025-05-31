@@ -1,0 +1,150 @@
+name: 手动构建APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: '构建类型'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+      target_platform:
+        description: '目标平台'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - android-arm64
+          - android-arm
+          - android-x64
+          - universal
+      version_suffix:
+        description: '版本后缀（可选）'
+        required: false
+        type: string
+
+jobs:
+  manual-build:
+    name: 手动构建APK
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Java环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: 设置Flutter环境
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取Flutter依赖
+        run: flutter pub get
+      
+      - name: 运行代码生成
+        run: |
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: 构建APK
+        run: |
+          BUILD_TYPE="${{ github.event.inputs.build_type }}"
+          TARGET_PLATFORM="${{ github.event.inputs.target_platform }}"
+          VERSION_SUFFIX="${{ github.event.inputs.version_suffix }}"
+          
+          if [ "$BUILD_TYPE" = "debug" ]; then
+            BUILD_FLAG="--debug"
+          else
+            BUILD_FLAG="--release"
+          fi
+          
+          case "$TARGET_PLATFORM" in
+            "all")
+              echo "构建所有平台APK..."
+              flutter build apk $BUILD_FLAG --split-per-abi
+              flutter build apk $BUILD_FLAG
+              ;;
+            "universal")
+              echo "构建通用APK..."
+              flutter build apk $BUILD_FLAG
+              ;;
+            "android-arm64")
+              echo "构建ARM64 APK..."
+              flutter build apk $BUILD_FLAG --target-platform android-arm64 --split-per-abi
+              ;;
+            "android-arm")
+              echo "构建ARM APK..."
+              flutter build apk $BUILD_FLAG --target-platform android-arm --split-per-abi
+              ;;
+            "android-x64")
+              echo "构建x64 APK..."
+              flutter build apk $BUILD_FLAG --target-platform android-x64 --split-per-abi
+              ;;
+          esac
+      
+      - name: 重命名APK文件
+        run: |
+          cd build/app/outputs/flutter-apk/
+          BUILD_TYPE="${{ github.event.inputs.build_type }}"
+          VERSION_SUFFIX="${{ github.event.inputs.version_suffix }}"
+          
+          SUFFIX=""
+          if [ -n "$VERSION_SUFFIX" ]; then
+            SUFFIX="-$VERSION_SUFFIX"
+          fi
+          
+          for apk in *.apk; do
+            if [ -f "$apk" ]; then
+              # 提取架构信息
+              if [[ "$apk" == *"arm64-v8a"* ]]; then
+                ARCH="arm64-v8a"
+              elif [[ "$apk" == *"armeabi-v7a"* ]]; then
+                ARCH="armeabi-v7a"
+              elif [[ "$apk" == *"x86_64"* ]]; then
+                ARCH="x86_64"
+              else
+                ARCH="universal"
+              fi
+              
+              NEW_NAME="dont-poop-in-my-phone-${ARCH}-${BUILD_TYPE}${SUFFIX}.apk"
+              mv "$apk" "$NEW_NAME"
+              echo "重命名: $apk -> $NEW_NAME"
+            fi
+          done
+          
+          ls -la
+      
+      - name: 上传APK构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-build-apks-${{ github.event.inputs.build_type }}-${{ github.run_number }}
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 7
+      
+      - name: 构建摘要
+        run: |
+          echo "## 🔨 手动构建完成" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**构建参数:**" >> $GITHUB_STEP_SUMMARY
+          echo "- 构建类型: ${{ github.event.inputs.build_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 目标平台: ${{ github.event.inputs.target_platform }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 版本后缀: ${{ github.event.inputs.version_suffix }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**生成的APK文件:**" >> $GITHUB_STEP_SUMMARY
+          cd build/app/outputs/flutter-apk/
+          for apk in *.apk; do
+            if [ -f "$apk" ]; then
+              SIZE=$(du -h "$apk" | cut -f1)
+              echo "- $apk ($SIZE)" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

@@ -1,0 +1,167 @@
+name: 持续集成检查
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+  push:
+    branches: [ main, master, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+
+jobs:
+  analyze:
+    name: 代码分析
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Flutter环境
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取Flutter依赖
+        run: flutter pub get
+      
+      - name: 运行代码生成
+        run: |
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: 验证代码格式
+        run: |
+          echo "检查代码格式..."
+          flutter format --set-exit-if-changed .
+      
+      - name: 运行静态分析
+        run: |
+          echo "运行静态代码分析..."
+          flutter analyze
+      
+      - name: 运行测试
+        run: |
+          echo "运行单元测试..."
+          flutter test --coverage
+      
+      - name: 上传测试覆盖率
+        uses: codecov/codecov-action@v4
+        if: success()
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: false
+
+  build-test:
+    name: 构建测试
+    runs-on: ubuntu-latest
+    needs: analyze
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置Java环境
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: 设置Flutter环境
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+      
+      - name: 获取Flutter依赖
+        run: flutter pub get
+      
+      - name: 运行代码生成
+        run: |
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: 构建Debug APK
+        run: |
+          echo "构建Debug APK进行测试..."
+          flutter build apk --debug
+      
+      - name: 检查APK大小
+        run: |
+          APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
+          if [ -f "$APK_PATH" ]; then
+            APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
+            APK_SIZE_BYTES=$(du -b "$APK_PATH" | cut -f1)
+            echo "APK大小: $APK_SIZE ($APK_SIZE_BYTES bytes)"
+            
+            # 检查APK大小是否超过阈值 (100MB)
+            MAX_SIZE_BYTES=104857600
+            if [ "$APK_SIZE_BYTES" -gt "$MAX_SIZE_BYTES" ]; then
+              echo "⚠️ 警告: APK大小 ($APK_SIZE) 超过100MB阈值"
+              echo "APK_SIZE_WARNING=true" >> $GITHUB_ENV
+            else
+              echo "✅ APK大小正常"
+            fi
+            
+            echo "APK_SIZE=$APK_SIZE" >> $GITHUB_ENV
+            echo "APK_SIZE_BYTES=$APK_SIZE_BYTES" >> $GITHUB_ENV
+          else
+            echo "❌ APK构建失败"
+            exit 1
+          fi
+      
+      - name: 构建摘要
+        run: |
+          echo "## 📊 构建测试结果" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**APK信息:**" >> $GITHUB_STEP_SUMMARY
+          echo "- 大小: ${{ env.APK_SIZE }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 字节数: ${{ env.APK_SIZE_BYTES }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ env.APK_SIZE_WARNING }}" = "true" ]; then
+            echo "- ⚠️ 大小警告: 超过100MB阈值" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ✅ 大小正常" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: 上传Debug APK
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: debug-apk-${{ github.run_number }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 3
+
+  security-scan:
+    name: 安全扫描
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 运行安全扫描
+        uses: securecodewarrior/github-action-add-sarif@v1
+        if: false  # 暂时禁用，需要配置SARIF
+        with:
+          sarif-file: 'security-scan-results.sarif'
+      
+      - name: 检查敏感信息
+        run: |
+          echo "检查是否包含敏感信息..."
+          
+          # 检查是否有硬编码的密钥或密码
+          if grep -r -i "password\|secret\|key\|token" --include="*.dart" --include="*.yaml" --include="*.json" . | grep -v "pubspec.lock" | grep -v ".git"; then
+            echo "⚠️ 发现可能的敏感信息，请检查上述文件"
+          else
+            echo "✅ 未发现明显的敏感信息"
+          fi
+          
+          # 检查是否有调试代码
+          if grep -r "print(" --include="*.dart" lib/ | head -10; then
+            echo "⚠️ 发现调试print语句，建议在发布前移除"
+          fi

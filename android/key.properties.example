@@ -1,0 +1,27 @@
+# Android APK 签名配置示例
+# 复制此文件为 key.properties 并填入实际的签名信息
+# 注意：key.properties 文件已在 .gitignore 中，不会被提交到版本控制
+
+# 签名文件路径（相对于 android 目录）
+storeFile=upload-keystore.jks
+
+# 密钥库密码
+storePassword=your_store_password_here
+
+# 密钥别名
+keyAlias=upload
+
+# 密钥密码
+keyPassword=your_key_password_here
+
+# 配置说明：
+# 1. 生成签名文件：
+#    keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# 2. 将生成的 upload-keystore.jks 文件放在 android 目录下
+#
+# 3. 复制此文件为 key.properties 并填入实际密码
+#
+# 4. 确保 key.properties 和 *.jks 文件不会被提交到版本控制
+#
+# 注意：为了安全，建议使用环境变量或 GitHub Secrets 来管理敏感信息
