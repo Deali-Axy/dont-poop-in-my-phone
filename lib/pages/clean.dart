@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
 import 'package:dont_poop_in_my_phone/services/auto_clean_service.dart';
 import 'package:dont_poop_in_my_phone/services/clean_config_manager.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart' as models;
@@ -8,6 +11,11 @@ import 'package:dont_poop_in_my_phone/utils/file_system.dart';
 import 'package:dont_poop_in_my_phone/widgets/clean_settings_widget.dart';
 import 'package:dont_poop_in_my_phone/widgets/clean_task_card.dart';
 import 'package:dont_poop_in_my_phone/widgets/star_text_button.dart';
+import 'package:dont_poop_in_my_phone/widgets/animated_stat_card.dart';
+import 'package:dont_poop_in_my_phone/widgets/cat_themed_app_bar.dart';
+import 'package:dont_poop_in_my_phone/widgets/cat_empty_state.dart';
+import 'package:dont_poop_in_my_phone/utils/theme.dart';
+import 'package:dont_poop_in_my_phone/states/theme.dart';
 
 class CleanPage extends StatefulWidget {
   const CleanPage({Key? key}) : super(key: key);
@@ -55,90 +63,58 @@ class _CleanPageState extends State<CleanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('自动清理'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: _showCleanSettings,
-            tooltip: '清理设置',
-          ),
-        ],
-      ),
+      appBar: CatThemedAppBar(
+         title: '自动清理',
+         actions: [
+           IconButton(
+             icon: const Icon(Icons.settings),
+             onPressed: _showCleanSettings,
+             tooltip: '清理设置',
+           ),
+         ],
+       ),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildStatisticsCard(),
-          const SizedBox(height: 16),
-          _buildActionButtons(),
-          const SizedBox(height: 16),
-          Expanded(child: _buildResultsList()),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: CatTheme.catGradient,
       ),
-    );
-  }
-
-  Widget _buildStatisticsCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '清理统计',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+            // 统计卡片
+            AnimationConfiguration.staggeredList(
+              position: 0,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: -50.0,
+                child: FadeInAnimation(
+                  child: _buildStatisticsCard(),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    '扫描文件',
-                    '${_statistics.scannedFiles}',
-                    Icons.search,
-                    Colors.blue,
-                  ),
+            // 操作按钮
+            _buildActionButtons(),
+            // 结果列表
+            Container(
+              height: MediaQuery.of(context).size.height * 0.8, // 给结果列表一个固定高度
+              margin: EdgeInsets.symmetric(
+                horizontal: CatTheme.getResponsivePadding(context),
+              ),
+              decoration: CatTheme.catCardDecoration(context).copyWith(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
                 ),
-                Expanded(
-                  child: _buildStatItem(
-                    '可清理',
-                    '${_statistics.cleanableFiles}',
-                    Icons.cleaning_services,
-                    Colors.orange,
-                  ),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    '已清理',
-                    '${_statistics.cleanedFiles}',
-                    Icons.check_circle,
-                    Colors.green,
-                  ),
-                ),
-                Expanded(
-                  child: _buildStatItem(
-                    '节省空间',
-                    _statistics.savedSpaceText,
-                    Icons.storage,
-                    Colors.purple,
-                  ),
-                ),
-              ],
+                child: _buildResultsList(),
+              ),
             ),
           ],
         ),
@@ -146,134 +122,291 @@ class _CleanPageState extends State<CleanPage> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
+  Widget _buildStatisticsCard() {
+    return AnimatedStatCard(
+      statistics: _statistics,
+      isLoading: _isScanning,
+      animationIndex: 0,
+      onTap: () {
+        // 可以添加点击统计卡片的交互
+        if (_statistics.cleanedFiles > 0) {
+          BotToast.showText(text: '总共清理了 ${_statistics.cleanedFiles} 个文件，节省了 ${_statistics.savedSpaceText} 空间！');
+        }
+      },
     );
   }
 
+
+
   Widget _buildActionButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: _isScanning || _isCleaning ? null : _startScan,
-            icon: _isScanning
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.search),
-            label: Text(_isScanning ? '扫描中...' : '开始扫描'),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: _scanResults.isEmpty || _isCleaning || _isScanning
-                ? null
-                : _startClean,
-            icon: _isCleaning
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.cleaning_services),
-            label: Text(_isCleaning ? '清理中...' : '开始清理'),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.orange,
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: CatTheme.getResponsivePadding(context),
+        vertical: 8, // 减小垂直间距
+      ),
+      child: Row(
+        children: [
+          // 扫描按钮卡片
+          Expanded(
+            child: AnimationConfiguration.staggeredList(
+              position: 0,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 30.0,
+                child: FadeInAnimation(
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: CatTheme.catCardDecoration(context).copyWith(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          CatTheme.getCatColor('softCream'),
+                          CatTheme.getCatColor('softPeach'),
+                        ],
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _isScanning ? null : _startScan,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: _isScanning
+                                    ? Center(
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              CatTheme.getCatColor('catOrange'),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.search_rounded,
+                                        color: CatTheme.getCatColor('catOrange'),
+                                        size: 20,
+                                      ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                _isScanning ? '扫描中...' : '开始扫描',
+                                style: CatTheme.catSubtitleStyle(context).copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _isScanning ? '寻找垃圾文件' : '扫描垃圾文件',
+                                style: CatTheme.catBodyStyle(context).copyWith(
+                                  fontSize: 11,
+                                  color: CatTheme.getCatColor('catGray'),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                CatTheme.getCatEmoji(_isScanning ? 'scanning' : 'pending'),
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+          // 清理按钮卡片
+          Expanded(
+            child: AnimationConfiguration.staggeredList(
+              position: 1,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                verticalOffset: 30.0,
+                child: FadeInAnimation(
+                  child: Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    decoration: CatTheme.catCardDecoration(context).copyWith(
+                      gradient: _canClean()
+                          ? LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                CatTheme.getCatColor('softMint'),
+                                const Color(0xFF86E5CE),
+                              ],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.grey[100]!,
+                                Colors.grey[200]!,
+                              ],
+                            ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _canClean() ? _startClean : null,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: _canClean() 
+                                      ? Colors.white.withOpacity(0.9)
+                                      : Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: _canClean() ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ] : null,
+                                ),
+                                child: _isCleaning
+                                    ? Center(
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              CatTheme.getCatColor('eyeGreen'),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.cleaning_services_rounded,
+                                        color: _canClean() 
+                                            ? CatTheme.getCatColor('eyeGreen')
+                                            : Colors.grey[500],
+                                        size: 20,
+                                      ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                _isCleaning ? '清理中...' : '开始清理',
+                                style: CatTheme.catSubtitleStyle(context).copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: _canClean() 
+                                      ? CatTheme.getCatColor('catBrown')
+                                      : Colors.grey[600],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _isCleaning 
+                                    ? '清理垃圾文件'
+                                    : _canClean() 
+                                        ? '清理垃圾文件'
+                                        : '请先扫描',
+                                style: CatTheme.catBodyStyle(context).copyWith(
+                                  fontSize: 11,
+                                  color: _canClean() 
+                                      ? CatTheme.getCatColor('catGray')
+                                      : Colors.grey[500],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                CatTheme.getCatEmoji(
+                                  _isCleaning 
+                                      ? 'running'
+                                      : _canClean() 
+                                          ? 'success'
+                                          : 'waiting'
+                                ),
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildResultsList() {
     if (_scanResults.isEmpty) {
-      return Card(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.cleaning_services_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '点击"开始扫描"来查找可清理的文件',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return CatEmptyState(
+        title: _isScanning ? '正在扫描中...' : '暂无扫描结果',
+        subtitle: _isScanning 
+            ? '小猫正在努力寻找可清理的文件' 
+            : '点击扫描按钮开始查找可清理的文件',
+        emptyType: _isScanning ? 'scan' : 'clean',
+        actionText: _isScanning ? null : '开始扫描',
+        onActionPressed: _isScanning ? null : _startScan,
+        showAnimation: true,
       );
     }
 
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Text(
-                  '扫描结果',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+    return AnimationLimiter(
+      child: ListView.builder(
+        padding: EdgeInsets.all(CatTheme.getResponsivePadding(context)),
+        itemCount: _scanResults.length,
+        itemBuilder: (context, index) {
+          final task = _scanResults[index];
+          return AnimationConfiguration.staggeredList(
+            position: index,
+            duration: const Duration(milliseconds: 375),
+            child: SlideAnimation(
+              verticalOffset: 50.0,
+              child: FadeInAnimation(
+                child: CleanTaskCard(
+                  task: task,
+                  onToggle: () {
+                    // CleanTask doesn't have enabled property
+                    // This would need to be handled differently
+                    // For now, just provide an empty callback
+                  },
                 ),
-                const Spacer(),
-                Text(
-                  '共 ${_scanResults.length} 项',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: CleanTaskList(
-              tasks: _scanResults,
-              showCheckbox: false,
-              onTaskTap: (task) {
-                // 可以在这里添加任务详情查看逻辑
-              },
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -437,5 +570,9 @@ class _CleanPageState extends State<CleanPage> {
         ),
       ),
     );
+  }
+
+  bool _canClean() {
+    return _scanResults.isNotEmpty && !_isScanning && !_isCleaning;
   }
 }

@@ -353,6 +353,164 @@ class MaterialTheme {
   ];
 }
 
+// 猫咪主题扩展
+class CatTheme {
+  // 猫咪主题颜色调色板
+  static const Map<String, Color> catColors = {
+    // 主要猫咪颜色
+    'catOrange': Color(0xFFFF8A65),      // 橘猫橙色
+    'catGray': Color(0xFF90A4AE),        // 灰猫灰色
+    'catBlack': Color(0xFF424242),       // 黑猫黑色
+    'catWhite': Color(0xFFFAFAFA),       // 白猫白色
+    'catBrown': Color(0xFF8D6E63),       // 棕猫棕色
+    
+    // 猫咪特征颜色
+    'pawPink': Color(0xFFFFAB91),        // 粉色肉垫
+    'noseBlack': Color(0xFF263238),      // 黑色鼻子
+    'eyeGreen': Color(0xFF66BB6A),       // 绿色眼睛
+    'eyeBlue': Color(0xFF42A5F5),        // 蓝色眼睛
+    'eyeYellow': Color(0xFFFFEE58),      // 黄色眼睛
+    
+    // 柔和背景色
+    'softCream': Color(0xFFFFF8E1),      // 奶油色
+    'softPeach': Color(0xFFFFE0B2),      // 桃色
+    'softMint': Color(0xFFE8F5E8),       // 薄荷色
+    'softLavender': Color(0xFFF3E5F5),   // 薰衣草色
+    'softSky': Color(0xFFE1F5FE),        // 天空色
+  };
+  
+  // 获取猫咪主题颜色
+  static Color getCatColor(String colorName) {
+    return catColors[colorName] ?? catColors['catOrange']!;
+  }
+  
+  // 猫咪主题渐变
+  static const LinearGradient catGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFFFE0B2), // 柔和桃色
+      Color(0xFFFFAB91), // 粉色肉垫
+    ],
+  );
+  
+  // 清洁主题渐变
+  static const LinearGradient cleanGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFE8F5E8), // 薄荷绿
+      Color(0xFF86E5CE), // 主题绿
+    ],
+  );
+  
+  // 猫咪主题文字样式
+  static TextStyle catTitleStyle(BuildContext context) {
+    return Theme.of(context).textTheme.headlineMedium!.copyWith(
+      fontWeight: FontWeight.bold,
+      color: getCatColor('catBrown'),
+      letterSpacing: 0.5,
+    );
+  }
+  
+  static TextStyle catSubtitleStyle(BuildContext context) {
+    return Theme.of(context).textTheme.bodyLarge!.copyWith(
+      color: getCatColor('catGray'),
+      fontWeight: FontWeight.w500,
+    );
+  }
+  
+  static TextStyle catBodyStyle(BuildContext context) {
+    return Theme.of(context).textTheme.bodyMedium!.copyWith(
+      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+    );
+  }
+  
+  // 猫咪主题装饰
+  static BoxDecoration catCardDecoration(BuildContext context, {bool isDark = false}) {
+    return BoxDecoration(
+      gradient: isDark ? null : catGradient,
+      color: isDark ? Theme.of(context).colorScheme.surfaceContainer : null,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    );
+  }
+  
+  // 清洁状态颜色
+  static Color getCleanStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'success':
+        return const Color(0xFF4CAF50); // 绿色
+      case 'running':
+      case 'scanning':
+        return const Color(0xFF2196F3); // 蓝色
+      case 'failed':
+      case 'error':
+        return const Color(0xFFF44336); // 红色
+      case 'pending':
+      case 'waiting':
+        return const Color(0xFFFF9800); // 橙色
+      case 'skipped':
+        return const Color(0xFF9E9E9E); // 灰色
+      default:
+        return const Color(0xFF607D8B); // 默认蓝灰色
+    }
+  }
+  
+  // 猫咪表情图标映射
+  static String getCatEmoji(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'success':
+        return '😸'; // 开心猫
+      case 'running':
+      case 'scanning':
+        return '🙀'; // 忙碌猫
+      case 'failed':
+      case 'error':
+        return '😿'; // 哭泣猫
+      case 'pending':
+      case 'waiting':
+        return '😺'; // 微笑猫
+      case 'empty':
+      case 'clean':
+        return '😻'; // 爱心眼猫
+      default:
+        return '🐱'; // 默认猫脸
+    }
+  }
+  
+  // 响应式间距
+  static double getResponsivePadding(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 600) {
+      return 16.0; // 手机
+    } else if (screenWidth < 1200) {
+      return 24.0; // 平板
+    } else {
+      return 32.0; // 桌面
+    }
+  }
+  
+  static double getResponsiveCardWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 600) {
+      return screenWidth - 32; // 手机：留边距
+    } else if (screenWidth < 1200) {
+      return screenWidth * 0.8; // 平板：80%宽度
+    } else {
+      return 800; // 桌面：固定最大宽度
+    }
+  }
+}
+
 class ExtendedColor {
   final Color seed, value;
   final ColorFamily light;

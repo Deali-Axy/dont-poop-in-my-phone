@@ -68,41 +68,49 @@ class CleanTaskCard extends StatelessWidget {
                     Row(
                       children: [
                         // 规则标签
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getRuleColor().withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: _getRuleColor().withOpacity(0.3),
-                              width: 1,
+                        Flexible(
+                          flex: 2,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
                             ),
-                          ),
-                          child: Text(
-                            task.rule.path,
-                            style: TextStyle(
-                              color: _getRuleColor(),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
+                            decoration: BoxDecoration(
+                              color: _getRuleColor().withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: _getRuleColor().withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              task.rule.path,
+                              style: TextStyle(
+                                color: _getRuleColor(),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
 
                         // 文件大小
-                        Text(
-                          StarFileSystem.formatFileSize(task.size.toInt()),
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                        Flexible(
+                          flex: 1,
+                          child: Text(
+                            StarFileSystem.formatFileSize(task.size.toInt()),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
 
-                        const Spacer(),
+                        const SizedBox(width: 8),
 
                         // 类型图标
                         Icon(
