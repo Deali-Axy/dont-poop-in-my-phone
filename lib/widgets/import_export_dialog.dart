@@ -113,9 +113,6 @@ class _ImportExportDialogState extends State<ImportExportDialog> {
               onPressed: _isLoading ? null : _handleImport,
               icon: const Icon(Icons.download),
               label: Text(widget.importButtonText),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-              ),
             ),
           ),
           
