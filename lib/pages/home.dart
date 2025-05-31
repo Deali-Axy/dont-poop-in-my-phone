@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static const String AppTitle = '别在我的手机里拉屎！';
+  static const String AppTitle = '🐱扫地喵';
   var _subtitle = '';
   var _hasPermission = false;
   DateTime? _lastWillPopAt; //上次返回退出动作时间
@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: const MyDrawer(),
-      extendBodyBehindAppBar: true,
       extendBody: true,
       body: PopScope(
         canPop: false,

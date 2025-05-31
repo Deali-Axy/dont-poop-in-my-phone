@@ -91,11 +91,11 @@ class _PathAnnotationPageState extends State<PathAnnotationPage> {
   Widget _buildAnnotationList() {
     return ListView.builder(
       itemCount: _annotations.length,
-      padding: const EdgeInsets.only(bottom: 80),
+      padding: const EdgeInsets.only(bottom: 96),
       itemBuilder: (context, index) {
         final annotation = _annotations[index];
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

@@ -85,7 +85,7 @@ class _WhitelistPageState extends State<WhitelistPage> {
         
         final whitelistItems = snapshot.data!;
         return ListView.builder(
-          padding: const EdgeInsets.all(10.0), // Slightly increased padding
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 96),
           itemCount: whitelistItems.length,
           itemBuilder: (context, index) {
             final item = whitelistItems[index];
