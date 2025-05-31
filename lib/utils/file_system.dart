@@ -45,9 +45,63 @@ abstract class StarFileSystem {
       str = '${(fileSize / 1024).toStringAsFixed(2)}KB';
     } else if (1048576 <= fileSize && fileSize < 1073741824) {
       str = '${(fileSize / 1024 / 1024).toStringAsFixed(2)}MB';
+    } else {
+      str = '${(fileSize / 1024 / 1024 / 1024).toStringAsFixed(2)}GB';
     }
 
     return str;
+  }
+
+  /// 计算目录大小（递归计算所有子文件和子目录的大小）
+  static Future<int> getDirectorySize(String dirPath) async {
+    try {
+      final dir = Directory(dirPath);
+      if (!dir.existsSync()) return 0;
+      
+      int totalSize = 0;
+      final entities = dir.listSync(recursive: true);
+      
+      for (final entity in entities) {
+        try {
+          if (entity is File) {
+            totalSize += entity.lengthSync();
+          }
+        } catch (e) {
+          // 忽略无法访问的文件
+          continue;
+        }
+      }
+      
+      return totalSize;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  /// 同步版本的目录大小计算（用于性能要求较高的场景）
+  static int getDirectorySizeSync(String dirPath) {
+    try {
+      final dir = Directory(dirPath);
+      if (!dir.existsSync()) return 0;
+      
+      int totalSize = 0;
+      final entities = dir.listSync(recursive: true);
+      
+      for (final entity in entities) {
+        try {
+          if (entity is File) {
+            totalSize += entity.lengthSync();
+          }
+        } catch (e) {
+          // 忽略无法访问的文件
+          continue;
+        }
+      }
+      
+      return totalSize;
+    } catch (e) {
+      return 0;
+    }
   }
 
   static bool isInWhiteList(String dirPath) {

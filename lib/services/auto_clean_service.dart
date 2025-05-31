@@ -203,6 +203,42 @@ class AutoCleanService {
     return tasks;
   }
   
+  /// 检查文件是否为扫地喵占位文件
+  Future<bool> _isPlaceholderFile(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return false;
+      
+      // 检查文件大小，占位文件通常很小
+      final stat = await file.stat();
+      if (stat.size > 1024) return false; // 大于1KB的文件不太可能是占位文件
+      
+      // 读取文件内容检查标识
+      final content = await file.readAsString();
+      return content.contains('扫地喵') || 
+             content.contains('dont-poop-in-my-phone') ||
+             content.contains('CleanApp Placeholder');
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  /// 生成占位文件内容
+  String _generatePlaceholderContent(String originalPath) {
+    final timestamp = DateTime.now().toIso8601String();
+    return '''扫地喵 - 手机清理助手
+CleanApp Placeholder File
+
+原始路径: $originalPath
+清理时间: $timestamp
+
+此文件由扫地喵应用生成，用于占位已清理的垃圾文件/文件夹。
+如需恢复原始内容，请在应用中查看清理历史。
+
+应用包名: dont-poop-in-my-phone
+开发者: 扫地喵团队''';
+  }
+  
   /// 递归扫描目录
   Future<void> _scanDirectory(
     String dirPath, 
@@ -259,11 +295,36 @@ class AutoCleanService {
               }
             }
             
+            // 对于"删除并替换"规则，检查是否已经是占位文件
+            if (matchedRule.actionType == models.ActionType.deleteAndReplace && 
+                entity is File && 
+                await _isPlaceholderFile(entity.path)) {
+              _logCleanAction(config, 'DEBUG', '跳过已清理的占位文件: ${entity.path}');
+              continue; // 跳过已经被清理过的路径
+            }
+            
+            // 计算文件或目录大小
+            double entitySize = 0.0;
+            if (entity is File) {
+              try {
+                entitySize = (await entity.stat()).size.toDouble();
+              } catch (e) {
+                entitySize = 0.0;
+              }
+            } else if (entity is Directory) {
+              try {
+                // 使用同步方法计算目录大小以提高性能
+                entitySize = StarFileSystem.getDirectorySizeSync(entity.path).toDouble();
+              } catch (e) {
+                entitySize = 0.0;
+              }
+            }
+            
             tasks.add(CleanTask(
               path: entity.path,
               ruleName: await _getRuleGroupName(matchedRule),
               actionType: matchedRule.actionType,
-              size: entity is File ? (await entity.stat()).size.toDouble() : 0.0,
+              size: entitySize,
               type: entity is File ? CleanTaskType.file : CleanTaskType.folder,
               rule: matchedRule,
             ));
@@ -410,13 +471,12 @@ class AutoCleanService {
       // 执行删除操作
       await entity.delete(recursive: true);
       
-      // 如果是删除并替换，创建空文件
+      // 如果是删除并替换，创建带有标识的占位文件
       if (task.actionType == models.ActionType.deleteAndReplace) {
-        if (entity is File) {
-          await File(task.path).create();
-        } else {
-          await Directory(task.path).create();
-        }
+        final placeholderFile = File(task.path);
+        await placeholderFile.create();
+        await placeholderFile.writeAsString(_generatePlaceholderContent(task.path));
+        _logCleanAction(config, 'INFO', '已创建占位文件: ${task.path}');
       }
       
       // 记录历史
