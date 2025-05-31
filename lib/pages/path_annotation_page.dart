@@ -3,6 +3,7 @@ import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
+import 'package:dont_poop_in_my_phone/widgets/import_export_dialog.dart';
 import 'package:dont_poop_in_my_phone/pages/add_annotation_page.dart';
 
 class PathAnnotationPage extends StatefulWidget {
@@ -40,6 +41,16 @@ class _PathAnnotationPageState extends State<PathAnnotationPage> {
         title: const Text('路径标注管理'),
         elevation: 1,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.import_export),
+            onPressed: () {
+              ImportExportDialogHelper.showPathAnnotationsDialog(
+                context,
+                onImportSuccess: _loadAnnotations,
+              );
+            },
+            tooltip: '导入导出',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadAnnotations,
@@ -283,4 +294,4 @@ class _PathAnnotationPageState extends State<PathAnnotationPage> {
       }
     }
   }
-} 
+}

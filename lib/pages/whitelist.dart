@@ -3,6 +3,7 @@ import 'package:dont_poop_in_my_phone/common/global.dart';
 import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart' as models;
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
+import 'package:dont_poop_in_my_phone/widgets/import_export_dialog.dart';
 import 'package:flutter/material.dart';
 import 'add_whitelist_page.dart'; // Import AddWhitelistPage
 
@@ -21,20 +22,14 @@ class _WhitelistPageState extends State<WhitelistPage> {
         title: Text('白名单管理'),
         actions: [
           IconButton(
-            icon: Icon(Icons.file_upload_outlined),
+            icon: Icon(Icons.import_export),
             onPressed: () {
-              // TODO: Implement batch import
-              BotToast.showText(text: '批量导入功能待实现');
+              ImportExportDialogHelper.showWhitelistDialog(
+                context,
+                onImportSuccess: () => setState(() {}),
+              );
             },
-            tooltip: '批量导入',
-          ),
-          IconButton(
-            icon: Icon(Icons.file_download_outlined),
-            onPressed: () {
-              // TODO: Implement batch export
-              BotToast.showText(text: '批量导出功能待实现');
-            },
-            tooltip: '批量导出',
+            tooltip: '导入导出',
           ),
         ],
       ),

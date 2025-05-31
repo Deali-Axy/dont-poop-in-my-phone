@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dont_poop_in_my_phone/services/clean_config_manager.dart';
+import 'package:dont_poop_in_my_phone/widgets/import_export_dialog.dart';
 
 /// 清理设置组件
 class CleanSettingsWidget extends StatefulWidget {
@@ -342,6 +343,62 @@ class _CleanSettingsWidgetState extends State<CleanSettingsWidget> {
                 onPressed: _exportConfig,
                 icon: const Icon(Icons.download),
                 label: const Text('导出配置'),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // 数据备份与恢复
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.backup,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '数据备份与恢复',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '备份或恢复白名单、清理规则、路径标注等所有数据',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        ImportExportDialogHelper.showAllDataDialog(context);
+                      },
+                      icon: const Icon(Icons.import_export),
+                      label: const Text('数据备份与恢复'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

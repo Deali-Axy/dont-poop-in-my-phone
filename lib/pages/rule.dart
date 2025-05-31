@@ -4,6 +4,7 @@ import 'package:dont_poop_in_my_phone/dao/index.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart' as models;
 import 'package:dont_poop_in_my_phone/pages/add_rule.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
+import 'package:dont_poop_in_my_phone/widgets/import_export_dialog.dart';
 import 'package:flutter/material.dart';
 
 class RulePage extends StatefulWidget {
@@ -24,7 +25,16 @@ class _RulePageState extends State<RulePage> {
       appBar: AppBar(
         title: Text('清理规则管理'),
         actions: [
-          // IconButton for batch operations can be added here later if needed
+          IconButton(
+            icon: Icon(Icons.import_export),
+            onPressed: () {
+              ImportExportDialogHelper.showRulesDialog(
+                context,
+                onImportSuccess: () => setState(() {}),
+              );
+            },
+            tooltip: '导入导出',
+          ),
         ],
       ),
       body: _buildBody(),
