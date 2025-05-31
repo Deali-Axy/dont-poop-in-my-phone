@@ -420,8 +420,7 @@ class ImportExportService {
   static Future<String?> _pickAndReadFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+        type: FileType.any,
         allowMultiple: false,
       );
       
