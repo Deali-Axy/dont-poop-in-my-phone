@@ -132,7 +132,7 @@ class AboutPageState extends State<AboutPage> {
                         text: '意见反馈',
                         onTap: () async {
                           const url =
-                              'mailto:feedback@deali.cn?subject=别在我手机里拉屎App反馈&body=反馈内容：';
+                              'mailto:feedback@deali.cn?subject=扫地喵App反馈&body=反馈内容：';
                           if (await canLaunchUrl(Uri.parse(url))) {
                             await launchUrl(Uri.parse(url));
                           } else {

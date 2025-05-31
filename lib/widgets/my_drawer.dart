@@ -19,7 +19,7 @@ class _MyDrawerState extends State<MyDrawer> {
   var _avatarImageUrl = 'https://blog.sblt.deali.cn:9000/Api/PicLib/Random/200/200';
   var _currentHitokoto = Hitokoto(
     hitokoto: '（正在加载一言）',
-    creator: '别在我的手机里拉屎！',
+    creator: '扫地喵🐱',
   );
 
   @override
@@ -38,7 +38,7 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<ThemeState>().darkMode;
-    
+
     return Drawer(
       elevation: 16.0,
       shape: const RoundedRectangleBorder(
@@ -54,11 +54,11 @@ class _MyDrawerState extends State<MyDrawer> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                // _buildMenuItem(
-                //   icon: Icons.folder_outlined,
-                //   title: '文件管理',
-                //   onTap: () => {},
-                // ),
+                _buildMenuItem(
+                  icon: Icons.cleaning_services_rounded,
+                  title: '自动清理',
+                  onTap: () => Navigator.of(context).pushNamed('clean'),
+                ),
                 _buildMenuItem(
                   icon: Icons.shield_outlined,
                   title: '白名单',
@@ -87,8 +87,8 @@ class _MyDrawerState extends State<MyDrawer> {
                 const Divider(height: 1, thickness: 1),
                 SwitchListTile(
                   secondary: Icon(
-                    isDarkMode ? Icons.dark_mode : Icons.light_mode, 
-                    size: 28, 
+                    isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                    size: 28,
                     color: isDarkMode ? Theme.of(context).colorScheme.primary : Colors.amber,
                   ),
                   title: Text(
@@ -104,9 +104,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   secondary: Icon(
                     Icons.design_services,
                     size: 28,
-                    color: context.watch<ThemeState>().material3 
-                      ? Theme.of(context).colorScheme.primary 
-                      : Colors.grey,
+                    color: context.watch<ThemeState>().material3 ? Theme.of(context).colorScheme.primary : Colors.grey,
                   ),
                   title: const Text(
                     'Material 3',

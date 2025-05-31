@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '别在我的手机里拉屎！',
+      title: '扫地喵',
       theme: _getTheme(
         context.watch<ThemeState>().darkMode ? Brightness.dark : Brightness.light,
         context.watch<ThemeState>().material3,
@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _getTheme(Brightness brightness, bool useMaterial3) {
-    const primaryColor = Color(0xff0763f5);
+    const primaryColor = Color(0xFF86E5CE);
 
     if (useMaterial3) {
       const md3Theme = MaterialTheme(TextTheme());
