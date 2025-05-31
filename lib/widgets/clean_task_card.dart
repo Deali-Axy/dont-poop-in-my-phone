@@ -9,7 +9,7 @@ class CleanTaskCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onToggle;
   final bool showCheckbox;
-  
+
   const CleanTaskCard({
     Key? key,
     required this.task,
@@ -17,7 +17,7 @@ class CleanTaskCard extends StatelessWidget {
     this.onToggle,
     this.showCheckbox = false,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -34,7 +34,7 @@ class CleanTaskCard extends StatelessWidget {
               // 状态指示器
               _buildStatusIndicator(),
               const SizedBox(width: 12),
-              
+
               // 文件信息
               Expanded(
                 child: Column(
@@ -51,7 +51,7 @@ class CleanTaskCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    
+
                     // 路径
                     Text(
                       task.path,
@@ -63,7 +63,7 @@ class CleanTaskCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    
+
                     // 规则和大小信息
                     Row(
                       children: [
@@ -82,7 +82,7 @@ class CleanTaskCard extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            task.rule.name,
+                            task.rule.path,
                             style: TextStyle(
                               color: _getRuleColor(),
                               fontSize: 10,
@@ -91,33 +91,31 @@ class CleanTaskCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        
+
                         // 文件大小
                         Text(
-                          StarFileSystem.formatFileSize(task.size),
+                          StarFileSystem.formatFileSize(task.size.toInt()),
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        
+
                         const Spacer(),
-                        
+
                         // 类型图标
                         Icon(
-                          task.type == CleanTaskType.file 
-                              ? Icons.description 
-                              : Icons.folder,
+                          task.type == CleanTaskType.file ? Icons.description : Icons.folder,
                           size: 16,
                           color: Colors.grey[600],
                         ),
                       ],
                     ),
-                    
+
                     // 错误信息（如果有）
-                    if (task.error != null) ..[
-                      const SizedBox(height: 4),
+                    if (task.error != null) const SizedBox(height: 4),
+                    if (task.error != null)
                       Text(
                         task.error!,
                         style: const TextStyle(
@@ -127,11 +125,10 @@ class CleanTaskCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ],
                   ],
                 ),
               ),
-              
+
               // 复选框或操作按钮
               if (showCheckbox && onToggle != null)
                 Checkbox(
@@ -146,11 +143,11 @@ class CleanTaskCard extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildStatusIndicator() {
     Color color;
     IconData icon;
-    
+
     switch (task.status) {
       case CleanTaskStatus.pending:
         color = Colors.orange;
@@ -173,7 +170,7 @@ class CleanTaskCard extends StatelessWidget {
         icon = Icons.skip_next;
         break;
     }
-    
+
     return Container(
       width: 32,
       height: 32,
@@ -189,7 +186,7 @@ class CleanTaskCard extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildActionButton(BuildContext context) {
     switch (task.status) {
       case CleanTaskStatus.pending:
@@ -224,7 +221,7 @@ class CleanTaskCard extends StatelessWidget {
         );
     }
   }
-  
+
   Color _getRuleColor() {
     // 根据规则类型返回不同颜色
     switch (task.rule.actionType.toString()) {
@@ -236,7 +233,7 @@ class CleanTaskCard extends StatelessWidget {
         return Colors.blue;
     }
   }
-  
+
   void _showTaskDetails(BuildContext context) {
     showDialog(
       context: context,
@@ -249,12 +246,11 @@ class CleanTaskCard extends StatelessWidget {
             children: [
               _buildDetailRow('路径', task.path),
               _buildDetailRow('类型', task.type == CleanTaskType.file ? '文件' : '文件夹'),
-              _buildDetailRow('大小', StarFileSystem.formatFileSize(task.size)),
-              _buildDetailRow('规则', task.rule.name),
+              _buildDetailRow('大小', StarFileSystem.formatFileSize(task.size.toInt())),
+              _buildDetailRow('规则', task.rule.path),
               _buildDetailRow('操作', _getActionTypeText(task.rule.actionType)),
               _buildDetailRow('状态', _getStatusText(task.status)),
-              if (task.error != null)
-                _buildDetailRow('错误', task.error!, isError: true),
+              if (task.error != null) _buildDetailRow('错误', task.error!, isError: true),
             ],
           ),
         ),
@@ -267,7 +263,7 @@ class CleanTaskCard extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildDetailRow(String label, String value, {bool isError = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -297,7 +293,7 @@ class CleanTaskCard extends StatelessWidget {
       ),
     );
   }
-  
+
   String _getActionTypeText(dynamic actionType) {
     switch (actionType.toString()) {
       case 'ActionType.delete':
@@ -308,7 +304,7 @@ class CleanTaskCard extends StatelessWidget {
         return '未知';
     }
   }
-  
+
   String _getStatusText(CleanTaskStatus status) {
     switch (status) {
       case CleanTaskStatus.pending:
@@ -331,7 +327,7 @@ class CleanTaskList extends StatelessWidget {
   final bool showCheckbox;
   final Function(CleanTask)? onTaskToggle;
   final Function(CleanTask)? onTaskTap;
-  
+
   const CleanTaskList({
     Key? key,
     required this.tasks,
@@ -339,7 +335,7 @@ class CleanTaskList extends StatelessWidget {
     this.onTaskToggle,
     this.onTaskTap,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     if (tasks.isEmpty) {
@@ -364,7 +360,7 @@ class CleanTaskList extends StatelessWidget {
         ),
       );
     }
-    
+
     return ListView.builder(
       itemCount: tasks.length,
       itemBuilder: (context, index) {

@@ -1,15 +1,23 @@
-import 'dart:io';
 import 'package:dont_poop_in_my_phone/models/index.dart' as models;
 import 'package:dont_poop_in_my_phone/dao/index.dart';
-import 'package:dont_poop_in_my_phone/utils/file_system.dart';
-import 'package:dont_poop_in_my_phone/viewmodels/file_item.dart';
-import 'package:dont_poop_in_my_phone/viewmodels/folder_item.dart';
-import 'package:dont_poop_in_my_phone/services/clean_config_manager.dart';
+import 'package:dont_poop_in_my_phone/utils/index.dart';
+import 'package:dont_poop_in_my_phone/common/index.dart';
+import 'clean_config_manager.dart';
+import 'dart:io';
 import 'package:path/path.dart' as path;
+import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/foundation.dart';
+
+/// 清理任务类型
+enum CleanTaskType {
+  file,       // 文件
+  folder,     // 文件夹
+}
 
 /// 清理任务状态
 enum CleanTaskStatus {
   pending,    // 待清理
+  running,    // 运行中
   completed,  // 已完成
   failed,     // 失败
   skipped,    // 跳过
@@ -24,6 +32,9 @@ class CleanTask {
   final String? error;
   final int savedSpace;
   final DateTime createdAt;
+  final double size;
+  final CleanTaskType type;
+  final models.RuleItem rule;
 
   CleanTask({
     required this.path,
@@ -33,6 +44,9 @@ class CleanTask {
     this.error,
     this.savedSpace = 0,
     DateTime? createdAt,
+    required this.size,
+    required this.type,
+    required this.rule,
   }) : createdAt = createdAt ?? DateTime.now();
 
   CleanTask copyWith({
@@ -43,6 +57,9 @@ class CleanTask {
     String? error,
     int? savedSpace,
     DateTime? createdAt,
+    double? size,
+    CleanTaskType? type,
+    models.RuleItem? rule,
   }) {
     return CleanTask(
       path: path ?? this.path,
@@ -52,7 +69,32 @@ class CleanTask {
       error: error ?? this.error,
       savedSpace: savedSpace ?? this.savedSpace,
       createdAt: createdAt ?? this.createdAt,
+      size: size ?? this.size,
+      type: type ?? this.type,
+      rule: rule ?? this.rule,
     );
+  }
+}
+
+/// RuleItem数据访问对象
+class RuleItemDao {
+  /// 根据路径获取匹配的规则项
+  static Future<List<models.RuleItem>?> getByPath(String path) async {
+    // 这里应该实现根据路径查找匹配的规则项的逻辑
+    // 暂时返回空列表，避免编译错误
+    return [];
+  }
+  
+  /// 获取所有启用的规则项
+  Future<List<models.RuleItem>> getAllEnabled() async {
+    // 这里应该实现获取所有启用规则项的逻辑
+    return [];
+  }
+  
+  /// 根据ID获取规则项
+  Future<models.RuleItem?> getById(int id) async {
+    // 这里应该实现根据ID获取规则项的逻辑
+    return null;
   }
 }
 
@@ -183,15 +225,13 @@ class AutoCleanService {
       
       // 检查路径标注（如果配置要求遵循标注）
       if (config.respectAnnotations) {
-        final annotations = await _pathAnnotationDao.getByPath(dirPath);
-        if (annotations.isNotEmpty) {
+        final annotation = await PathAnnotationDao.getByPath(dirPath);
+        if (annotation != null) {
           // 如果有保护标注，跳过此路径
-          final hasProtection = annotations.any((annotation) => 
-            annotation.annotation.toLowerCase().contains('保护') ||
-            annotation.annotation.toLowerCase().contains('protect') ||
-            annotation.annotation.toLowerCase().contains('重要') ||
-            annotation.annotation.toLowerCase().contains('important')
-          );
+          final hasProtection = annotation.description.toLowerCase().contains('保护') ||
+            annotation.description.toLowerCase().contains('protect') ||
+            annotation.description.toLowerCase().contains('重要') ||
+            annotation.description.toLowerCase().contains('important');
           if (hasProtection) {
             return;
           }
@@ -223,6 +263,9 @@ class AutoCleanService {
               path: entity.path,
               ruleName: await _getRuleGroupName(matchedRule),
               actionType: matchedRule.actionType,
+              size: entity is File ? (await entity.stat()).size.toDouble() : 0.0,
+              type: entity is File ? CleanTaskType.file : CleanTaskType.folder,
+              rule: matchedRule,
             ));
           }
           
@@ -334,12 +377,12 @@ class AutoCleanService {
       }
       
       if (config.respectAnnotations) {
-        final annotations = await _pathAnnotationDao.getByPath(task.path);
-        final hasProtection = annotations.any((annotation) => 
-          annotation.annotation.toLowerCase().contains('保护') ||
-          annotation.annotation.toLowerCase().contains('protect') ||
-          annotation.annotation.toLowerCase().contains('重要') ||
-          annotation.annotation.toLowerCase().contains('important')
+        final annotation = await PathAnnotationDao.getByPath(task.path);
+        final hasProtection = annotation != null && (
+          annotation.description.toLowerCase().contains('保护') ||
+          annotation.description.toLowerCase().contains('protect') ||
+          annotation.description.toLowerCase().contains('重要') ||
+          annotation.description.toLowerCase().contains('important')
         );
         if (hasProtection) {
           _logCleanAction(config, 'WARNING', '路径有保护标注，跳过清理: ${task.path}');

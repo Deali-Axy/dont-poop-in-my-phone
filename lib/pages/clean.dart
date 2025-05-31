@@ -299,7 +299,7 @@ class _CleanPageState extends State<CleanPage> {
         _scanResults = results;
         _statistics = CleanStatistics(
           totalTasks: results.length,
-          totalSizeFreed: results.fold(0, (sum, task) => sum + task.size),
+          totalSizeFreed: results.fold(0.0, (sum, task) => sum + task.size).toInt(),
         );
         _progress = 1.0;
       });
@@ -307,7 +307,7 @@ class _CleanPageState extends State<CleanPage> {
       if (results.isEmpty) {
         BotToast.showText(text: '未发现需要清理的文件');
       } else {
-        final totalSize = results.fold(0, (sum, task) => sum + task.size);
+        final totalSize = results.fold(0.0, (sum, task) => sum + task.size).toInt();
         BotToast.showText(
           text: '扫描完成，发现 ${results.length} 个可清理项目，'
                 '可节省 ${StarFileSystem.formatFileSize(totalSize)} 空间'
@@ -389,7 +389,7 @@ class _CleanPageState extends State<CleanPage> {
   }
   
   Future<bool> _showCleanConfirmDialog() async {
-    final totalSize = _scanResults.fold(0, (sum, task) => sum + task.size);
+    final totalSize = _scanResults.fold(0.0, (sum, task) => sum + task.size).toInt();
     
     return await showDialog<bool>(
       context: context,
