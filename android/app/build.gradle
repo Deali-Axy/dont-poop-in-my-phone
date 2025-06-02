@@ -51,6 +51,8 @@ android {
         release {
             if (keystorePropertiesFile.exists() && keystoreProperties['storeFile']) {
                 signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
             }
             minifyEnabled true // 需要混淆的话可以改为 true
             shrinkResources true // 是否压缩资源
