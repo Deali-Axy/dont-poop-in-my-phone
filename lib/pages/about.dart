@@ -56,8 +56,9 @@ class AboutPageState extends State<AboutPage> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                // color: Theme.of(context).colorScheme.primary,
-                color: Color.fromRGBO(134, 229, 206, 1),
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : Color.fromRGBO(134, 229, 206, 1),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
@@ -69,36 +70,44 @@ class AboutPageState extends State<AboutPage> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Color.fromRGBO(134, 229, 206, 1),
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                        ? Theme.of(context).colorScheme.primaryContainer
+                        : Color.fromRGBO(134, 229, 206, 1),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Image.asset('assets/icon/icon.png'),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     '扫地喵',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark 
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '${packageInfo?.version} (Build ${packageInfo?.buildNumber})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark 
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     '🐾 扫地喵到，垃圾全跑！',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark 
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Colors.white,
                     ),
                   ),
                 ],
@@ -168,7 +177,12 @@ class AboutPageState extends State<AboutPage> {
             ),
 
             // 底部隐私条款部分
-            Divider(color: Colors.grey.withOpacity(0.3), height: 1),
+            Divider(
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Theme.of(context).colorScheme.outline.withOpacity(0.3)
+                  : Colors.grey.withOpacity(0.3), 
+              height: 1
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: Row(
@@ -195,7 +209,9 @@ class AboutPageState extends State<AboutPage> {
                 '© ${DateTime.now().year} DealiAxy',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.withOpacity(0.7),
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                      : Colors.grey.withOpacity(0.7),
                 ),
               ),
             ),

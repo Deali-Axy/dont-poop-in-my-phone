@@ -52,7 +52,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: Theme.of(context).brightness == Brightness.dark ? null : LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
@@ -61,6 +61,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
               Colors.purple.shade50,
             ],
           ),
+          color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surface : null,
         ),
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -183,9 +184,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildQuickStartCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -319,9 +321,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFeaturesCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -447,9 +450,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
 
 
   Widget _buildSafetyCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -556,13 +560,15 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildTipsCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: isDark ? null : LinearGradient(
           colors: [Colors.orange.shade100, Colors.yellow.shade100],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : null,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -673,13 +679,15 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFAQCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: isDark ? null : LinearGradient(
           colors: [Colors.purple.shade100, Colors.pink.shade100],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : null,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

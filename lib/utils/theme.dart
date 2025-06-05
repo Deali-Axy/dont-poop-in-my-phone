@@ -355,7 +355,7 @@ class MaterialTheme {
 
 // 猫咪主题扩展
 class CatTheme {
-  // 猫咪主题颜色调色板
+  // 猫咪主题颜色调色板 - 浅色模式
   static const Map<String, Color> catColors = {
     // 主要猫咪颜色
     'catOrange': Color(0xFFFF8A65),      // 橘猫橙色
@@ -379,9 +379,42 @@ class CatTheme {
     'softSky': Color(0xFFE1F5FE),        // 天空色
   };
   
+  // 猫咪主题颜色调色板 - 暗色模式
+  static const Map<String, Color> catColorsDark = {
+    // 主要猫咪颜色 - 暗色适配
+    'catOrange': Color(0xFFFFB74D),      // 橘猫橙色 - 更亮
+    'catGray': Color(0xFFB0BEC5),        // 灰猫灰色 - 更亮
+    'catBlack': Color(0xFF616161),       // 黑猫黑色 - 更亮
+    'catWhite': Color(0xFFE0E0E0),       // 白猫白色 - 稍暗
+    'catBrown': Color(0xFFA1887F),       // 棕猫棕色 - 更亮
+    
+    // 猫咪特征颜色 - 暗色适配
+    'pawPink': Color(0xFFFFCC80),        // 粉色肉垫 - 更温暖
+    'noseBlack': Color(0xFF455A64),      // 黑色鼻子 - 更亮
+    'eyeGreen': Color(0xFF81C784),       // 绿色眼睛 - 更亮
+    'eyeBlue': Color(0xFF64B5F6),        // 蓝色眼睛 - 更亮
+    'eyeYellow': Color(0xFFFFF176),      // 黄色眼睛 - 更亮
+    
+    // 柔和背景色 - 暗色适配
+    'softCream': Color(0xFF3E2723),      // 奶油色 - 深棕
+    'softPeach': Color(0xFF4E342E),      // 桃色 - 深棕
+    'softMint': Color(0xFF1B5E20),       // 薄荷色 - 深绿
+    'softLavender': Color(0xFF4A148C),   // 薰衣草色 - 深紫
+    'softSky': Color(0xFF0D47A1),        // 天空色 - 深蓝
+  };
+  
   // 获取猫咪主题颜色
-  static Color getCatColor(String colorName) {
+  static Color getCatColor(String colorName, {bool isDark = false}) {
+    if (isDark) {
+      return catColorsDark[colorName] ?? catColorsDark['catOrange']!;
+    }
     return catColors[colorName] ?? catColors['catOrange']!;
+  }
+  
+  // 根据上下文获取猫咪主题颜色
+  static Color getCatColorForContext(BuildContext context, String colorName) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return getCatColor(colorName, isDark: isDark);
   }
   
   // 猫咪主题渐变
@@ -415,8 +448,9 @@ class CatTheme {
   }
   
   static TextStyle catSubtitleStyle(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Theme.of(context).textTheme.bodyLarge!.copyWith(
-      color: getCatColor('catGray'),
+      color: isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.8) : getCatColor('catGray'),
       fontWeight: FontWeight.w500,
     );
   }
