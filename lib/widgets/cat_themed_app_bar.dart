@@ -155,13 +155,17 @@ class _CatThemedAppBarState extends State<CatThemedAppBar>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 AnimatedTextKit(
-                  key: ValueKey(widget.title),
+                  key: ValueKey('${widget.title}_${isDark}'), // 添加主题状态到key中
                   animatedTexts: [
                     TypewriterAnimatedText(
                       widget.title,
-                      textStyle: CatTheme.catTitleStyle(context).copyWith(
+                      textStyle: Theme.of(context).textTheme.headlineMedium!.copyWith(
                         fontSize: 20,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                        color: isDark 
+                            ? Colors.white 
+                            : CatTheme.getCatColor('catBrown'),
+                        letterSpacing: 0.5,
                       ),
                       speed: const Duration(milliseconds: 100),
                     ),
@@ -170,9 +174,11 @@ class _CatThemedAppBarState extends State<CatThemedAppBar>
                 ),
                 Text(
                   '让小猫帮您清理手机 🐾',
-                  style: CatTheme.catBodyStyle(context).copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    color: isDark 
+                        ? Colors.white.withOpacity(0.8) 
+                        : CatTheme.getCatColor('catGray'),
                   ),
                 ),
               ],

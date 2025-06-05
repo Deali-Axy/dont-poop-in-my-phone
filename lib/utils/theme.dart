@@ -406,9 +406,10 @@ class CatTheme {
   
   // 猫咪主题文字样式
   static TextStyle catTitleStyle(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Theme.of(context).textTheme.headlineMedium!.copyWith(
       fontWeight: FontWeight.bold,
-      color: getCatColor('catBrown'),
+      color: isDark ? Theme.of(context).colorScheme.onSurface : getCatColor('catBrown'),
       letterSpacing: 0.5,
     );
   }
