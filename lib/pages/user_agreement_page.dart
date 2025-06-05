@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:dont_poop_in_my_phone/common/global.dart';
+import 'package:flutter/services.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import '../common/global.dart';
 
 class UserAgreementPage extends StatefulWidget {
   const UserAgreementPage({Key? key}) : super(key: key);
@@ -8,173 +10,324 @@ class UserAgreementPage extends StatefulWidget {
   _UserAgreementPageState createState() => _UserAgreementPageState();
 }
 
-class _UserAgreementPageState extends State<UserAgreementPage> {
+class _UserAgreementPageState extends State<UserAgreementPage>
+    with TickerProviderStateMixin {
   bool _agreementAccepted = false;
   bool _privacyAccepted = false;
+  late AnimationController _catAnimationController;
+  late Animation<double> _catBounceAnimation;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _catAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _catBounceAnimation = Tween<double>(
+      begin: 0.0,
+      end: 10.0,
+    ).animate(CurvedAnimation(
+      parent: _catAnimationController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    ));
+    
+    _catAnimationController.repeat(reverse: true);
+    _fadeController.forward();
+  }
+
+  @override
+  void dispose() {
+    _catAnimationController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = const Color(0xFF86E5CE); // 薄荷绿主色
+    final accentColor = const Color(0xFF00A693); // 深薄荷绿
+    
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5FFFE),
       appBar: AppBar(
-        title: const Text('用户协议与隐私政策'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 权限说明卡片
-                  Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.security, color: Colors.orange),
-                              const SizedBox(width: 8),
-                              Text(
-                                '权限说明',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPermissionItem(
-                            Icons.folder,
-                            '存储权限',
-                            '用于扫描并清理垃圾文件，这是应用的核心功能',
-                            true,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildPermissionItem(
-                            Icons.picture_in_picture,
-                            '悬浮窗权限',
-                            '用于展示清理进度提示（可选）',
-                            false,
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.blue.shade200),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.info, color: Colors.blue),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    '所有数据处理均在本地完成，不会上传任何个人信息',
-                                    style: TextStyle(
-                                      color: Colors.blue.shade700,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
+        title: Row(
+          children: [
+            AnimatedBuilder(
+              animation: _catBounceAnimation,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, -_catBounceAnimation.value),
+                  child: const Text(
+                    '🐱',
+                    style: TextStyle(fontSize: 24),
                   ),
-
-                  // 用户协议
-                  _buildAgreementSection(
-                    '用户协议',
-                    _getAgreementContent(),
-                    _agreementAccepted,
-                    (value) =>
-                        setState(() => _agreementAccepted = value ?? false),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // 隐私政策
-                  _buildAgreementSection(
-                    '隐私政策',
-                    _getPrivacyContent(),
-                    _privacyAccepted,
-                    (value) =>
-                        setState(() => _privacyAccepted = value ?? false),
-                  ),
-                ],
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              '用户协议与隐私政策',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
+          ],
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
+        ),
+      ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 欢迎卡片
+                    _buildWelcomeCard(primaryColor, accentColor, isDark),
+                    const SizedBox(height: 20),
+                    
+                    // 权限说明卡片
+                    _buildPermissionCard(primaryColor, accentColor, isDark),
+                    const SizedBox(height: 20),
 
-          // 底部按钮
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, -3),
+                    // 用户协议
+                    _buildAgreementSection(
+                      '📋 用户协议',
+                      _getAgreementContent(),
+                      _agreementAccepted,
+                      (value) =>
+                          setState(() => _agreementAccepted = value ?? false),
+                      primaryColor,
+                      accentColor,
+                      isDark,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // 隐私政策
+                    _buildAgreementSection(
+                      '🔒 隐私政策',
+                      _getPrivacyContent(),
+                      _privacyAccepted,
+                      (value) =>
+                          setState(() => _privacyAccepted = value ?? false),
+                      primaryColor,
+                      accentColor,
+                      isDark,
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+
+            // 底部按钮
+            _buildBottomButtons(primaryColor, accentColor, isDark),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 欢迎卡片
+  Widget _buildWelcomeCard(Color primaryColor, Color accentColor, bool isDark) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            primaryColor.withOpacity(0.1),
+            accentColor.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: primaryColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: _catBounceAnimation,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: 1.0 + (_catBounceAnimation.value / 100),
+                    child: const Text(
+                      '🐱',
+                      style: TextStyle(fontSize: 48),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 16),
+              const Text(
+                '✨',
+                style: TextStyle(fontSize: 32),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          AnimatedTextKit(
+            animatedTexts: [
+              TypewriterAnimatedText(
+                '欢迎使用扫地喵！',
+                textStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: accentColor,
+                ),
+                speed: const Duration(milliseconds: 100),
+              ),
+            ],
+            totalRepeatCount: 1,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '为了给您提供更好的服务体验\n请仔细阅读以下协议内容',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: isDark ? Colors.white70 : Colors.black54,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 权限说明卡片
+  Widget _buildPermissionCard(Color primaryColor, Color accentColor, bool isDark) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: primaryColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '🔐',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '权限说明',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: accentColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildPermissionItem(
+            '📁',
+            '存储权限',
+            '用于扫描并清理垃圾文件，这是应用的核心功能',
+            true,
+            primaryColor,
+            isDark,
+          ),
+          const SizedBox(height: 16),
+          _buildPermissionItem(
+            '🎈',
+            '悬浮窗权限',
+            '用于展示清理进度提示（可选）',
+            false,
+            primaryColor,
+            isDark,
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  primaryColor.withOpacity(0.1),
+                  accentColor.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: primaryColor.withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Row(
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // 不同意，退出应用
-                      Navigator.of(context).pop();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey),
-                    ),
-                    child: const Text(
-                      '不同意',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ),
+                Text(
+                  '🛡️',
+                  style: TextStyle(fontSize: 20),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: (_agreementAccepted && _privacyAccepted)
-                        ? () {
-                            // 同意协议，标记已接受并继续
-                            Global.agreementAccepted = true;
-                            if (Global.firstRun) {
-                              Navigator.of(context)
-                                  .pushReplacementNamed('introview');
-                            } else {
-                              Navigator.of(context)
-                                  .pushReplacementNamed('home');
-                            }
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      disabledBackgroundColor: Colors.grey.shade300,
-                    ),
-                    child: const Text(
-                      '同意并继续',
-                      style: TextStyle(fontSize: 16),
+                  child: Text(
+                    '所有数据处理均在本地完成，不会上传任何个人信息',
+                    style: TextStyle(
+                      color: accentColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -187,12 +340,28 @@ class _UserAgreementPageState extends State<UserAgreementPage> {
   }
 
   Widget _buildPermissionItem(
-      IconData icon, String title, String description, bool required) {
+    String emoji,
+    String title,
+    String description,
+    bool required,
+    Color primaryColor,
+    bool isDark,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey.shade600),
-        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            emoji,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,19 +370,20 @@ class _UserAgreementPageState extends State<UserAgreementPage> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
-                  if (required) const SizedBox(width: 4),
+                  if (required) const SizedBox(width: 8),
                   if (required)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.red.shade400,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
                         '必需',
@@ -226,12 +396,13 @@ class _UserAgreementPageState extends State<UserAgreementPage> {
                     ),
                 ],
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
                 description,
                 style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 12,
+                  color: isDark ? Colors.white60 : Colors.black54,
+                  fontSize: 13,
+                  height: 1.4,
                 ),
               ),
             ],
@@ -246,47 +417,210 @@ class _UserAgreementPageState extends State<UserAgreementPage> {
     String content,
     bool isAccepted,
     ValueChanged<bool?> onChanged,
+    Color primaryColor,
+    Color accentColor,
+    bool isDark,
   ) {
-    return Card(
-      elevation: 2,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: primaryColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: accentColor,
               ),
             ),
           ),
           Container(
             height: 200,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              color: isDark 
+                  ? Colors.grey[800] 
+                  : primaryColor.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: primaryColor.withOpacity(0.2),
+                width: 1,
+              ),
             ),
             child: SingleChildScrollView(
               child: Text(
                 content,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  height: 1.5,
+                  height: 1.6,
+                  color: isDark ? Colors.white70 : Colors.black87,
                 ),
               ),
             ),
           ),
-          CheckboxListTile(
-            title: Text('我已阅读并同意《$title》'),
-            value: isAccepted,
-            onChanged: onChanged,
-            controlAffinity: ListTileControlAffinity.leading,
-            activeColor: Colors.blue,
+          Container(
+            margin: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isAccepted 
+                  ? primaryColor.withOpacity(0.1) 
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isAccepted 
+                    ? primaryColor 
+                    : Colors.grey.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: CheckboxListTile(
+              title: Text(
+                '我已阅读并同意${title.replaceAll(RegExp(r'[📋🔒]\s*'), '')}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              value: isAccepted,
+              onChanged: onChanged,
+              controlAffinity: ListTileControlAffinity.leading,
+              activeColor: accentColor,
+              checkColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomButtons(Color primaryColor, Color accentColor, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 50,
+              child: OutlinedButton(
+                onPressed: () {
+                  // 不同意，退出应用
+                  SystemNavigator.pop();
+                },
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: Colors.grey.shade400,
+                    width: 1.5,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '😔',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '不同意',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Container(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: (_agreementAccepted && _privacyAccepted)
+                    ? () {
+                        // 同意协议，标记已接受并继续
+                        Global.agreementAccepted = true;
+                        if (Global.firstRun) {
+                          Navigator.of(context)
+                              .pushReplacementNamed('introview');
+                        } else {
+                          Navigator.of(context)
+                              .pushReplacementNamed('home');
+                        }
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: (_agreementAccepted && _privacyAccepted)
+                      ? accentColor
+                      : Colors.grey.shade300,
+                  foregroundColor: Colors.white,
+                  elevation: (_agreementAccepted && _privacyAccepted) ? 4 : 0,
+                  shadowColor: accentColor.withOpacity(0.3),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      (_agreementAccepted && _privacyAccepted) ? '🎉' : '⏳',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '同意并继续',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
