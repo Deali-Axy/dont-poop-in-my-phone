@@ -182,15 +182,23 @@ class _CleanPageState extends State<CleanPage> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: _canClean() 
+                                      ? (isDark 
+                                          ? Theme.of(context).colorScheme.surface.withOpacity(0.9)
+                                          : Colors.white.withOpacity(0.9))
+                                      : (isDark 
+                                          ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                          : Colors.grey[300]),
                                   borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
+                                  boxShadow: _canClean() ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: (isDark 
+                                          ? Colors.black.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.1)),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
-                                  ],
+                                  ] : null,
                                 ),
                                 child: _isScanning
                                     ? Center(
@@ -257,22 +265,40 @@ class _CleanPageState extends State<CleanPage> {
                     margin: const EdgeInsets.only(left: 8),
                     decoration: CatTheme.catCardDecoration(context).copyWith(
                       gradient: _canClean()
-                          ? (isDark ? null : LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                CatTheme.getCatColor('softMint'),
-                                const Color(0xFF86E5CE),
-                              ],
-                            ))
-                          : (isDark ? null : LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.grey[100]!,
-                                Colors.grey[200]!,
-                              ],
-                            )),
+                          ? (isDark 
+                              ? LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Theme.of(context).colorScheme.surfaceContainer,
+                                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  ],
+                                )
+                              : LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    CatTheme.getCatColor('softMint'),
+                                    const Color(0xFF86E5CE),
+                                  ],
+                                ))
+                          : (isDark 
+                              ? LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                                    Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                                  ],
+                                )
+                              : LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.grey[100]!,
+                                    Colors.grey[200]!,
+                                  ],
+                                )),
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -288,12 +314,18 @@ class _CleanPageState extends State<CleanPage> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   color: _canClean() 
-                                      ? Colors.white.withOpacity(0.9)
-                                      : Colors.grey[300],
+                                      ? (isDark 
+                                          ? Theme.of(context).colorScheme.surface.withOpacity(0.9)
+                                          : Colors.white.withOpacity(0.9))
+                                      : (isDark 
+                                          ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                          : Colors.grey[300]),
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: _canClean() ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: (isDark 
+                                          ? Colors.black.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.1)),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),

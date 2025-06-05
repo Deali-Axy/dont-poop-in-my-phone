@@ -94,17 +94,19 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildWelcomeCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: isDark ? null : LinearGradient(
           colors: [Colors.orange.shade100, Colors.pink.shade100],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : null,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.3),
+            color: (isDark ? Colors.black : Colors.orange).withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -120,11 +122,11 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? Theme.of(context).colorScheme.surface : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.orange.withOpacity(0.2),
+                        color: (isDark ? Colors.black : Colors.orange).withOpacity(0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -140,19 +142,19 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         '欢迎使用扫地喵',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.orange,
+                          color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.orange,
                         ),
                       ),
                       Text(
                         '让手机更清爽 🧹',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.orange.shade700,
+                          color: isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.8) : Colors.orange.shade700,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -165,15 +167,17 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: isDark 
+                    ? Theme.of(context).colorScheme.surface.withOpacity(0.8)
+                    : Colors.white.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
+              child: Text(
                 '扫地喵是一款专为安卓用户设计的智能垃圾清理工具。与传统清理软件不同，扫地喵不仅可以识别并清理常见的垃圾目录，还能自动在清理后为这些目录创建"只读替身"，防止流氓应用反复生成垃圾文件。',
                 style: TextStyle(
                   fontSize: 16,
                   height: 1.6,
-                  color: Colors.black87,
+                  color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.black87,
                 ),
               ),
             ),
@@ -219,12 +223,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   '快速上手',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.blue,
                   ),
                 ),
               ],
@@ -241,13 +245,18 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildStepItem(String step, String title, String description, String emoji) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: isDark ? Theme.of(context).colorScheme.surface : Colors.blue.shade50,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(
+          color: isDark 
+              ? Theme.of(context).colorScheme.outline.withOpacity(0.3)
+              : Colors.blue.shade100,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,10 +303,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.blue,
                         ),
                       ),
                     ),
@@ -308,7 +317,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   description,
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey[700],
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                        : Colors.grey[700],
                     height: 1.5,
                   ),
                 ),
@@ -356,12 +367,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   '主要功能',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.amber,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.amber,
                   ),
                 ),
               ],
@@ -375,6 +386,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFeatureGrid() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final features = [
       {'icon': '🧹', 'title': '智能清理', 'desc': '自动识别常见垃圾目录，一键清理释放空间', 'color': Colors.green},
       {'icon': '🛡️', 'title': '防止再生', 'desc': '清理后创建只读替身，防止垃圾文件重新生成', 'color': Colors.blue},
@@ -399,7 +411,7 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: isDark ? null : LinearGradient(
               colors: [
                 (feature['color'] as MaterialColor).shade50,
                 (feature['color'] as MaterialColor).shade100,
@@ -407,9 +419,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
+            color: isDark ? Theme.of(context).colorScheme.surface : null,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: (feature['color'] as MaterialColor).shade200,
+              color: isDark 
+                  ? Theme.of(context).colorScheme.outline.withOpacity(0.3)
+                  : (feature['color'] as MaterialColor).shade200,
             ),
           ),
           child: Column(
@@ -425,7 +440,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                 style: TextStyle(
                    fontSize: 16,
                    fontWeight: FontWeight.bold,
-                   color: feature['color'] as MaterialColor,
+                   color: isDark 
+                       ? Theme.of(context).colorScheme.onSurface
+                       : feature['color'] as MaterialColor,
                  ),
               ),
               const SizedBox(height: 4),
@@ -435,7 +452,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   overflow: TextOverflow.clip,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[700],
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                        : Colors.grey[700],
                     height: 1.2,
                   ),
                 ),
@@ -485,12 +504,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   '安全保障',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.green,
                   ),
                 ),
               ],
@@ -507,13 +526,18 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildSafetyItem(String title, String description, String emoji) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: isDark ? Theme.of(context).colorScheme.surface : Colors.green.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade100),
+        border: Border.all(
+          color: isDark 
+              ? Theme.of(context).colorScheme.outline.withOpacity(0.3)
+              : Colors.green.shade100,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,7 +545,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark 
+                  ? Theme.of(context).colorScheme.surfaceContainer
+                  : Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -536,10 +562,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.green,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -547,7 +573,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                        : Colors.grey[700],
                     height: 1.4,
                   ),
                 ),
@@ -588,7 +616,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.surfaceContainer
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -604,12 +634,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   '使用技巧',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.orange,
                   ),
                 ),
               ],
@@ -626,13 +656,20 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildTipItem(String title, String description, String emoji) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: isDark 
+                ? Theme.of(context).colorScheme.surface
+                : Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.shade200),
+        border: Border.all(
+          color: isDark 
+              ? Theme.of(context).colorScheme.outline.withOpacity(0.3)
+              : Colors.orange.shade200,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +677,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.orange.shade50,
+              color: isDark 
+                  ? Theme.of(context).colorScheme.surfaceContainer
+                  : Colors.orange.shade50,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -655,10 +694,10 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.orange,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -666,7 +705,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   description,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                        : Colors.grey[700],
                     height: 1.4,
                   ),
                 ),
@@ -707,7 +748,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.surfaceContainer
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -723,12 +766,12 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   '常见问题',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple,
+                    color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.purple,
                   ),
                 ),
               ],
@@ -757,23 +800,30 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFAQItem(String question, String answer) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: isDark 
+                ? Theme.of(context).colorScheme.surface
+                : Colors.white.withOpacity(0.9),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.purple.shade200),
+        border: Border.all(
+          color: isDark 
+              ? Theme.of(context).colorScheme.outline.withOpacity(0.3)
+              : Colors.purple.shade200,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             question,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.purple,
+              color: isDark ? Theme.of(context).colorScheme.onSurface : Colors.purple,
             ),
           ),
           const SizedBox(height: 8),
@@ -781,7 +831,9 @@ class _HelpPageState extends State<HelpPage> with TickerProviderStateMixin {
             answer,
             style: TextStyle(
               fontSize: 15,
-              color: Colors.grey[700],
+              color: isDark 
+                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                  : Colors.grey[700],
               height: 1.5,
             ),
           ),
