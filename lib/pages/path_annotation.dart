@@ -4,7 +4,7 @@ import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/import_export_dialog.dart';
-import 'package:dont_poop_in_my_phone/pages/add_annotation_page.dart';
+import 'package:dont_poop_in_my_phone/pages/add_annotation.dart';
 
 class PathAnnotationPage extends StatefulWidget {
   const PathAnnotationPage({Key? key}) : super(key: key);
