@@ -22,14 +22,14 @@ abstract class Global {
       final configData = jsonDecode(configJson);
       _appConfig = AppConfig(history: []); // 历史记录现在从数据库读取
       _appConfig.darkMode = configData['darkMode'] ?? false;
-      _appConfig.material3 = configData['material3'] ?? false;
+      _appConfig.material3 = configData['material3'] ?? true;
       // whiteList 和 ruleList 现在从数据库读取，不再从SharedPreferences读取
       _appConfig.whiteList = [];
       _appConfig.ruleList = [];
     } else {
       _appConfig = AppConfig(history: []);
       _appConfig.darkMode = false;
-      _appConfig.material3 = false;
+      _appConfig.material3 = true;
       _appConfig.whiteList = [];
       _appConfig.ruleList = [];
     }
