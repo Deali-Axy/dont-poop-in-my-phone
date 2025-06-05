@@ -61,4 +61,12 @@ abstract class Global {
     else
       _prefs.setBool('firstRun', false);
   }
+
+  static bool get agreementAccepted {
+    return _prefs.getBool('agreementAccepted') ?? false;
+  }
+
+  static set agreementAccepted(bool data) {
+    _prefs.setBool('agreementAccepted', data);
+  }
 }

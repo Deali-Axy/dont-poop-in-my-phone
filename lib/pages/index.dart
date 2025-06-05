@@ -1,4 +1,5 @@
 export 'whitelist.dart';
+export 'user_agreement_page.dart';
 export 'rule.dart';
 export 'home.dart';
 export 'history_page.dart';

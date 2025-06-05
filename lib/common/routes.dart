@@ -12,6 +12,7 @@ class AppRoutes {
   static const String whitelist = 'white_list';
   static const String debug = 'debug';
   static const String pathAnnotation = 'path_annotation';
+  static const String userAgreement = 'user_agreement';
   
   static Map<String, WidgetBuilder> routes = {
     home: (ctx) => HomePage(),
@@ -24,9 +25,10 @@ class AppRoutes {
     whitelist: (ctx) => const WhitelistPage(),
     debug: (ctx) => const DebugPage(),
     pathAnnotation: (ctx) => const PathAnnotationPage(),
+    userAgreement: (ctx) => const UserAgreementPage(),
   };
   
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     return null;
   }
-} 
+}
