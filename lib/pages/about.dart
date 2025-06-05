@@ -1,4 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dont_poop_in_my_phone/common/index.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:flutter/material.dart';
@@ -125,7 +126,7 @@ class AboutPageState extends State<AboutPage> {
                         icon: Icons.help_outline,
                         text: '功能介绍',
                         onTap: () =>
-                            Navigator.of(context).pushNamed('introview'),
+                            Navigator.of(context).pushNamed(AppRoutes.help),
                       ),
                       _buildActionButton(
                         icon: Icons.send,
@@ -177,29 +178,13 @@ class AboutPageState extends State<AboutPage> {
                     icon: Icon(Icons.gavel,
                         size: 18, color: Theme.of(context).colorScheme.primary),
                     label: const Text('软件许可'),
-                    onPressed: () async {
-                      var uri = Uri.parse(
-                          'http://www.sblt.deali.cn:9000/APP许可协议.html');
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      } else {
-                        BotToast.showText(text: '无法启动浏览器');
-                      }
-                    },
+                    onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userAgreement),
                   ),
                   TextButton.icon(
                     icon: Icon(Icons.privacy_tip,
                         size: 18, color: Theme.of(context).colorScheme.primary),
                     label: const Text('隐私政策'),
-                    onPressed: () async {
-                      var uri = Uri.parse(
-                          'http://www.sblt.deali.cn:9000/APP隐私政策.html');
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      } else {
-                        BotToast.showText(text: '无法启动浏览器');
-                      }
-                    },
+                    onPressed: () => Navigator.of(context).pushNamed(AppRoutes.userAgreement),
                   ),
                 ],
               ),

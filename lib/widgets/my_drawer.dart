@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dont_poop_in_my_phone/common/index.dart';
 import 'package:dont_poop_in_my_phone/contrib/hitokoto/hitokoto_generator.dart';
 import 'package:dont_poop_in_my_phone/contrib/hitokoto/models/hitokoto.dart';
 import 'package:dont_poop_in_my_phone/states/index.dart';
@@ -57,32 +58,32 @@ class _MyDrawerState extends State<MyDrawer> {
                 _buildMenuItem(
                   icon: Icons.cleaning_services_rounded,
                   title: '自动清理',
-                  onTap: () => Navigator.of(context).pushNamed('clean'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.clean),
                 ),
                 _buildMenuItem(
                   icon: Icons.shield_outlined,
                   title: '白名单',
-                  onTap: () => Navigator.of(context).pushNamed('white_list'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.whitelist),
                 ),
                 _buildMenuItem(
                   icon: Icons.rule,
                   title: '清理规则',
-                  onTap: () => Navigator.of(context).pushNamed('rule'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.rule),
                 ),
                 _buildMenuItem(
                   icon: Icons.label_outline,
                   title: '路径标注',
-                  onTap: () => Navigator.of(context).pushNamed('path_annotation'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.pathAnnotation),
                 ),
                 _buildMenuItem(
                   icon: Icons.history,
                   title: '历史记录',
-                  onTap: () => Navigator.of(context).pushNamed('history'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.history),
                 ),
                 _buildMenuItem(
                   icon: Icons.bug_report_outlined,
                   title: '调试工具',
-                  onTap: () => Navigator.of(context).pushNamed('debug'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.debug),
                 ),
                 const Divider(height: 1, thickness: 1),
                 SwitchListTile(
@@ -119,12 +120,12 @@ class _MyDrawerState extends State<MyDrawer> {
                 _buildMenuItem(
                   icon: Icons.help_outline,
                   title: '帮助',
-                  onTap: () => Navigator.of(context).pushNamed('help'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.help),
                 ),
                 _buildMenuItem(
                   icon: Icons.info_outline,
                   title: '关于',
-                  onTap: () => Navigator.of(context).pushNamed('about'),
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.about),
                 ),
               ],
             ),

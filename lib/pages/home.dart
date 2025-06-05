@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dont_poop_in_my_phone/common/index.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.cleaning_services_rounded),
             tooltip: '自动清理',
-            onPressed: () => Navigator.of(context).pushNamed('clean'),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.clean),
           ),
           const SizedBox(width: 8),
         ],
