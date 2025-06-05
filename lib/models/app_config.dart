@@ -20,6 +20,8 @@ class AppConfig {
       return Whitelist(path: e, annotation: '[内置规则]系统/重要文件目录', readOnly: true);
     }).toList();
     ruleList = [];
+    darkMode = false;
+    material3 = true;
   }
 
   late List<History> history;

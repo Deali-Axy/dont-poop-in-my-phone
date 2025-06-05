@@ -178,13 +178,27 @@ class _UserAgreementPageState extends State<UserAgreementPage>
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 60,
-            backgroundColor: Color.fromRGBO(134, 229, 206, 1),
-            child: Padding(
-              padding: const EdgeInsets.all(0),
-              child: Image.asset('assets/icon/icon.png'),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: _catBounceAnimation,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: 1.0 + (_catBounceAnimation.value / 100),
+                    child: const Text(
+                      '🐱',
+                      style: TextStyle(fontSize: 48),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 16),
+              const Text(
+                '✨',
+                style: TextStyle(fontSize: 32),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           AnimatedTextKit(

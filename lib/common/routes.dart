@@ -13,6 +13,7 @@ class AppRoutes {
   static const String debug = 'debug';
   static const String pathAnnotation = 'path_annotation';
   static const String userAgreement = 'user_agreement';
+  static const String help = 'help';
   
   static Map<String, WidgetBuilder> routes = {
     home: (ctx) => HomePage(),
@@ -26,6 +27,7 @@ class AppRoutes {
     debug: (ctx) => const DebugPage(),
     pathAnnotation: (ctx) => const PathAnnotationPage(),
     userAgreement: (ctx) => const UserAgreementPage(),
+    help: (ctx) => const HelpPage(),
   };
   
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {

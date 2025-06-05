@@ -119,7 +119,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 _buildMenuItem(
                   icon: Icons.help_outline,
                   title: '帮助',
-                  onTap: () => Navigator.of(context).pushReplacementNamed('introview'),
+                  onTap: () => Navigator.of(context).pushNamed('help'),
                 ),
                 _buildMenuItem(
                   icon: Icons.info_outline,
