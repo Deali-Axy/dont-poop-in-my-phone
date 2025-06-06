@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/index.dart' as models;
 import '../utils/index.dart';
+import '../common/default_configs.dart';
 import 'database.dart';
 
 /// 数据库管理器，负责数据库的初始化和关闭
@@ -29,9 +30,14 @@ class DatabaseManager {
     // 检查是否已有默认白名单
     final existingWhitelists = await _service.getAllWhitelists();
     if (existingWhitelists.isEmpty) {
-      // 添加默认白名单
+      // 添加基础白名单
       for (final path in StarFileSystem.PATH_WHITE_LIST) {
         final whitelist = models.Whitelist(path: path, annotation: '[内置规则]系统/重要文件目录', readOnly: true);
+        await _service.addWhitelist(whitelist);
+      }
+      
+      // 添加扩展白名单（针对中国Android环境）
+      for (final whitelist in DefaultConfigs.getExtendedWhitelistItems()) {
         await _service.addWhitelist(whitelist);
       }
     }
@@ -41,31 +47,22 @@ class DatabaseManager {
     // 初始化用户自定义规则组
     await _service.ensureRuleGroupExists(models.Rule.customRuleName, isSystemRule: false);
 
+    // 添加默认的系统推荐清理规则
+    final recommendRuleGroup = await _service.getRuleByName(models.Rule.recommendRuleName);
+    if (recommendRuleGroup.rules.isEmpty) {
+      for (final ruleItem in DefaultConfigs.getDefaultCleanRules()) {
+        await _service.addRuleItem(models.Rule.recommendRuleName, ruleItem);
+      }
+    }
+
     // 初始化内置路径标注
     final existingAnnotations = await _service.getAllPathAnnotations();
     if (existingAnnotations.isEmpty) {
-      // 添加内置标注
-      await _service.addPathAnnotation(models.PathAnnotation(
-        path: StarFileSystem.SDCARD_ROOT + '/tencent',
-        description: '[内置标注]腾讯相关app的文件，不建议清理',
-        suggestDelete: false,
-        isBuiltIn: true,
-      ));
-      
-      // 可以添加更多内置标注...
+      // 添加默认路径标注
+      for (final annotation in DefaultConfigs.getDefaultPathAnnotations()) {
+        await _service.addPathAnnotation(annotation);
+      }
     }
-
-    // 可选：在这里添加一些默认的系统推荐规则项
-    // Example:
-    // final recommendRuleGroup = await _service.getRuleByName(models.Rule.recommendRuleName);
-    // if (recommendRuleGroup.rules.isEmpty) {
-    //   await _service.addRuleItem(models.Rule.recommendRuleName, models.RuleItem(
-    //     path: "/sdcard/DCIM/CameraCache",
-    //     pathMatchType: models.PathMatchType.exact,
-    //     actionType: models.ActionType.deleteFolder,
-    //     annotation: "相机缓存"
-    //   ));
-    // }
   }
 
   /// 关闭数据库连接

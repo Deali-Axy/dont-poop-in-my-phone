@@ -85,6 +85,11 @@ class _MyDrawerState extends State<MyDrawer> {
                   title: '调试工具',
                   onTap: () => Navigator.of(context).pushNamed(AppRoutes.debug),
                 ),
+                _buildMenuItem(
+                  icon: Icons.settings_applications,
+                  title: '配置管理',
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.configManagement),
+                ),
                 const Divider(height: 1, thickness: 1),
                 SwitchListTile(
                   secondary: Icon(
