@@ -1,4 +1,4 @@
-package com.dealiaxy.dont_poop_in_my_phone
+package cn.deali.dont_poop_in_my_phone
 
 import android.os.Build
 import android.os.Bundle

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../pages/index.dart';
+import '../pages/permission_guide.dart';
 
 class AppRoutes {
   static const String home = 'home';
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String userAgreement = 'user_agreement';
   static const String help = 'help';
   static const String configManagement = 'config_management';
+  static const String permissionGuide = 'permission_guide';
   
   static Map<String, WidgetBuilder> routes = {
     home: (ctx) => HomePage(),
@@ -30,6 +32,7 @@ class AppRoutes {
     userAgreement: (ctx) => const UserAgreementPage(),
     help: (ctx) => const HelpPage(),
     configManagement: (ctx) => const ConfigManagementPage(),
+    permissionGuide: (ctx) => const PermissionGuidePage(),
   };
   
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
