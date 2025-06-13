@@ -174,22 +174,27 @@ class _FileCardState extends State<FileCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Icon(
-              Icons.access_time_rounded,
-              size: 14,
-              color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              lastModified,
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8),
+        Expanded(
+          child: Row(
+            children: [
+              Icon(
+                Icons.access_time_rounded,
+                size: 14,
+                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
               ),
-            ),
-          ],
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  lastModified,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
