@@ -9,19 +9,20 @@ abstract class PermissionService {
     if (Platform.isAndroid) {
       final deviceInfo = DeviceInfoPlugin();
       final androidInfo = await deviceInfo.androidInfo;
-      
+
       // 创建权限数组
       var permissions = <Permission>[];
-      
-      // 所有安卓版本都默认添加存储权限
-      permissions.add(Permission.storage);
+
+      // 所有安卓版本都默认添加的权限
       permissions.add(Permission.notification);
-      
-      // Android 11+ 需要额外添加管理外部存储权限
+
+      // 分别对应 Android 11+ 和旧版 Android 的存储权限
       if (androidInfo.version.sdkInt > 29) {
         permissions.add(Permission.manageExternalStorage);
+      } else {
+        permissions.add(Permission.storage);
       }
-      
+
       try {
         // 批量检查权限状态
         for (var permission in permissions) {
@@ -44,27 +45,28 @@ abstract class PermissionService {
     if (Platform.isAndroid) {
       final deviceInfo = DeviceInfoPlugin();
       final androidInfo = await deviceInfo.androidInfo;
-      
+
       // 创建权限数组
       var permissions = <Permission>[];
-      
+
       // 所有安卓版本都默认添加存储权限
       permissions.add(Permission.storage);
       permissions.add(Permission.notification);
-      
+
       // Android 11+ 需要额外添加管理外部存储权限
       if (androidInfo.version.sdkInt > 29) {
         permissions.add(Permission.manageExternalStorage);
       }
-      
+
       try {
         // 批量请求权限
-        Map<Permission, PermissionStatus> statuses = await permissions.request();
-        
+        Map<Permission, PermissionStatus> statuses =
+            await permissions.request();
+
         // 检查是否有权限被永久拒绝
         bool hasPermanentlyDenied = false;
         bool allGranted = true;
-        
+
         for (var entry in statuses.entries) {
           if (entry.value.isPermanentlyDenied) {
             hasPermanentlyDenied = true;
@@ -73,13 +75,13 @@ abstract class PermissionService {
             allGranted = false;
           }
         }
-        
+
         // 如果有权限被永久拒绝，引导用户到设置页面
         if (hasPermanentlyDenied) {
           openAppSettings();
           return false;
         }
-        
+
         // Android 11+ 的 MANAGE_EXTERNAL_STORAGE 权限需要特殊处理
         if (androidInfo.version.sdkInt > 29) {
           var manageStatus = statuses[Permission.manageExternalStorage];
@@ -89,7 +91,7 @@ abstract class PermissionService {
             return false;
           }
         }
-        
+
         return allGranted;
       } catch (e) {
         return false;
