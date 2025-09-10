@@ -31,7 +31,7 @@ flutter pub run flutter_launcher_icons:main
 ### 打包apk
 
 ```bash
-flutter build apk -v --obfuscate --split-debug-info=HLQ_Struggle --split-per-abi --release
+flutter build apk -v --obfuscate --split-debug-info=build/debug-info --split-per-abi --release
 ```
 
 
