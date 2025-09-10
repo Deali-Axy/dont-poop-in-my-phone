@@ -20,6 +20,8 @@ class CleanTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       elevation: 2,
@@ -43,9 +45,10 @@ class CleanTaskCard extends StatelessWidget {
                     // 文件名
                     Text(
                       path.basename(task.path),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -56,7 +59,9 @@ class CleanTaskCard extends StatelessWidget {
                     Text(
                       task.path,
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: isDark 
+                            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                            : Colors.grey[600],
                         fontSize: 12,
                       ),
                       maxLines: 1,
@@ -103,7 +108,9 @@ class CleanTaskCard extends StatelessWidget {
                           child: Text(
                             StarFileSystem.formatFileSize(task.size.toInt()),
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: isDark 
+                                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                                  : Colors.grey[600],
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -116,7 +123,9 @@ class CleanTaskCard extends StatelessWidget {
                         Icon(
                           task.type == CleanTaskType.file ? Icons.description : Icons.folder,
                           size: 16,
-                          color: Colors.grey[600],
+                          color: isDark 
+                              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                              : Colors.grey[600],
                         ),
                       ],
                     ),
@@ -196,10 +205,18 @@ class CleanTaskCard extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     switch (task.status) {
       case CleanTaskStatus.pending:
         return IconButton(
-          icon: const Icon(Icons.info_outline, size: 20),
+          icon: Icon(
+            Icons.info_outline, 
+            size: 20,
+            color: isDark 
+                ? Theme.of(context).colorScheme.onSurface
+                : null,
+          ),
           onPressed: () => _showTaskDetails(context),
           tooltip: '查看详情',
         );
@@ -224,7 +241,9 @@ class CleanTaskCard extends StatelessWidget {
       case CleanTaskStatus.skipped:
         return Icon(
           Icons.skip_next,
-          color: Colors.grey,
+          color: isDark 
+              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+              : Colors.grey,
           size: 20,
         );
     }
@@ -252,13 +271,13 @@ class CleanTaskCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailRow('路径', task.path),
-              _buildDetailRow('类型', task.type == CleanTaskType.file ? '文件' : '文件夹'),
-              _buildDetailRow('大小', StarFileSystem.formatFileSize(task.size.toInt())),
-              _buildDetailRow('规则', task.rule.path),
-              _buildDetailRow('操作', _getActionTypeText(task.rule.actionType)),
-              _buildDetailRow('状态', _getStatusText(task.status)),
-              if (task.error != null) _buildDetailRow('错误', task.error!, isError: true),
+              _buildDetailRow(context, '路径', task.path),
+              _buildDetailRow(context, '类型', task.type == CleanTaskType.file ? '文件' : '文件夹'),
+              _buildDetailRow(context, '大小', StarFileSystem.formatFileSize(task.size.toInt())),
+              _buildDetailRow(context, '规则', task.rule.path),
+              _buildDetailRow(context, '操作', _getActionTypeText(task.rule.actionType)),
+              _buildDetailRow(context, '状态', _getStatusText(task.status)),
+              if (task.error != null) _buildDetailRow(context, '错误', task.error!, isError: true),
             ],
           ),
         ),
@@ -272,7 +291,9 @@ class CleanTaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isError = false}) {
+  Widget _buildDetailRow(BuildContext context, String label, String value, {bool isError = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -282,9 +303,10 @@ class CleanTaskCard extends StatelessWidget {
             width: 60,
             child: Text(
               '$label:',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -293,7 +315,9 @@ class CleanTaskCard extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: 12,
-                color: isError ? Colors.red : null,
+                color: isError 
+                    ? Colors.red 
+                    : Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -346,22 +370,28 @@ class CleanTaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     if (tasks.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.cleaning_services_outlined,
               size: 64,
-              color: Colors.grey,
+              color: isDark 
+                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                  : Colors.grey,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               '暂无清理任务',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey,
+                color: isDark 
+                    ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                    : Colors.grey,
               ),
             ),
           ],

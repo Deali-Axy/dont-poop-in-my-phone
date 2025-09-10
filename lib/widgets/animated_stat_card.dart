@@ -337,6 +337,7 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
     required String value,
     required Color color,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnimatedBuilder(
       animation: _progressAnimation,
       builder: (context, child) {
@@ -363,7 +364,9 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
                   key: ValueKey(value),
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: color,
+                    color: isDark 
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),

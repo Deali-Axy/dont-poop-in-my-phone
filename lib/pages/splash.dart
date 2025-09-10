@@ -17,10 +17,14 @@ class _SplashPageState extends State<SplashPage> {
     // 使用全局的边到边显示配置，不在此处覆盖
 
     Future.delayed(Duration(seconds: 1)).then((e) {
-      if (Global.firstRun)
+      // 首先检查用户是否已同意协议
+      if (!Global.agreementAccepted) {
+        Navigator.of(context).pushReplacementNamed('user_agreement');
+      } else if (Global.firstRun) {
         Navigator.of(context).pushReplacementNamed('introview');
-      else
+      } else {
         Navigator.of(context).pushReplacementNamed('home');
+      }
     });
   }
 

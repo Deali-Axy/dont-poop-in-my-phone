@@ -101,7 +101,7 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
                     SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                     
                     // 猫咪插图
-                    _buildCatIllustration(),
+                    _buildCatIllustration(isDark),
 
                     const SizedBox(height: 24),
 
@@ -131,7 +131,7 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
                     const SizedBox(height: 20),
 
                     // 个性化消息
-                    _buildPersonalizedMessage(),
+                    _buildPersonalizedMessage(isDark),
 
                     const SizedBox(height: 24),
 
@@ -150,7 +150,7 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
     );
   }
 
-  Widget _buildCatIllustration() {
+  Widget _buildCatIllustration(bool isDark) {
     return AnimatedBuilder(
       animation: _floatAnimation,
       builder: (context, child) {
@@ -160,11 +160,20 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              gradient: CatTheme.catGradient,
+              gradient: isDark ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  CatTheme.getCatColor('softPeach', isDark: true),
+                  CatTheme.getCatColor('pawPink', isDark: true),
+                ],
+              ) : CatTheme.catGradient,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: CatTheme.getCatColor('pawPink').withOpacity(0.3),
+                  color: (isDark 
+                    ? CatTheme.getCatColor('pawPink', isDark: true) 
+                    : CatTheme.getCatColor('pawPink')).withOpacity(0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -199,16 +208,20 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
     }
   }
 
-  Widget _buildPersonalizedMessage() {
+  Widget _buildPersonalizedMessage(bool isDark) {
     final messages = _getPersonalizedMessages();
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: CatTheme.getCatColor('softMint').withOpacity(0.3),
+        color: isDark 
+          ? CatTheme.getCatColor('softMint', isDark: true).withOpacity(0.3)
+          : CatTheme.getCatColor('softMint').withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: CatTheme.getCatColor('eyeGreen').withOpacity(0.3),
+          color: isDark 
+            ? CatTheme.getCatColor('eyeGreen', isDark: true).withOpacity(0.3)
+            : CatTheme.getCatColor('eyeGreen').withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -306,7 +319,7 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: isDark ? CatTheme.getCatColor('pawPink') : CatTheme.getCatColor('eyeGreen'),
+          backgroundColor: isDark ? CatTheme.getCatColor('pawPink', isDark: true) : CatTheme.getCatColor('eyeGreen'),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(
             horizontal: 32,
@@ -316,7 +329,7 @@ class _CatEmptyStateState extends State<CatEmptyState> with TickerProviderStateM
             borderRadius: BorderRadius.circular(25),
           ),
           elevation: 8,
-          shadowColor: (isDark ? CatTheme.getCatColor('pawPink') : CatTheme.getCatColor('eyeGreen')).withOpacity(0.3),
+          shadowColor: (isDark ? CatTheme.getCatColor('pawPink', isDark: true) : CatTheme.getCatColor('eyeGreen')).withOpacity(0.3),
         ),
       ),
     );
@@ -351,6 +364,8 @@ class SimpleCatEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -373,7 +388,9 @@ class SimpleCatEmptyState extends StatelessWidget {
               Text(
                 '点击重试',
                 style: CatTheme.catBodyStyle(context).copyWith(
-                  color: CatTheme.getCatColor('eyeBlue'),
+                  color: isDark 
+                    ? CatTheme.getCatColor('eyeBlue', isDark: true)
+                    : CatTheme.getCatColor('eyeBlue'),
                   decoration: TextDecoration.underline,
                 ),
               ),

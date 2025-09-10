@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:dont_poop_in_my_phone/common/index.dart';
 import 'package:dont_poop_in_my_phone/common/update.dart';
 import 'package:dont_poop_in_my_phone/models/index.dart';
 import 'package:dont_poop_in_my_phone/utils/index.dart';
@@ -43,10 +44,32 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    // 启动就打开根目录
-    _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
+    
+    // 先检查权限，再访问存储
+    _initializeApp();
     AppUpdate.checkUpdate(context);
+  }
+
+  /// 初始化应用，检查权限后再访问存储
+  Future<void> _initializeApp() async {
+    // 检查权限状态
+    final hasPermission = await PermissionService.checkPermissionStatus();
+    
+    if (!mounted) return;
+    
+    setState(() {
+      _hasPermission = hasPermission;
+    });
+    
+    if (hasPermission) {
+      // 有权限，直接打开根目录
+      _goToPath(FolderItem(StarFileSystem.SDCARD_ROOT));
+    } else {
+       // 没有权限，跳转到权限引导页面
+       WidgetsBinding.instance.addPostFrameCallback((_) {
+         Navigator.of(context).pushReplacementNamed(AppRoutes.permissionGuide);
+       });
+     }
   }
 
   @override
@@ -110,7 +133,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.cleaning_services_rounded),
             tooltip: '自动清理',
-            onPressed: () => Navigator.of(context).pushNamed('clean'),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.clean),
           ),
           const SizedBox(width: 8),
         ],

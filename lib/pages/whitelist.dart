@@ -5,7 +5,7 @@ import 'package:dont_poop_in_my_phone/models/index.dart' as models;
 import 'package:dont_poop_in_my_phone/widgets/index.dart';
 import 'package:dont_poop_in_my_phone/widgets/import_export_dialog.dart';
 import 'package:flutter/material.dart';
-import 'add_whitelist_page.dart'; // Import AddWhitelistPage
+import 'add_whitelist.dart'; // Import AddWhitelistPage
 
 class WhitelistPage extends StatefulWidget {
   const WhitelistPage({Key? key}) : super(key: key);

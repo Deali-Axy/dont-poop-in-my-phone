@@ -78,9 +78,11 @@ class _CleanPageState extends State<CleanPage> {
   }
 
   Widget _buildBody() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: CatTheme.catGradient,
+        gradient: isDark ? null : CatTheme.catGradient,
+        color: isDark ? Theme.of(context).colorScheme.surface : null,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -139,6 +141,7 @@ class _CleanPageState extends State<CleanPage> {
 
 
   Widget _buildActionButtons() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: CatTheme.getResponsivePadding(context),
@@ -156,8 +159,8 @@ class _CleanPageState extends State<CleanPage> {
                 child: FadeInAnimation(
                   child: Container(
                     margin: const EdgeInsets.only(right: 8),
-                    decoration: CatTheme.catCardDecoration(context).copyWith(
-                      gradient: LinearGradient(
+                    decoration: CatTheme.catCardDecoration(context, isDark: isDark).copyWith(
+                      gradient: isDark ? null : LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
@@ -179,15 +182,23 @@ class _CleanPageState extends State<CleanPage> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: _canClean() 
+                                      ? (isDark 
+                                          ? Theme.of(context).colorScheme.surface.withOpacity(0.9)
+                                          : Colors.white.withOpacity(0.9))
+                                      : (isDark 
+                                          ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                          : Colors.grey[300]),
                                   borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
+                                  boxShadow: _canClean() ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: (isDark 
+                                          ? Colors.black.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.1)),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
-                                  ],
+                                  ] : null,
                                 ),
                                 child: _isScanning
                                     ? Center(
@@ -214,6 +225,7 @@ class _CleanPageState extends State<CleanPage> {
                                 style: CatTheme.catSubtitleStyle(context).copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
+                                  color: isDark ? Theme.of(context).colorScheme.onSurface : null,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -222,7 +234,7 @@ class _CleanPageState extends State<CleanPage> {
                                 _isScanning ? '寻找垃圾文件' : '扫描垃圾文件',
                                 style: CatTheme.catBodyStyle(context).copyWith(
                                   fontSize: 11,
-                                  color: CatTheme.getCatColor('catGray'),
+                                  color: isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) : CatTheme.getCatColor('catGray'),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -253,22 +265,40 @@ class _CleanPageState extends State<CleanPage> {
                     margin: const EdgeInsets.only(left: 8),
                     decoration: CatTheme.catCardDecoration(context).copyWith(
                       gradient: _canClean()
-                          ? LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                CatTheme.getCatColor('softMint'),
-                                const Color(0xFF86E5CE),
-                              ],
-                            )
-                          : LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.grey[100]!,
-                                Colors.grey[200]!,
-                              ],
-                            ),
+                          ? (isDark 
+                              ? LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Theme.of(context).colorScheme.surfaceContainer,
+                                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  ],
+                                )
+                              : LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    CatTheme.getCatColor('softMint'),
+                                    const Color(0xFF86E5CE),
+                                  ],
+                                ))
+                          : (isDark 
+                              ? LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                                    Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                                  ],
+                                )
+                              : LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.grey[100]!,
+                                    Colors.grey[200]!,
+                                  ],
+                                )),
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -284,12 +314,18 @@ class _CleanPageState extends State<CleanPage> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   color: _canClean() 
-                                      ? Colors.white.withOpacity(0.9)
-                                      : Colors.grey[300],
+                                      ? (isDark 
+                                          ? Theme.of(context).colorScheme.surface.withOpacity(0.9)
+                                          : Colors.white.withOpacity(0.9))
+                                      : (isDark 
+                                          ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5)
+                                          : Colors.grey[300]),
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: _canClean() ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: (isDark 
+                                          ? Colors.black.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.1)),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -323,8 +359,8 @@ class _CleanPageState extends State<CleanPage> {
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                   color: _canClean() 
-                                      ? CatTheme.getCatColor('catBrown')
-                                      : Colors.grey[600],
+                                      ? (isDark ? Theme.of(context).colorScheme.onSurface : CatTheme.getCatColor('catBrown'))
+                                      : (isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Colors.grey[600]),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -338,8 +374,8 @@ class _CleanPageState extends State<CleanPage> {
                                 style: CatTheme.catBodyStyle(context).copyWith(
                                   fontSize: 11,
                                   color: _canClean() 
-                                      ? CatTheme.getCatColor('catGray')
-                                      : Colors.grey[500],
+                                      ? (isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7) : CatTheme.getCatColor('catGray'))
+                                      : (isDark ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Colors.grey[500]),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
